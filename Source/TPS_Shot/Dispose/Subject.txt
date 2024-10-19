@@ -1,0 +1,120 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "ISubject.h"
+
+
+/**
+ *
+ */
+template<typename T>
+class TPS_SHOT_API Subject final : public IISubject<T, T>
+{
+public:
+	DECLARE_MULTICAST_DELEGATE_OneParam(FOnNext, T);
+	DECLARE_MULTICAST_DELEGATE(FOnCompleted);
+	//DECLARE_MULTICAST_DELEGATE_OneParam(FOnError, FString);
+
+	Subject() : bIsDisposed(false) {}
+	virtual ~Subject() { Dispose(); }
+
+	virtual void Dispose() override
+	{
+		if (!bIsDisposed)
+		{
+			_onNextDelegate.Clear();  // 購読解除
+			_subscribers.Empty();     // 購読者リストのクリア
+			bIsDisposed = true;
+		}
+	}
+
+	// 購読者に通知を送る
+	//template<typename... TArgs>
+	FORCEINLINE virtual void OnNext(const T& value) override
+	{
+		if (bIsDisposed) return;
+
+		if (bIsStopped) return;
+
+		for (int i = 0; i < _subscribers.Num(); i++)
+		{
+			if (_subscribers[i].IsValid()) // 購読者がまだ有効かどうかを確認
+			{
+				_onNextDelegate.Broadcast(value);
+			}
+			else
+			{
+				// 購読者が無効になっている場合、リストから削除
+				_subscribers.RemoveAt(i);
+				i--;
+			}
+		}
+	}
+
+	virtual void OnCompleted() override
+	{
+		if (bIsDisposed) return;
+
+		if (bIsStopped) return;
+
+		for (int i = 0; i < _subscribers.Num(); i++)
+		{
+			/*if (_subscribers[i].IsValid())
+			{*/
+			_onCompletedDelegate.Broadcast();
+			/*}
+			else
+			{
+				_subscribers.RemoveAt(i);
+				i--;
+			}*/
+		}
+
+		bIsStopped = true;
+	}
+
+	virtual void OnError(const FString& error) override
+	{
+		if (bIsDisposed) return;
+
+
+	}
+
+	template<typename CallableOnNext, typename CallableOnCompleted = TFunction<void()>, typename CallableOnError = TFunction<void(FString)>>
+	IIDisposable Subscribe(CallableOnNext onNextCallback,
+		CallableOnCompleted onCompletedCallback = nullptr,
+		CallableOnError onErrorCallback = nullptr) override
+	{
+		_onNextDelegate.AddLambda([onNextCallback](T value)
+			{
+				// 複数の引数をコールバックに渡すことができる
+				//onNextCallback(Forward<decltype(args)>(args)...);
+				onNextCallback(value);
+			});
+
+		if (onCompletedCallback)
+		{
+			_onCompletedDelegate.AddLambda([onCompletedCallback]()
+				{
+					onCompletedCallback();
+				});
+		}
+	}
+
+private:
+	/*TArray<TWeakPtr<TFunction<void(TArgs...)>>> _onNextSubscribers;
+	TArray<TWeakPtr<TFunction<void()>>> _onCompletedsubscribers;*/
+	//TArray<TWeakPtr<TFunction<void(FString)>>> _onErrorSubscribers;
+
+	FOnNext _onNextDelegate;
+	FOnCompleted _onCompletedDelegate;
+	//FOnError _onErrorDelegate;
+
+	// 使用しているアクター等が破棄される前に手動で購読解除する場合も考えられるため
+	bool bIsDisposed;
+
+	// OnCompletedが呼ばれた後にOnNext等を呼べないように
+	bool bIsStopped;
+};

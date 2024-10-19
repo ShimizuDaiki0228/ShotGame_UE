@@ -1,0 +1,95 @@
+
+
+// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "UObject/Interface.h"
+#include "Engine/Engine.h"
+//#include "IObserver.generated.h"
+
+// This class does not need to be modified.
+//UINTERFACE(MinimalAPI)
+//class UIObserver : public UInterface
+//{
+//	GENERATED_BODY()
+//};
+
+/**
+ * 
+ */
+template<typename T>
+class TPS_SHOT_API IIObserver
+{
+public:
+	virtual void OnNext(const T& value) = 0;
+
+	virtual void OnCompleted() = 0;
+
+	virtual void OnError(const FString& error) = 0;
+};
+
+template<>
+class TPS_SHOT_API IIObserver<void>
+{
+public:
+	virtual void OnNext() = 0;
+
+	virtual void OnCompleted() = 0;
+
+	virtual void OnError(const FString& error) = 0;
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "UObject/Interface.h"
+#include "IDisposable.h"
+#include "IObserver.h"
+//#include "IObservable.generated.h"
+
+// This class does not need to be modified.
+//UINTERFACE(MinimalAPI)
+//class UIObservable : public UInterface
+//{
+//	GENERATED_BODY()
+//};
+
+/**
+ * 
+ */
+template<typename T>
+class TPS_SHOT_API IIObservable : public IIDisposable
+{
+public:
+	virtual TSharedPtr<IIDisposable> Subscribe(TSharedPtr<IIObserver<T>> observer) = 0;
+};
+
+//template<>
+//class TPS_SHOT_API IIObservable<void> : public IIDisposable
+//{
+//public:
+//	virtual TSharedPtr<IIDisposable> Subscribe(TSharedPtr<IIObserver<void>> observer) = 0;
+//};
+
+
+
