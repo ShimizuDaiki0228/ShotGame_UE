@@ -7,6 +7,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Enemy/EnemyActor.h"
+#include "UObject/ConstructorHelpers.h" 
 #include "Utility/TimeManagerUtility.h"
 
 

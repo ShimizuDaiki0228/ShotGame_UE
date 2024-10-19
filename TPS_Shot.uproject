@@ -12,13 +12,9 @@
 				"Engine",
 				"UMG",
 				"Niagara",
-				"CoreUObject"
+				"CoreUObject",
+				"UnrealEd"
 			]
-		},
-		{
-			"Name": "Module",
-			"Type": "Editor",
-			"LoadingPhase": "Default"
 		}
 	],
 	"Plugins": [

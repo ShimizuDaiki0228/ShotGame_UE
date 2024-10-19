@@ -11,6 +11,5 @@ public class TPS_ShotEditorTarget : TargetRules
 		DefaultBuildSettings = BuildSettingsVersion.V2;
 		IncludeOrderVersion = EngineIncludeOrderVersion.Unreal5_1;
 		ExtraModuleNames.Add("TPS_Shot");
-		ExtraModuleNames.Add("Module");
 	}
 }
