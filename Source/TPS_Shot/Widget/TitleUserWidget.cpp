@@ -3,6 +3,7 @@
 
 #include "TitleUserWidget.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "../InputModeController.h"
 #include "Kismet/GameplayStatics.h"
 
 void UTitleUserWidget::NativeConstruct()
@@ -12,19 +13,8 @@ void UTitleUserWidget::NativeConstruct()
 	bIsFocusable = true;
 
 	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(this, 0);
-
-	if (PlayerController)
-	{
-		// カーソルを非表示にする
-		PlayerController->bShowMouseCursor = false;
-
-		// 入力モードをゲーム専用に設定して、UIのクリックなどを無効にする
-		FInputModeGameOnly InputMode;
-		PlayerController->SetInputMode(InputMode);
-
-		// マウスのロック動作を設定（不要な場合でも設定を確認）
-		PlayerController->SetMouseCursorWidget(EMouseCursor::None, nullptr);
-	}
+	_inputModeController = NewObject<UInputModeController>();
+	_inputModeController->Initialized(PlayerController);
 
 	this->SetKeyboardFocus();
 }
@@ -42,13 +32,9 @@ void UTitleUserWidget::NativeDestruct()
 FReply UTitleUserWidget::NativeOnKeyDown(const FGeometry& inGeometry, const FKeyEvent& inKeyEvent)
 {
 	FKey keyPressed = inKeyEvent.GetKey();
-	UKismetSystemLibrary::PrintString(this, "キャラクターを取得できませんでした", true, true, FColor::Cyan, 2.f, TEXT("None"));
-
 	
 	if (keyPressed == EKeys::K)
 	{
-		UKismetSystemLibrary::PrintString(this, "キャラクターを取得できませんでした", true, true, FColor::Cyan, 2.f, TEXT("None"));
-
 		FocusNextButton();
 		return FReply::Handled();
 	}
@@ -99,14 +85,4 @@ void UTitleUserWidget::Initialized(TWeakObjectPtr<ATPS_ShotCharacter> character,
 
 	_playSelectButtons.Add(_startButton);
 	_playSelectButtons.Add(_exitButton);
-
-	//for (auto button : _playSelectButtons)
-	//{
-	//	if (button)
-	//	{
-	//		// 最初のボタンのみフォーカスさせる
-	//		button->SetKeyboardFocus();
-	//		break;
-	//	}
-	//}
 }
