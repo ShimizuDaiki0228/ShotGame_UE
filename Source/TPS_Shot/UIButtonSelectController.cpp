@@ -49,8 +49,10 @@ void UUIButtonSelectController::ButtonClick()
 	}
 }
 
-bool UUIButtonSelectController::ManualKeyAction(const FGeometry& inGeometry, const FKeyEvent& inKeyEvent,FKey& keyPressed)
+bool UUIButtonSelectController::ManualKeyAction(const FGeometry& inGeometry, const FKeyEvent& inKeyEvent)
 {
+	FKey keyPressed = inKeyEvent.GetKey();
+
 	if (_selectButtons.Num() == 0)
 	{
 		return false;
