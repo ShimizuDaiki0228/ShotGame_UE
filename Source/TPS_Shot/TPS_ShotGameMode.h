@@ -36,6 +36,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "HUD", meta = (BlueprintProtected = "true"))
 	TSubclassOf<class UGameOverUserWidget> _gameoverWidgetClass;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Level")
+		TSoftObjectPtr<UWorld> _titleLevel;
+
 public:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "HUD")
 		int Score;
