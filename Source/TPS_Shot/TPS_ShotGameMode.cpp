@@ -100,9 +100,11 @@ void ATPS_ShotGameMode::Bind()
 
 void ATPS_ShotGameMode::GameOver()
 {
-	_spawnVolumeActor->GameOver();
+	// TODO
+	// 中身の実装方法を変えないとクラッシュしてそう
+	/*_spawnVolumeActor->GameOver();
 
-	_playingWidget->Gameover();
+	_playingWidget->Gameover();*/
 
 	APlayerController* playerController = UGameplayStatics::GetPlayerController(this, 0);
 	if (playerController)
@@ -123,6 +125,9 @@ void ATPS_ShotGameMode::Initialized(ALevelManager* levelManager)
 {
 	_spawnVolumeActor->Initialized(_explosionEnemyActor, _sniperEnemyActor, _character, levelManager);
 	_character->Initialized();
+
+	const FName playLevelName = _titleLevel.IsValid() ? FName(*_titleLevel.GetAssetName()) : FName(TEXT("InvalidLevel"));
+	_gameoverWidget->Initialized(playLevelName);
 }
 
 void ATPS_ShotGameMode::Reset()

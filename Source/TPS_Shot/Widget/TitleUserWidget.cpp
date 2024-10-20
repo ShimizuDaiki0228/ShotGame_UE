@@ -31,9 +31,7 @@ void UTitleUserWidget::NativeDestruct()
 
 FReply UTitleUserWidget::NativeOnKeyDown(const FGeometry& inGeometry, const FKeyEvent& inKeyEvent)
 {
-	FKey keyPressed = inKeyEvent.GetKey();
-
-	if (_buttonSelectController->ManualKeyAction(inGeometry, inKeyEvent, keyPressed))
+	if (_buttonSelectController->ManualKeyAction(inGeometry, inKeyEvent))
 	{
 		return FReply::Handled();
 	}

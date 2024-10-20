@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
+#include "Blueprint/UserWidget.h"
 #include "WidgetManager.generated.h"
 
 /**
