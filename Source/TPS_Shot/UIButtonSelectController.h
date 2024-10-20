@@ -21,7 +21,7 @@ public:
 
 	void ButtonClick();
 
-	virtual bool ManualKeyAction(const FGeometry& inGeometry, const FKeyEvent& inKeyEvent,const FKey& keyPressed);
+	virtual bool ManualKeyAction(const FGeometry& inGeometry, const FKeyEvent& inKeyEvent,FKey& keyPressed);
 
 private:
 	TArray<UButtonSubject*> _selectButtons;

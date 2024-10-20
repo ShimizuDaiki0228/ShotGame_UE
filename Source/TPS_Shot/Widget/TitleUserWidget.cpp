@@ -3,7 +3,6 @@
 
 #include "TitleUserWidget.h"
 #include "Kismet/KismetSystemLibrary.h"
-#include "../InputModeController.h"
 #include "Kismet/GameplayStatics.h"
 
 void UTitleUserWidget::NativeConstruct()
@@ -12,6 +11,7 @@ void UTitleUserWidget::NativeConstruct()
 
 	bIsFocusable = true;
 
+	// UInputModeControllerの設定はコンストラクタで行う必要がある
 	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(this, 0);
 	_inputModeController = NewObject<UInputModeController>();
 	_inputModeController->Initialized(PlayerController);
@@ -32,41 +32,17 @@ void UTitleUserWidget::NativeDestruct()
 FReply UTitleUserWidget::NativeOnKeyDown(const FGeometry& inGeometry, const FKeyEvent& inKeyEvent)
 {
 	FKey keyPressed = inKeyEvent.GetKey();
-	
-	if (keyPressed == EKeys::K)
-	{
-		FocusNextButton();
-		return FReply::Handled();
-	}
 
-	if (keyPressed == EKeys::J)
+	if (_buttonSelectController->ManualKeyAction(inGeometry, inKeyEvent, keyPressed))
 	{
-		if (_playSelectButtons.IsValidIndex(_currentButtonIndex) && _playSelectButtons[_currentButtonIndex])
-		{
-			_playSelectButtons[_currentButtonIndex]->HandleOnClick();
-			return FReply::Handled();
-		}
+		return FReply::Handled();
 	}
 
 	return Super::NativeOnKeyDown(inGeometry, inKeyEvent);
 }
 
-void UTitleUserWidget::FocusNextButton()
+void UTitleUserWidget::SetEvent(FName playLevelName)
 {
-	if (_playSelectButtons.Num() == 0) return;
-
-	_currentButtonIndex = (_currentButtonIndex + 1) % _playSelectButtons.Num();
-
-	if (_playSelectButtons[_currentButtonIndex])
-	{
-		_playSelectButtons[_currentButtonIndex]->SetKeyboardFocus();
-	}
-}
-
-void UTitleUserWidget::Initialized(TWeakObjectPtr<ATPS_ShotCharacter> character, FName playLevelName)
-{
-	_character = character;
-	
 	_startButton->Subscribe([this, playLevelName]()
 		{
 			UGameplayStatics::OpenLevel(this, playLevelName);
@@ -79,10 +55,18 @@ void UTitleUserWidget::Initialized(TWeakObjectPtr<ATPS_ShotCharacter> character,
 			{
 				UKismetSystemLibrary::QuitGame(world, world->GetFirstPlayerController(), EQuitPreference::Quit, false);
 			});
-
-		_exitButton->SetKeyboardFocus();
 	}
+}
 
-	_playSelectButtons.Add(_startButton);
-	_playSelectButtons.Add(_exitButton);
+void UTitleUserWidget::Initialized(TWeakObjectPtr<ATPS_ShotCharacter> character, FName playLevelName)
+{
+	_character = character;
+
+	TArray<UButtonSubject*> selectButtons;
+	selectButtons.Add(_startButton);
+	selectButtons.Add(_exitButton);
+	_buttonSelectController = NewObject<UUIButtonSelectController>();
+	_buttonSelectController->Initialized(selectButtons);
+
+	SetEvent(playLevelName);
 }

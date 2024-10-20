@@ -6,7 +6,9 @@
 #include "Blueprint/UserWidget.h"
 #include "Components/Button.h"
 #include "../TPS_ShotCharacter.h"
+#include "../InputModeController.h"
 #include "../Dispose/ButtonSubject.h"
+#include "../UIButtonSelectController.h"
 #include "TitleUserWidget.generated.h"
 
 /**
@@ -25,6 +27,9 @@ protected:
 	virtual void NativeDestruct() override;
 
 	virtual FReply NativeOnKeyDown(const FGeometry& inGeometry, const FKeyEvent& inKeyEvent) override;
+
+private:
+	void SetEvent(FName playLevelName);
 	
 private:
 	UPROPERTY(meta = (BindWidget))
@@ -35,11 +40,10 @@ private:
 
 	TWeakObjectPtr<ATPS_ShotCharacter> _character;
 
+	UUIButtonSelectController* _buttonSelectController;
 	TArray<UButtonSubject*> _playSelectButtons;
-
-	void FocusNextButton();
 
 	int _currentButtonIndex;
 
-	UInputModeController* inputModeController;
+	UInputModeController* _inputModeController;
 };
