@@ -2,17 +2,21 @@
 
 
 #include "TitleUserWidget.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/GameplayStatics.h"
 
 void UTitleUserWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	auto world = this->GetWorld();
-	_exitButton->Subscribe([this, world]()
-		{
-			UKismetSystemLibrary::QuitGame(world, world->GetFirstPlayerController(), EQuitPreference::Quit, false);
-		});
+	bIsFocusable = true;
+
+	// UInputModeControllerの設定はコンストラクタで行う必要がある
+	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(this, 0);
+	_inputModeController = NewObject<UInputModeController>();
+	_inputModeController->Initialized(PlayerController);
+
+	this->SetKeyboardFocus();
 }
 
 void UTitleUserWidget::NativeDestruct()
@@ -25,12 +29,44 @@ void UTitleUserWidget::NativeDestruct()
 	_character.Reset();
 }
 
-void UTitleUserWidget::Initialized(TWeakObjectPtr<ATPS_ShotCharacter> character, FName playLevelName)
+FReply UTitleUserWidget::NativeOnKeyDown(const FGeometry& inGeometry, const FKeyEvent& inKeyEvent)
 {
-	_character = character;
-	
+	FKey keyPressed = inKeyEvent.GetKey();
+
+	if (_buttonSelectController->ManualKeyAction(inGeometry, inKeyEvent, keyPressed))
+	{
+		return FReply::Handled();
+	}
+
+	return Super::NativeOnKeyDown(inGeometry, inKeyEvent);
+}
+
+void UTitleUserWidget::SetEvent(FName playLevelName)
+{
 	_startButton->Subscribe([this, playLevelName]()
 		{
 			UGameplayStatics::OpenLevel(this, playLevelName);
 		});
+
+	auto world = this->GetWorld();
+	if (_exitButton)
+	{
+		_exitButton->Subscribe([this, world]()
+			{
+				UKismetSystemLibrary::QuitGame(world, world->GetFirstPlayerController(), EQuitPreference::Quit, false);
+			});
+	}
+}
+
+void UTitleUserWidget::Initialized(TWeakObjectPtr<ATPS_ShotCharacter> character, FName playLevelName)
+{
+	_character = character;
+
+	TArray<UButtonSubject*> selectButtons;
+	selectButtons.Add(_startButton);
+	selectButtons.Add(_exitButton);
+	_buttonSelectController = NewObject<UUIButtonSelectController>();
+	_buttonSelectController->Initialized(selectButtons);
+
+	SetEvent(playLevelName);
 }
