@@ -2,6 +2,8 @@
 
 
 #include "UIButtonSelectController.h"
+#include "Kismet/KismetSystemLibrary.h"
+
 
 UUIButtonSelectController::UUIButtonSelectController()
 {
@@ -26,7 +28,12 @@ void UUIButtonSelectController::Initialized(TArray<UButtonSubject*> selectButton
 void UUIButtonSelectController::ChangeSelectButton(const bool isRightOrUpKey)
 {
 	int amountOfChange = isRightOrUpKey ? 1 : -1;
-	_currentButtonIndex = (_currentButtonIndex + amountOfChange) % _selectButtons.Num();
+	_currentButtonIndex = (_currentButtonIndex + amountOfChange);
+
+	if (_currentButtonIndex < 0 || _currentButtonIndex >= _selectButtons.Num())
+	{
+		return;
+	}
 
 	if (_selectButtons[_currentButtonIndex])
 	{
@@ -42,7 +49,7 @@ void UUIButtonSelectController::ButtonClick()
 	}
 }
 
-bool UUIButtonSelectController::ManualKeyAction(const FGeometry& inGeometry, const FKeyEvent& inKeyEvent,const FKey& keyPressed)
+bool UUIButtonSelectController::ManualKeyAction(const FGeometry& inGeometry, const FKeyEvent& inKeyEvent,FKey& keyPressed)
 {
 	if (_selectButtons.Num() == 0)
 	{
