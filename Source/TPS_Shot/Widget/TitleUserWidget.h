@@ -40,4 +40,6 @@ private:
 	void FocusNextButton();
 
 	int _currentButtonIndex;
+
+	UInputModeController* inputModeController;
 };
