@@ -36,13 +36,14 @@ public:
 		_onClickDelegate.Clear();
 	}
 
-private:
-
-	FOnClickDelegate _onClickDelegate;
-
 	UFUNCTION()
 	void HandleOnClick()
 	{
 		_onClickDelegate.Broadcast();
 	}
+
+private:
+
+	FOnClickDelegate _onClickDelegate;
+
 };

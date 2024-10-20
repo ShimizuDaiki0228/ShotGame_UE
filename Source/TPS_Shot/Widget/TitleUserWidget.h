@@ -6,7 +6,9 @@
 #include "Blueprint/UserWidget.h"
 #include "Components/Button.h"
 #include "../TPS_ShotCharacter.h"
+#include "../InputModeController.h"
 #include "../Dispose/ButtonSubject.h"
+#include "../UIButtonSelectController.h"
 #include "TitleUserWidget.generated.h"
 
 /**
@@ -18,10 +20,17 @@ class TPS_SHOT_API UTitleUserWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
+	void Initialized(TWeakObjectPtr<ATPS_ShotCharacter> character, FName playLevelName);
+
+protected:
 	virtual void NativeConstruct() override;
 	virtual void NativeDestruct() override;
+
+	virtual FReply NativeOnKeyDown(const FGeometry& inGeometry, const FKeyEvent& inKeyEvent) override;
+
+private:
+	void SetEvent(FName playLevelName);
 	
-	void Initialized(TWeakObjectPtr<ATPS_ShotCharacter> character, FName playLevelName);
 private:
 	UPROPERTY(meta = (BindWidget))
 	class UButtonSubject* _startButton;
@@ -30,4 +39,11 @@ private:
 	class UButtonSubject* _exitButton;
 
 	TWeakObjectPtr<ATPS_ShotCharacter> _character;
+
+	UUIButtonSelectController* _buttonSelectController;
+	TArray<UButtonSubject*> _playSelectButtons;
+
+	int _currentButtonIndex;
+
+	UInputModeController* _inputModeController;
 };
