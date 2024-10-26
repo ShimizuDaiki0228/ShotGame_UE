@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <memory>
 #include "CoreMinimal.h"
 #include "EnemyActor.h"
 #include "../EnemyState/Sniper/SniperEnemyIdleState.h"
