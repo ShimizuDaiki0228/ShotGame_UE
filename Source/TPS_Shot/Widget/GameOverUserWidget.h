@@ -29,8 +29,11 @@ private:
 	void SetEvent(const FName& playLevelName);
 
 private:
+	//UPROPERTY(meta = (BindWidget))
+	//class UButtonSubject* _restartButton;
+
 	UPROPERTY(meta = (BindWidget))
-	class UButtonSubject* _restartButton;
+	class UButtonSubject* _exitButton;
 
 	UPROPERTY(meta = (BindWidget))
 	class UButtonSubject* _titleButton;
