@@ -101,6 +101,8 @@ void ASpawnVolumeActor::Initialized(
 void ASpawnVolumeActor::GameOver()
 {
 	DestroySpawnEnemies();
+
+	TimeManagerUtility::GetInstance().Cancel(GetWorld(), _spawnEnemyTimerHandle);
 }
 
 void ASpawnVolumeActor::DestroySpawnEnemies()

@@ -24,7 +24,8 @@ FReply UGameOverUserWidget::NativeOnKeyDown(const FGeometry& inGeometry, const F
 void UGameOverUserWidget::Initialized(const FName& playLevelName)
 {
 	TArray<UButtonSubject*> selectButtons;
-	selectButtons.Add(_restartButton);
+	//selectButtons.Add(_restartButton);
+	selectButtons.Add(_exitButton);
 	selectButtons.Add(_titleButton);
 	_buttonSelectController = NewObject<UUIButtonSelectController>();
 	_buttonSelectController->Initialized(selectButtons);
@@ -34,11 +35,20 @@ void UGameOverUserWidget::Initialized(const FName& playLevelName)
 
 void UGameOverUserWidget::SetEvent(const FName& playLevelName)
 {
-	if (_restartButton)
-	{
-		_restartButton->Subscribe([]()
-			{
+	//if (_restartButton)
+	//{
+	//	_restartButton->Subscribe([]()
+	//		{
 
+	//		});
+	//}
+
+	auto world = this->GetWorld();
+	if (_exitButton)
+	{
+		_exitButton->Subscribe([this, world]()
+			{
+				UKismetSystemLibrary::QuitGame(world, world->GetFirstPlayerController(), EQuitPreference::Quit, false);
 			});
 	}
 
@@ -47,7 +57,7 @@ void UGameOverUserWidget::SetEvent(const FName& playLevelName)
 	{
 		_titleButton->Subscribe([this, playLevelName]()
 			{
-				UGameplayStatics::OpenLevel(this, playLevelName);
+				UGameplayStatics::OpenLevel(this, "TitleMap");
 			});
 	}
 

@@ -102,9 +102,9 @@ void ATPS_ShotGameMode::GameOver()
 {
 	// TODO
 	// 中身の実装方法を変えないとクラッシュしてそう
-	/*_spawnVolumeActor->GameOver();
+	_spawnVolumeActor->GameOver();
 
-	_playingWidget->Gameover();*/
+	_playingWidget->Gameover();
 
 	APlayerController* playerController = UGameplayStatics::GetPlayerController(this, 0);
 	if (playerController)
