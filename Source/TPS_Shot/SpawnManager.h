@@ -28,7 +28,7 @@ public:
 	void SetUp(const FActorSpawnParameters& spawnParameter,
 		const FVector location = FVector::ZeroVector,
 		const FRotator rotation = FRotator::ZeroRotator,
-		const FVector scale = FVector::ZeroVector);
+		const FVector scale = FVector::OneVector);
 
 	AActor* SpawnActor(TSubclassOf<AActor> actorClass);
 

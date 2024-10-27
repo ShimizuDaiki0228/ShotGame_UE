@@ -2,6 +2,7 @@
 
 
 #include "SpawnManager.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 USpawnManager::USpawnManager()
 {
@@ -22,7 +23,7 @@ AActor* USpawnManager::SpawnActor(TSubclassOf<AActor> actorClass)
 		return nullptr;
 	}
 
-	UWorld* world = GetWorld();
+	UWorld* world = _spawnData.SpawnParameter.Owner->GetWorld();
 	if (world)
 	{
 		FTransform spawnTransform(_spawnData.Rotation, _spawnData.Location, _spawnData.Scale);
