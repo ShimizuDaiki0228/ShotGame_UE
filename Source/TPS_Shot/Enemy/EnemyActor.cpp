@@ -3,6 +3,8 @@
 
 #include "EnemyActor.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "../Utility/TimeManagerUtility.h"
+#include "../Utility/SoundManagerUtility.h"
 
 // Sets default values
 AEnemyActor::AEnemyActor()
@@ -27,7 +29,44 @@ void AEnemyActor::Tick(float DeltaTime)
 
 void AEnemyActor::SelfDestroy()
 {
+	TimeManagerUtility::GetInstance().Cancel(GetWorld(), _destroyTimerHandle);
+
 	Destroy();
+}
+
+AExplosionEffect* AEnemyActor::Explosion()
+{
+	if (_explosionEffect)
+	{
+		if (_soundToPlay)
+		{
+			SoundManagerUtility::GetInstance().Play(_soundToPlay, this);
+		}
+		
+		_explosionEffectSpawnManager = NewObject<USpawnManager>();
+		FActorSpawnParameters explodeEffectSpawnParameters;
+		explodeEffectSpawnParameters.Owner = this;
+		explodeEffectSpawnParameters.Instigator = GetInstigator();
+		FVector location = GetActorLocation();
+		_explosionEffectSpawnManager->SetUp(explodeEffectSpawnParameters, location);
+
+		AExplosionEffect* spawnedExplosionEffect = _explosionEffectSpawnManager->SpawnActor(_explosionEffect);
+		
+		if (spawnedExplosionEffect)
+		{
+			spawnedExplosionEffect->Initialized(GetTarget());
+			TimeManagerUtility::GetInstance().Delay(GetWorld(), [this, spawnedExplosionEffect]()
+				{
+					spawnedExplosionEffect->Destroy();
+				}, 3.0f, _destroyTimerHandle);
+		}
+		
+		SelfDestroy();
+
+		return spawnedExplosionEffect;
+	}
+
+	return nullptr;
 }
 
 void AEnemyActor::Initialized(ATPS_ShotCharacter* character, ALevelManager* levelManager)

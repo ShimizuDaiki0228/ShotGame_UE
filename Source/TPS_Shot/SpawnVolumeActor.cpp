@@ -34,41 +34,30 @@ void ASpawnVolumeActor::Tick(float DeltaTime)
 
 }
 
-void ASpawnVolumeActor::SpawnEnemy(ALevelManager* levelManager)
+void ASpawnVolumeActor::SpawnEnemy(ALevelManager* levelManager, USpawnManager* enemySpawnManager)
 {
 	UWorld* const world = GetWorld();
 	if (world)
 	{
-		FActorSpawnParameters spawnParameters;
-
-		spawnParameters.Owner = this;
-		spawnParameters.Instigator = GetInstigator();
-
-		FVector spawnLocation = GetRandomPointInVolume();
-		FRotator spawnRotation;
-
-		spawnRotation.Yaw = FMath::FRand() * 360.0f;
-
-		TWeakObjectPtr<AEnemyActor> spawnedEnemy = DecideGenerateEnemy(world, spawnLocation, spawnRotation, spawnParameters);
+		TWeakObjectPtr<AEnemyActor> spawnedEnemy = DecideGenerateEnemy(world, enemySpawnManager);
 		_spawnEnemies.Add(spawnedEnemy);
 
 		if (_character && spawnedEnemy.IsValid())
 		{
 			spawnedEnemy->Initialized(_character, levelManager);
 		}
-		TimeManagerUtility::GetInstance().Delay(world, this, &ASpawnVolumeActor::SpawnEnemy, _spawnDelay, _spawnEnemyTimerHandle, levelManager);
+		TimeManagerUtility::GetInstance().Delay(world, this, &ASpawnVolumeActor::SpawnEnemy, _spawnDelay, _spawnEnemyTimerHandle, levelManager, enemySpawnManager);
 	}
 }
 
-TWeakObjectPtr<AEnemyActor> ASpawnVolumeActor::DecideGenerateEnemy(UWorld* world, FVector spawnLocation, FRotator spawnRotation, FActorSpawnParameters spawnParameters)
+TWeakObjectPtr<AEnemyActor> ASpawnVolumeActor::DecideGenerateEnemy(const UWorld* world, USpawnManager* spawnManager)
 {
 	int8 randomValue = FMath::RandRange(0, 1);
 
-	AEnemyActor* spawnedEnemy = nullptr;
+	AEnemyActor* spawnEnemy = nullptr;
+	spawnEnemy = spawnManager->SpawnActor(_explosionEnemyActor);
+	return TWeakObjectPtr<AEnemyActor>(spawnEnemy);
 
-	spawnedEnemy = world->SpawnActor<AExplosionEnemyActor>(_explosionEnemyActor, spawnLocation, spawnRotation, spawnParameters);
-
-	return TWeakObjectPtr<AEnemyActor>(spawnedEnemy);
 	//return world->SpawnActor<ASniperEnemyActor>(_sniperEnemyActor, spawnLocation, spawnRotation, spawnParameters);
 
 	/*if(randomValue == 0) return world->SpawnActor<ASniperEnemyActor>(_sniperEnemyActor, spawnLocation, spawnRotation, spawnParameters);
@@ -94,8 +83,17 @@ void ASpawnVolumeActor::Initialized(
 	_explosionEnemyActor = explosionEnemy;
 	_sniperEnemyActor = sniperEnemy;
 	_character = character;
+	
+	USpawnManager* spawnManager = NewObject<USpawnManager>();
+	FActorSpawnParameters spawnParameters;
+	spawnParameters.Owner = this;
+	spawnParameters.Instigator = GetInstigator();
+	FVector spawnLocation = GetRandomPointInVolume();
+	FRotator spawnRotation;
+	spawnRotation.Yaw = FMath::FRand() * 360.0f;
+	spawnManager->SetUp(spawnParameters, spawnLocation, spawnRotation);
 
-	SpawnEnemy(levelManager);
+	SpawnEnemy(levelManager, spawnManager);
 }
 
 void ASpawnVolumeActor::GameOver()

@@ -9,6 +9,7 @@
 #include "Enemy/ExplosionEnemyActor.h"
 #include "TPS_ShotCharacter.h"
 #include "Runtime/Engine/Classes/Components/BoxComponent.h"
+#include "SpawnManager.h"
 #include "SpawnVolumeActor.generated.h"
 
 UCLASS()
@@ -32,7 +33,7 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Spawning", meta = (AllowPrivateAccess = "true"))
 	class UBoxComponent* _whereToSpawn;
 
-	void SpawnEnemy(ALevelManager* levelManager);
+	void SpawnEnemy(ALevelManager* levelManager, USpawnManager* enemySpawnManager);
 
 	float _spawnDelay;
 
@@ -50,7 +51,7 @@ private:
 private:
 	FVector GetRandomPointInVolume();
 
-	TWeakObjectPtr<AEnemyActor> DecideGenerateEnemy(UWorld* world, FVector spawnLocation, FRotator spawnRotation, FActorSpawnParameters spawnParameters);
+	TWeakObjectPtr<AEnemyActor> DecideGenerateEnemy(const UWorld* world, USpawnManager* spawnManager);
 
 protected:
 	

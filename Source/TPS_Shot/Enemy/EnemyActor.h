@@ -7,6 +7,8 @@
 #include "../TPS_ShotCharacter.h"
 #include "../EnemyState/IEnemyState.h"
 #include "../LevelManager.h"
+#include "../SpawnManager.h"
+#include "../Niagara/ExplosionEffect.h"
 #include "EnemyActor.generated.h"
 
 
@@ -47,9 +49,20 @@ public:
 	// hpがある一定の値以下になった場合に破棄してスコアを上げるためにbool型
 	bool DecreaseHP();
 
+	AExplosionEffect* Explosion();
 private:
 	ALevelManager* _levelManager;
 
 	const int MAX_HP = 3;
 	int _hp;
+
+	USpawnManager* _explosionEffectSpawnManager;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effect", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<AExplosionEffect> _explosionEffect;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Audio", meta = (AllowPrivateAccess = "true"))
+	USoundBase* _soundToPlay;
+
+	FTimerHandle _destroyTimerHandle;
 };

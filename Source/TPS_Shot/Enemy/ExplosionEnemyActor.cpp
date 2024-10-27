@@ -6,7 +6,6 @@
 #include "../EnemyState/Explosion/ExplosionEnemyIdleState.h"
 #include "../EnemyState/Explosion/ExplosionEnemyTrackingState.h"
 #include "../Utility/TimeManagerUtility.h"
-#include "../Utility/SoundManagerUtility.h"
 #include "Kismet/GameplayStatics.h"
 
 
@@ -38,8 +37,6 @@ void AExplosionEnemyActor::Tick(float DeltaTime)
 
 void AExplosionEnemyActor::SelfDestroy()
 {
-	TimeManagerUtility::GetInstance().Cancel(GetWorld(), _destroyTimerHandle);
-
 	_currentState->ExitState(this);
 
 	Super::SelfDestroy();
@@ -70,44 +67,4 @@ void AExplosionEnemyActor::ChangeState(IExplosionEnemyState* newState)
 	{
 		_currentState->EnterState(this);
 	}
-}
-
-void AExplosionEnemyActor::Explosion()
-{
-	if (_explosionEffect)
-	{
-		if (_soundToPlay)
-		{
-			SoundManagerUtility::GetInstance().Play(_soundToPlay, this);
-		}
-
-		AExplosionEffect* spawnedExplosionEffect = SpawnExplosionEffect();
-
-		if (spawnedExplosionEffect)
-		{
-			spawnedExplosionEffect->Initialized(GetTarget());
-			TimeManagerUtility::GetInstance().Delay(GetWorld(), [this, spawnedExplosionEffect]()
-				{
-					spawnedExplosionEffect->Destroy();
-				}, 3.0f, _destroyTimerHandle);
-		}
-
-		SelfDestroy();
-	}
-}
-
-AExplosionEffect* AExplosionEnemyActor::SpawnExplosionEffect()
-{
-	FActorSpawnParameters spawnPrams;
-
-	spawnPrams.Owner = this;
-	spawnPrams.Instigator = GetInstigator();
-
-	FVector spawnLocation = GetActorLocation();
-
-	return GetWorld()->SpawnActor<AExplosionEffect>(
-		_explosionEffect,
-		spawnLocation,
-		FRotator::ZeroRotator,
-		spawnPrams);
 }
