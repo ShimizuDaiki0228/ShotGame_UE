@@ -33,7 +33,7 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Spawning", meta = (AllowPrivateAccess = "true"))
 	class UBoxComponent* _whereToSpawn;
 
-	void SpawnEnemy(ALevelManager* levelManager, USpawnManager* spawnManager);
+	void SpawnEnemy(ALevelManager* levelManager, USpawnManager* enemySpawnManager);
 
 	float _spawnDelay;
 

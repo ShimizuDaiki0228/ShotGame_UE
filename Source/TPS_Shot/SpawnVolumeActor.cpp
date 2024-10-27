@@ -34,19 +34,19 @@ void ASpawnVolumeActor::Tick(float DeltaTime)
 
 }
 
-void ASpawnVolumeActor::SpawnEnemy(ALevelManager* levelManager, USpawnManager* spawnManager)
+void ASpawnVolumeActor::SpawnEnemy(ALevelManager* levelManager, USpawnManager* enemySpawnManager)
 {
 	UWorld* const world = GetWorld();
 	if (world)
 	{
-		TWeakObjectPtr<AEnemyActor> spawnedEnemy = DecideGenerateEnemy(world, spawnManager);
+		TWeakObjectPtr<AEnemyActor> spawnedEnemy = DecideGenerateEnemy(world, enemySpawnManager);
 		_spawnEnemies.Add(spawnedEnemy);
 
 		if (_character && spawnedEnemy.IsValid())
 		{
 			spawnedEnemy->Initialized(_character, levelManager);
 		}
-		TimeManagerUtility::GetInstance().Delay(world, this, &ASpawnVolumeActor::SpawnEnemy, _spawnDelay, _spawnEnemyTimerHandle, levelManager, spawnManager);
+		TimeManagerUtility::GetInstance().Delay(world, this, &ASpawnVolumeActor::SpawnEnemy, _spawnDelay, _spawnEnemyTimerHandle, levelManager, enemySpawnManager);
 	}
 }
 
@@ -54,12 +54,10 @@ TWeakObjectPtr<AEnemyActor> ASpawnVolumeActor::DecideGenerateEnemy(const UWorld*
 {
 	int8 randomValue = FMath::RandRange(0, 1);
 
-	AActor* spawnActor = nullptr;
-
-	spawnActor = spawnManager->SpawnActor(_explosionEnemyActor);
-	AEnemyActor* spawnEnemy = Cast<AEnemyActor>(spawnActor);
-
+	AEnemyActor* spawnEnemy = nullptr;
+	spawnEnemy = spawnManager->SpawnActor(_explosionEnemyActor);
 	return TWeakObjectPtr<AEnemyActor>(spawnEnemy);
+
 	//return world->SpawnActor<ASniperEnemyActor>(_sniperEnemyActor, spawnLocation, spawnRotation, spawnParameters);
 
 	/*if(randomValue == 0) return world->SpawnActor<ASniperEnemyActor>(_sniperEnemyActor, spawnLocation, spawnRotation, spawnParameters);

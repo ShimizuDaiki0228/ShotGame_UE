@@ -16,28 +16,10 @@ void USpawnManager::SetUp(const FActorSpawnParameters& spawnParameter, const FVe
 	_spawnData.Scale = scale;
 }
 
-AActor* USpawnManager::SpawnActor(TSubclassOf<AActor> actorClass)
+void USpawnManager::SetUp(const FActorSpawnParameters& spawnParameter, const FSpawnTransform& spawnTransform)
 {
-	if (!actorClass)
-	{
-		return nullptr;
-	}
-
-	UWorld* world = _spawnData.SpawnParameter.Owner->GetWorld();
-	if (world)
-	{
-		FTransform spawnTransform(_spawnData.Rotation, _spawnData.Location, _spawnData.Scale);
-
-		AActor* spawnActor = world->SpawnActor<AActor>(
-			actorClass,
-			spawnTransform,
-			_spawnData.SpawnParameter);
-
-		if (spawnActor)
-		{
-			return spawnActor;
-		}	
-	}
-
-	return nullptr;
+	_spawnData.SpawnParameter = spawnParameter;
+	_spawnData.Location = spawnTransform.Location;
+	_spawnData.Rotation = spawnTransform.Rotation;
+	_spawnData.Scale = spawnTransform.Scale;
 }

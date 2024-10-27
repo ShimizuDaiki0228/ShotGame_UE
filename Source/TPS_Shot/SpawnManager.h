@@ -17,6 +17,16 @@ struct FSpawnData
 	FVector Scale;
 };
 
+USTRUCT()
+struct FSpawnTransform
+{
+	GENERATED_BODY()
+
+	FVector Location;
+	FRotator Rotation;
+	FVector Scale;
+};
+
 UCLASS()
 class TPS_SHOT_API USpawnManager : public UObject
 {
@@ -30,7 +40,35 @@ public:
 		const FRotator rotation = FRotator::ZeroRotator,
 		const FVector scale = FVector::OneVector);
 
-	AActor* SpawnActor(TSubclassOf<AActor> actorClass);
+	void SetUp(const FActorSpawnParameters& spawnParameter,
+		const FSpawnTransform& spawnTransform);
+
+	template<typename T>
+	T* SpawnActor(TSubclassOf<T> actorClass)
+	{
+		if (!actorClass)
+		{
+			return nullptr;
+		}
+
+		UWorld* world = _spawnData.SpawnParameter.Owner->GetWorld();
+		if (world)
+		{
+			FTransform spawnTransform(_spawnData.Rotation, _spawnData.Location, _spawnData.Scale);
+
+			T* spawnActor = world->SpawnActor<T>(
+				actorClass,
+				spawnTransform,
+				_spawnData.SpawnParameter);
+
+			if (spawnActor)
+			{
+				return spawnActor;
+			}
+		}
+
+		return nullptr;
+	}
 
 private:
 	FSpawnData _spawnData;

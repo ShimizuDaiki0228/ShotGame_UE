@@ -41,21 +41,8 @@ private:
 	// ‘¼‚Å‹¤—L‚µ‚È‚¢‚½‚ßunique_ptr‚Å
 	std::unique_ptr<IExplosionEnemyState> _currentState;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effect", meta = (AllowPrivateAccess = "true"))
-		TSubclassOf<AExplosionEffect> _explosionEffect;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Audio", meta = (AllowPrivateAccess = "true"))
-		USoundBase* _soundToPlay;
-
-	AExplosionEffect* SpawnExplosionEffect();
-
-	FTimerHandle _destroyTimerHandle;
-
 public:
 	virtual void Initialized(ATPS_ShotCharacter* character, ALevelManager* levelManager) override;
 	
 	void ChangeState(IExplosionEnemyState* newState);
-
-	void Explosion();
-protected:
 };
