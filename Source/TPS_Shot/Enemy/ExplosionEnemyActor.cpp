@@ -19,6 +19,8 @@ void AExplosionEnemyActor::BeginPlay()
 	Super::BeginPlay();
 
 	_mesh->SetSimulatePhysics(true);
+	_mesh->SetAngularDamping(5.0f);
+
 
 	//‰Šúó‘Ô‚ÍIdle‚Éİ’è
 	_currentState = std::make_unique<ExplosionEnemyIdleState>();

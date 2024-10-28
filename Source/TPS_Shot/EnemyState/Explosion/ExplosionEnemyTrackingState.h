@@ -22,8 +22,6 @@ private:
 	float _targetDistance;
 	float CalculateTargetDistance(AExplosionEnemyActor* enemy);
 
-	bool _updateEnable;
-	void ChangeUpdateBrakeEnable(AExplosionEnemyActor* enemy);
 	const float UPDATE_ENABLE_INTERVAL = 0.15f;
 
 	/*void MaterialSetting(AExplosionEnemyActor* enemy);
@@ -39,8 +37,6 @@ private:
 	UMaterialInstanceDynamic* _materialInstance;
 	float _timeElapsed;
 	const float COLOR_CHANGE_DURATION = 3.0f;
-
-	FTimerHandle _brakeTimerHandle;
 
 	FTimerHandle _explodeTimerHandle;
 
