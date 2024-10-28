@@ -33,8 +33,6 @@ void ExplosionEnemyPatrolState::UpdateState(AExplosionEnemyActor* enemy)
 	}
 	else
 	{
-		SetVelocity(0.99f, enemy);
-
 		bIsTransitioning = CheckAndAttack(enemy);
 	}
 }
@@ -45,7 +43,7 @@ void ExplosionEnemyPatrolState::ExitState(AExplosionEnemyActor* enemy)
 
 void ExplosionEnemyPatrolState::TransitionToTracking(AExplosionEnemyActor* enemy)
 {
-	SetVelocity(0.95f, enemy);
+	SetVelocity(0.5f, enemy);
 	if (enemy->GetMesh()->GetPhysicsLinearVelocity().Size() < 100.0f)
 	{
 		enemy->ChangeState(new ExplosionEnemyTrackingState());

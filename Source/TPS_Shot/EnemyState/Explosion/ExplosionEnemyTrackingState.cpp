@@ -19,22 +19,11 @@ void ExplosionEnemyTrackingState::EnterState(AExplosionEnemyActor* enemy)
 	// 現在の進行方向を取得
 	FVector CurrentForward = enemy->GetActorForwardVector();
 
-	// ターゲット方向に向けてのトルク（回転力）を計算
-	FVector TorqueDirection = FVector::CrossProduct(CurrentForward, DirectionToTarget) * 500.0f;  // 500.0fは回転力のスケール
-	enemy->GetMesh()->AddTorqueInRadians(TorqueDirection);
-
 	//// 進行方向に力を加える
-	FVector Force = DirectionToTarget * 300000.0f;
+	FVector Force = DirectionToTarget * 200000.0f;
 	enemy->GetMesh()->AddImpulse(Force);
 
-	_updateEnable = true;
-
 	//MaterialSetting(enemy);
-
-	TimeManagerUtility::GetInstance().Delay(enemy->GetWorld(), [this, enemy]() {
-		ChangeUpdateBrakeEnable(enemy);
-		}, UPDATE_ENABLE_INTERVAL, _brakeTimerHandle);
-	_timerHandles.Add(_brakeTimerHandle);
 
 	TimeManagerUtility::GetInstance().Delay(enemy->GetWorld(), [this, enemy]()
 		{
@@ -45,23 +34,7 @@ void ExplosionEnemyTrackingState::EnterState(AExplosionEnemyActor* enemy)
 
 void ExplosionEnemyTrackingState::UpdateState(AExplosionEnemyActor* enemy)
 {
-	if (_updateEnable)
-	{
-		_updateEnable = false;
-
-		float distance = CalculateTargetDistance(enemy);
-
-		// 距離に基づいて速度を減少させる
-		FVector currentVelocity = enemy->GetMesh()->GetPhysicsLinearVelocity();
-
-		// 距離に応じた減少率を計算
-		float speedFactor = FMath::Clamp(distance / _targetDistance, 0.0f, 0.95f);
-
-		// 速度を減少させる
-		// 速度が増加してしまう可能性があるため最大でも現在の速度から少し落とした速度に
-		FVector newVelocity = currentVelocity * speedFactor;
-		enemy->GetMesh()->SetPhysicsLinearVelocity(newVelocity);
-	}
+	
 }
 
 void ExplosionEnemyTrackingState::ExitState(AExplosionEnemyActor* enemy)
@@ -80,22 +53,6 @@ float ExplosionEnemyTrackingState::CalculateTargetDistance(AExplosionEnemyActor*
     FVector objectLocation = enemy->GetActorLocation();
     FVector playerLocation = enemy->GetTarget()->GetActorLocation();
     return FVector::Dist(objectLocation, playerLocation);
-}
-
-void ExplosionEnemyTrackingState::ChangeUpdateBrakeEnable(AExplosionEnemyActor* enemy)
-{
-	// フラグを true に設定
-	_updateEnable = true;
-
-	// 再びn秒後にフラグをtrueにするために再度Delayを呼び出す
-	TimeManagerUtility::GetInstance().Delay(enemy->GetWorld(), [this, enemy]()
-		{
-			// 確定ではないが、Stateが変わったときに呼び出されてクラッシュしている可能性がある
-			if (this)
-			{
-				ChangeUpdateBrakeEnable(enemy);
-			}
-		}, UPDATE_ENABLE_INTERVAL, _brakeTimerHandle);
 }
 
 
