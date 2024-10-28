@@ -6,6 +6,7 @@
 #include "CoreMinimal.h"
 #include "EnemyActor.h"
 #include "../EnemyState/Sniper/SniperEnemyIdleState.h"
+#include "../Niagara/EnemyBeamEffect.h"
 #include "SniperEnemyActor.generated.h"
 
 //class SniperEnemyIdleState;
@@ -50,6 +51,12 @@ private:
 	AActor* _nextPosition;
 
 	
+	bool bCanShot;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Beam")
+	TSubclassOf<AEnemyBeamEffect> _beamEffect;
+
+	UNiagaraComponent* _beamEffectSystemInstance;
 
 public:
 	void ChangeState(ISniperEnemyState* newState);
