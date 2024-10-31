@@ -23,3 +23,15 @@ void USpawnManager::SetUp(const FActorSpawnParameters& spawnParameter, const FSp
 	_spawnData.Rotation = spawnTransform.Rotation;
 	_spawnData.Scale = spawnTransform.Scale;
 }
+
+void USpawnManager::SetSpawnParameter(const FActorSpawnParameters& spawnParameter)
+{
+	_spawnData.SpawnParameter = spawnParameter;
+}
+
+void USpawnManager::SetTransform(const FVector location, const FRotator rotation, const FVector scale)
+{
+	_spawnData.Location = location;
+	_spawnData.Rotation = rotation;
+	_spawnData.Scale = scale;
+}

@@ -4,10 +4,12 @@
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
+#include "Animation/AnimInstance.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Engine/LocalPlayer.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -115,7 +117,7 @@ void ATPS_ShotCharacter::CreateBullet()
 
 	if (_fireSound)
 	{
-		UGameplayStatics::PlaySound2D(this, _fireSound);
+		SoundManagerUtility::GetInstance().Play(_fireSound, this);
 	}
 
 	const USkeletalMeshSocket* barrelSocket = GetMesh()->GetSocketByName("BarrelSocket");

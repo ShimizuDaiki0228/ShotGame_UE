@@ -5,6 +5,8 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "../EnemyBulletActor.h"
 #include "../Utility/TimeManagerUtility.h"
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
 
 ASniperEnemyActor::ASniperEnemyActor()
 {
@@ -23,6 +25,17 @@ void ASniperEnemyActor::BeginPlay()
 void ASniperEnemyActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	/*if (_beamEffectSystemInstance && GetTarget())
+	{
+		_beamEffectSystemInstance->SetWorldLocation(GetActorLocation());
+		FVector targetLocation = GetTarget()->GetActorLocation();
+		_beamEffectSystemInstance->SetVectorParameter(TEXT("Beam End"), targetLocation);
+	}*/
+
+	_shotSpawnManager->SetTransform(GetActorLocation(), GetActorRotation());
+	AEnemyShotActor* shotActor = _shotSpawnManager->SpawnActor(_enemyShotActorClass);
+	shotActor->Initialized(GetActorLocation(), GetTarget()->GetActorLocation(), GetActorRotation());
 
 	if (_currentState)
 	{
@@ -62,9 +75,38 @@ void ASniperEnemyActor::Initialized(ATPS_ShotCharacter* character, ALevelManager
 		_currentState = std::make_unique<SniperEnemyIdleState>();
 		_currentState->EnterState(this);
 
-		CreateBulletActor();
+		BeamShot();
 	}
 
+	if (_enemyShotActorClass)
+	{
+		_shotSpawnManager = NewObject<USpawnManager>();
+		FActorSpawnParameters spawnParams;
+		spawnParams.Owner = this;
+		_shotSpawnManager->SetSpawnParameter(spawnParams);
+
+	}
+
+	//if (_beamEffect)
+	//{
+	//	FActorSpawnParameters beamEffectSpawnParams;
+	//	beamEffectSpawnParams.Owner = this;
+
+	//	AEnemyBeamEffect* beamEffect = GetWorld()->SpawnActor<AEnemyBeamEffect>(_beamEffect, GetActorLocation(), FRotator::ZeroRotator, beamEffectSpawnParams);
+
+	//	/*if (beamEffect)
+	//	{
+	//		_beamEffectSystemInstance = beamEffect->GetNiagaraComponent();
+
+	//		if (_beamEffectSystemInstance && GetTarget())
+	//		{
+	//			FVector targetLocation = GetTarget()->GetActorLocation();
+	//			_beamEffectSystemInstance->SetVectorParameter(TEXT("BeamEnd"), targetLocation);
+	//		}
+	//	}*/
+
+	//	
+	//}
 }
 
 void ASniperEnemyActor::SetPatrolAreaOrder()
@@ -122,26 +164,13 @@ void ASniperEnemyActor::SelectPosition()
 	}
 }
 
-void ASniperEnemyActor::CreateBulletActor()
+void ASniperEnemyActor::BeamShot()
 {
-	if (_bulletActor)
+	if (!bCanShot) return;
+
+	if (_beamShotSound)
 	{
-		FVector location = GetActorLocation() + GetActorForwardVector() * 500.0f;
-		FRotator rotation = GetActorRotation();
-
-		FActorSpawnParameters spawnParams;
-		spawnParams.Owner = this;
-		spawnParams.Instigator = GetInstigator();
-
-		AEnemyBulletActor* bullet = GetWorld()->SpawnActor<AEnemyBulletActor>(_bulletActor, location, rotation, spawnParams);
-
-		if (bullet)
-		{
-			bullet->Initialized(this);
-		}
-
-		TimeManagerUtility::GetInstance().Delay(GetWorld(), this, &ASniperEnemyActor::CreateBulletActor, 1.0f, _createBulletTimerHandle);
-
+		SoundManagerUtility::GetInstance().Play(_beamShotSound, this);
 	}
 }
 

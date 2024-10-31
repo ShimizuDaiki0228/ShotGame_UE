@@ -55,7 +55,7 @@ TWeakObjectPtr<AEnemyActor> ASpawnVolumeActor::DecideGenerateEnemy(const UWorld*
 	int8 randomValue = FMath::RandRange(0, 1);
 
 	AEnemyActor* spawnEnemy = nullptr;
-	spawnEnemy = spawnManager->SpawnActor(_explosionEnemyActor);
+	spawnEnemy = spawnManager->SpawnActor(_sniperEnemyActor);
 	return TWeakObjectPtr<AEnemyActor>(spawnEnemy);
 
 	//return world->SpawnActor<ASniperEnemyActor>(_sniperEnemyActor, spawnLocation, spawnRotation, spawnParameters);
