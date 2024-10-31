@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "SpawnManager.generated.h"
 
 USTRUCT()
@@ -43,11 +44,23 @@ public:
 	void SetUp(const FActorSpawnParameters& spawnParameter,
 		const FSpawnTransform& spawnTransform);
 
+	void SetSpawnParameter(const FActorSpawnParameters& spawnParameter);
+
+	void SetTransform(const FVector location = FVector::ZeroVector,
+		const FRotator rotation = FRotator::ZeroRotator,
+		const FVector scale = FVector::OneVector);
+
 	template<typename T>
-	T* SpawnActor(TSubclassOf<T> actorClass)
+	FORCEINLINE T* SpawnActor(TSubclassOf<T> actorClass)
 	{
 		if (!actorClass)
 		{
+			return nullptr;
+		}
+
+		if (!_spawnData.SpawnParameter.Owner)
+		{
+			UKismetSystemLibrary::PrintString(this, TEXT("owner is null"), true, true, FColor::Green, 2.f);
 			return nullptr;
 		}
 

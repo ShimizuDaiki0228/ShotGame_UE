@@ -9,6 +9,7 @@
 #include "../LevelManager.h"
 #include "../SpawnManager.h"
 #include "../Niagara/ExplosionEffect.h"
+#include "../Utility/SoundManagerUtility.h"
 #include "EnemyActor.generated.h"
 
 
@@ -62,7 +63,7 @@ private:
 	TSubclassOf<AExplosionEffect> _explosionEffect;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Audio", meta = (AllowPrivateAccess = "true"))
-	USoundBase* _soundToPlay;
+	USoundBase* _explosionSound;
 
 	FTimerHandle _destroyTimerHandle;
 };

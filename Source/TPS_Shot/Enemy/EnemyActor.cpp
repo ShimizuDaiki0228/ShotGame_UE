@@ -3,8 +3,8 @@
 
 #include "EnemyActor.h"
 #include "Kismet/KismetSystemLibrary.h"
-#include "../Utility/TimeManagerUtility.h"
 #include "../Utility/SoundManagerUtility.h"
+#include "../Utility/TimeManagerUtility.h"
 
 // Sets default values
 AEnemyActor::AEnemyActor()
@@ -19,7 +19,6 @@ AEnemyActor::AEnemyActor()
 void AEnemyActor::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 void AEnemyActor::Tick(float DeltaTime)
@@ -38,9 +37,9 @@ AExplosionEffect* AEnemyActor::Explosion()
 {
 	if (_explosionEffect)
 	{
-		if (_soundToPlay)
+		if (_explosionSound)
 		{
-			SoundManagerUtility::GetInstance().Play(_soundToPlay, this);
+			SoundManagerUtility::GetInstance().Play(_explosionSound, this);
 		}
 		
 		_explosionEffectSpawnManager = NewObject<USpawnManager>();

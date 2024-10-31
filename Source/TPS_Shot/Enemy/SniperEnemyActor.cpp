@@ -26,13 +26,16 @@ void ASniperEnemyActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (_beamEffectSystemInstance && GetTarget())
+	/*if (_beamEffectSystemInstance && GetTarget())
 	{
 		_beamEffectSystemInstance->SetWorldLocation(GetActorLocation());
 		FVector targetLocation = GetTarget()->GetActorLocation();
 		_beamEffectSystemInstance->SetVectorParameter(TEXT("Beam End"), targetLocation);
-	}
+	}*/
 
+	_shotSpawnManager->SetTransform(GetActorLocation(), GetActorRotation());
+	AEnemyShotActor* shotActor = _shotSpawnManager->SpawnActor(_enemyShotActorClass);
+	shotActor->Initialized(GetActorLocation(), GetTarget()->GetActorLocation(), GetActorRotation());
 
 	if (_currentState)
 	{
@@ -72,40 +75,38 @@ void ASniperEnemyActor::Initialized(ATPS_ShotCharacter* character, ALevelManager
 		_currentState = std::make_unique<SniperEnemyIdleState>();
 		_currentState->EnterState(this);
 
-		CreateBulletActor();
+		BeamShot();
 	}
 
-	if (_beamEffect)
+	if (_enemyShotActorClass)
 	{
-		FActorSpawnParameters beamEffectSpawnParams;
-		beamEffectSpawnParams.Owner = this;
+		_shotSpawnManager = NewObject<USpawnManager>();
+		FActorSpawnParameters spawnParams;
+		spawnParams.Owner = this;
+		_shotSpawnManager->SetSpawnParameter(spawnParams);
 
-		AEnemyBeamEffect* beamEffect = GetWorld()->SpawnActor<AEnemyBeamEffect>(_beamEffect, GetActorLocation(), FRotator::ZeroRotator, beamEffectSpawnParams);
-
-		if (beamEffect)
-		{
-			_beamEffectSystemInstance = beamEffect->GetNiagaraComponent();
-
-			/*UNiagaraSystem* beamEffectSystem = _beamEffect.GetDefaultObject();
-			_beamEffectSystemInstance = UNiagaraFunctionLibrary::SpawnSystemAttached(
-				beamEffectSystem,
-				RootComponent,
-				NAME_None,
-				GetActorLocation(),
-				FRotator::ZeroRotator,
-				EAttachLocation::KeepWorldPosition,
-				true
-			);*/
-
-			if (_beamEffectSystemInstance && GetTarget())
-			{
-				FVector targetLocation = GetTarget()->GetActorLocation();
-				_beamEffectSystemInstance->SetVectorParameter(TEXT("BeamEnd"), targetLocation);
-			}
-		}
-
-		
 	}
+
+	//if (_beamEffect)
+	//{
+	//	FActorSpawnParameters beamEffectSpawnParams;
+	//	beamEffectSpawnParams.Owner = this;
+
+	//	AEnemyBeamEffect* beamEffect = GetWorld()->SpawnActor<AEnemyBeamEffect>(_beamEffect, GetActorLocation(), FRotator::ZeroRotator, beamEffectSpawnParams);
+
+	//	/*if (beamEffect)
+	//	{
+	//		_beamEffectSystemInstance = beamEffect->GetNiagaraComponent();
+
+	//		if (_beamEffectSystemInstance && GetTarget())
+	//		{
+	//			FVector targetLocation = GetTarget()->GetActorLocation();
+	//			_beamEffectSystemInstance->SetVectorParameter(TEXT("BeamEnd"), targetLocation);
+	//		}
+	//	}*/
+
+	//	
+	//}
 }
 
 void ASniperEnemyActor::SetPatrolAreaOrder()
@@ -163,78 +164,14 @@ void ASniperEnemyActor::SelectPosition()
 	}
 }
 
-void ASniperEnemyActor::CreateBulletActor()
+void ASniperEnemyActor::BeamShot()
 {
-	/*if (!bCanShot) return;
+	if (!bCanShot) return;
 
-	if (_fireSound)
+	if (_beamShotSound)
 	{
-		UGameplayStatics::PlaySound2D(this, _fireSound);
+		SoundManagerUtility::GetInstance().Play(_beamShotSound, this);
 	}
-
-	const USkeletalMeshSocket* barrelSocket = GetMesh()->GetSocketByName("BarrelSocket");
-	if (barrelSocket)
-	{
-		const FTransform socketTransform = barrelSocket->GetSocketTransform(GetMesh());
-
-		if (_muzzleFlash)
-		{
-			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), _muzzleFlash, socketTransform);
-		}
-
-		_numberOfBulletProp->SetValue(_numberOfBulletProp->GetValue() - 1);
-		bIsReloading = ChangeNumberOfBullet(_numberOfBulletProp->GetValue());
-
-		FVector beamEnd;
-		bool bBeamEnd = GetBeamEndLocation(socketTransform.GetLocation(), beamEnd);
-		if (bBeamEnd)
-		{
-			if (_impatctParticle)
-			{
-				UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), _impatctParticle, beamEnd);
-			}
-
-			if (_beamParticle)
-			{
-				UParticleSystemComponent* beam = UGameplayStatics::SpawnEmitterAtLocation(
-					GetWorld(),
-					_beamParticle,
-					socketTransform);
-				if (beam)
-				{
-					beam->SetVectorParameter(FName("Target"), beamEnd);
-				}
-			}
-		}
-
-		UAnimInstance* animInstance = GetMesh()->GetAnimInstance();
-		if (animInstance && _hipFireMontage)
-		{
-			animInstance->Montage_Play(_hipFireMontage);
-			animInstance->Montage_JumpToSection(FName("StartFire"));
-		}*/
-	
-
-
-	/*if (_bulletActor)
-	{
-		FVector location = GetActorLocation() + GetActorForwardVector() * 500.0f;
-		FRotator rotation = GetActorRotation();
-
-		FActorSpawnParameters spawnParams;
-		spawnParams.Owner = this;
-		spawnParams.Instigator = GetInstigator();
-
-		AEnemyBulletActor* bullet = GetWorld()->SpawnActor<AEnemyBulletActor>(_bulletActor, location, rotation, spawnParams);
-
-		if (bullet)
-		{
-			bullet->Initialized(this);
-		}
-
-		TimeManagerUtility::GetInstance().Delay(GetWorld(), this, &ASniperEnemyActor::CreateBulletActor, 1.0f, _createBulletTimerHandle);
-
-	}*/
 }
 
 void ASniperEnemyActor::SetupCurrentPatrolArea()

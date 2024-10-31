@@ -5,6 +5,7 @@
 #include <memory>
 #include "CoreMinimal.h"
 #include "EnemyActor.h"
+#include "EnemyShotActor.h"
 #include "../EnemyState/Sniper/SniperEnemyIdleState.h"
 #include "../Niagara/EnemyBeamEffect.h"
 #include "SniperEnemyActor.generated.h"
@@ -40,8 +41,6 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Spawning", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<AActor> _bulletActor;
 
-	//
-
 	std::unique_ptr<ISniperEnemyState> _currentState;
 
 	void SetPatrolAreaOrder();
@@ -53,16 +52,24 @@ private:
 	
 	bool bCanShot;
 
+	/*UPROPERTY(EditDefaultsOnly, Category = "Beam")
+	TSubclassOf<AEnemyBeamEffect> _beamEffect;*/
+
 	UPROPERTY(EditDefaultsOnly, Category = "Beam")
-	TSubclassOf<AEnemyBeamEffect> _beamEffect;
+	TSubclassOf<AEnemyShotActor> _enemyShotActorClass;
+
+	USpawnManager* _shotSpawnManager;
 
 	UNiagaraComponent* _beamEffectSystemInstance;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Audio", meta = (AllowPrivateAccess = "true"))
+	USoundBase* _beamShotSound;
 
 public:
 	void ChangeState(ISniperEnemyState* newState);
 	virtual void Initialized(ATPS_ShotCharacter* character, ALevelManager* levelManager) override;
 
-	void CreateBulletActor();
+	void BeamShot();
 
 	void SetupCurrentPatrolArea();
 	TArray<int8> PatrolAreaOrder;
