@@ -3,6 +3,7 @@
 
 #include "SniperEnemyActor.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "../EnemyBulletActor.h"
 #include "../Utility/TimeManagerUtility.h"
 #include "NiagaraComponent.h"
@@ -20,6 +21,8 @@ void ASniperEnemyActor::BeginPlay()
 	Super::BeginPlay();
 
 	_mesh->SetSimulatePhysics(false);
+
+	_cacheWorld = GetWorld();
 }
 
 void ASniperEnemyActor::Tick(float DeltaTime)
@@ -33,9 +36,20 @@ void ASniperEnemyActor::Tick(float DeltaTime)
 		_beamEffectSystemInstance->SetVectorParameter(TEXT("Beam End"), targetLocation);
 	}*/
 
-	_shotSpawnManager->SetTransform(GetActorLocation(), GetActorRotation());
-	AEnemyShotActor* shotActor = _shotSpawnManager->SpawnActor(_enemyShotActorClass);
-	shotActor->Initialized(GetActorLocation(), GetTarget()->GetActorLocation(), GetActorRotation());
+	if (GetTarget())
+	{
+		//UKismetSystemLibrary::PrintString(this, TEXT("target isnt null"), true, true, FColor::Green, 2.f);
+		FRotator lookAtRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), GetTarget()->GetActorLocation());
+		SetActorRotation(lookAtRotation);
+	}
+
+	if (_rayObject->IsHit(this, GetTarget(), _cacheWorld))
+	{
+		FRotator shotRotation = GetActorRotation() + FRotator(90, 0, 0);
+		_shotSpawnManager->SetTransform(GetActorLocation(), shotRotation);
+		AEnemyShotActor* shotActor = _shotSpawnManager->SpawnActor(_enemyShotActorClass);
+		shotActor->Initialized(GetActorLocation(), GetTarget()->GetActorLocation(), GetActorRotation());
+	}
 
 	if (_currentState)
 	{
@@ -92,7 +106,7 @@ void ASniperEnemyActor::Initialized(ATPS_ShotCharacter* character, ALevelManager
 	//	FActorSpawnParameters beamEffectSpawnParams;
 	//	beamEffectSpawnParams.Owner = this;
 
-	//	AEnemyBeamEffect* beamEffect = GetWorld()->SpawnActor<AEnemyBeamEffect>(_beamEffect, GetActorLocation(), FRotator::ZeroRotator, beamEffectSpawnParams);
+	//	AEnemyBeamEffect* beamEffect = _cacheWorld->SpawnActor<AEnemyBeamEffect>(_beamEffect, GetActorLocation(), FRotator::ZeroRotator, beamEffectSpawnParams);
 
 	//	/*if (beamEffect)
 	//	{
@@ -107,6 +121,8 @@ void ASniperEnemyActor::Initialized(ATPS_ShotCharacter* character, ALevelManager
 
 	//	
 	//}
+
+	_rayObject = NewObject<URayObject>();
 }
 
 void ASniperEnemyActor::SetPatrolAreaOrder()
@@ -182,7 +198,7 @@ void ASniperEnemyActor::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	GetLevelManager()->SetPatrolAreaMap(nullptr, _nextPosition);
 
-	TimeManagerUtility::GetInstance().Cancel(GetWorld(), _createBulletTimerHandle);
+	TimeManagerUtility::GetInstance().Cancel(_cacheWorld, _createBulletTimerHandle);
 }
 
 void ASniperEnemyActor::SelfDestroy()
