@@ -8,6 +8,7 @@
 #include "EnemyShotActor.h"
 #include "../EnemyState/Sniper/SniperEnemyIdleState.h"
 #include "../Niagara/EnemyBeamEffect.h"
+#include "../RayObject.h"
 #include "SniperEnemyActor.generated.h"
 
 //class SniperEnemyIdleState;
@@ -64,6 +65,15 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Audio", meta = (AllowPrivateAccess = "true"))
 	USoundBase* _beamShotSound;
+
+	// ‰½•b‚²‚Æ‚Éray‚ð”ò‚Î‚·‚©
+	// ‚ ‚Ü‚è‚É”ò‚Î‚µ‚·‚¬‚é‚Æ•‰‰×‚ª‘å‚«‚¢‚½‚ß
+	const float RAY_SPAN = 0.5f;
+	float _elapsedRayTime;
+
+	URayObject* _rayObject;
+
+	UWorld* _cacheWorld;
 
 public:
 	void ChangeState(ISniperEnemyState* newState);

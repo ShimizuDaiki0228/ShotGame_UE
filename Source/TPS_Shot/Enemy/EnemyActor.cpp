@@ -13,6 +13,7 @@ AEnemyActor::AEnemyActor()
 	PrimaryActorTick.bCanEverTick = true;
 
 	_mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("SphereMesh"));
+	RootComponent = _mesh;
 }
 
 // Called when the game starts or when spawned
