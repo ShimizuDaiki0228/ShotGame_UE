@@ -29,6 +29,19 @@ void ASniperEnemyActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (_isTargetLockOn)
+	{
+		_shotLimit -= DeltaTime;
+		if (_shotLimit <= 0.0f)
+		{
+			BeamShot();
+			_shotLimit = SHOT_DURATION;
+			_isTargetLockOn = false;
+		}
+	}
+
+	_elapsedRayTime -= DeltaTime;
+
 	/*if (_beamEffectSystemInstance && GetTarget())
 	{
 		_beamEffectSystemInstance->SetWorldLocation(GetActorLocation());
@@ -38,17 +51,17 @@ void ASniperEnemyActor::Tick(float DeltaTime)
 
 	if (GetTarget())
 	{
-		//UKismetSystemLibrary::PrintString(this, TEXT("target isnt null"), true, true, FColor::Green, 2.f);
 		FRotator lookAtRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), GetTarget()->GetActorLocation());
 		SetActorRotation(lookAtRotation);
 	}
 
-	if (_rayObject->IsHit(this, GetTarget(), _cacheWorld))
+	if (_elapsedRayTime <= 0)
 	{
-		FRotator shotRotation = GetActorRotation() + FRotator(90, 0, 0);
-		_shotSpawnManager->SetTransform(GetActorLocation(), shotRotation);
-		AEnemyShotActor* shotActor = _shotSpawnManager->SpawnActor(_enemyShotActorClass);
-		shotActor->Initialized(GetActorLocation(), GetTarget()->GetActorLocation(), GetActorRotation());
+		_elapsedRayTime = RAY_SPAN;
+		if (_rayObject->IsHit(this, GetTarget(), _cacheWorld))
+		{
+			_isTargetLockOn = true;
+		}
 	}
 
 	if (_currentState)
@@ -81,6 +94,9 @@ void ASniperEnemyActor::Initialized(ATPS_ShotCharacter* character, ALevelManager
 {
 	Super::Initialized(character, levelManager);
 
+	_shotLimit = SHOT_DURATION;
+	_elapsedRayTime = RAY_SPAN;
+
 	SetPatrolAreaOrder();
 
 	if (_nextPosition != nullptr)
@@ -88,8 +104,6 @@ void ASniperEnemyActor::Initialized(ATPS_ShotCharacter* character, ALevelManager
 		//èâä˙èÛë‘ÇÕIdleÇ…ê›íË
 		_currentState = std::make_unique<SniperEnemyIdleState>();
 		_currentState->EnterState(this);
-
-		BeamShot();
 	}
 
 	if (_enemyShotActorClass)
@@ -182,12 +196,15 @@ void ASniperEnemyActor::SelectPosition()
 
 void ASniperEnemyActor::BeamShot()
 {
-	if (!bCanShot) return;
-
 	if (_beamShotSound)
 	{
 		SoundManagerUtility::GetInstance().Play(_beamShotSound, this);
 	}
+
+	FRotator shotRotation = GetActorRotation() + FRotator(90, 0, 0);
+	_shotSpawnManager->SetTransform(GetActorLocation(), shotRotation);
+	AEnemyShotActor* shotActor = _shotSpawnManager->SpawnActor(_enemyShotActorClass);
+	shotActor->Initialized(GetActorLocation(), GetTarget()->GetActorLocation(), GetActorRotation());
 }
 
 void ASniperEnemyActor::SetupCurrentPatrolArea()
