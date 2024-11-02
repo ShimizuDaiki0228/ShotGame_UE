@@ -201,10 +201,11 @@ void ASniperEnemyActor::BeamShot()
 		SoundManagerUtility::GetInstance().Play(_beamShotSound, this);
 	}
 
-	FRotator shotRotation = GetActorRotation() + FRotator(90, 0, 0);
+	FRotator shotRotation = GetActorRotation() + SHOT_ROTATION_OFFSET;
 	_shotSpawnManager->SetTransform(GetActorLocation(), shotRotation);
 	AEnemyShotActor* shotActor = _shotSpawnManager->SpawnActor(_enemyShotActorClass);
-	shotActor->Initialized(GetActorLocation(), GetTarget()->GetActorLocation(), GetActorRotation());
+	FVector targetLocation = GetTarget()->GetActorLocation() + TARGET_OFFSET;
+	shotActor->Initialized(GetActorLocation(), targetLocation, GetActorRotation());
 }
 
 void ASniperEnemyActor::SetupCurrentPatrolArea()

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "../Niagara/ExplosionEffect.h"
 #include "EnemyShotActor.generated.h"
 
 UCLASS()
@@ -18,6 +19,9 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	UFUNCTION()
+	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
 public:	
 	// Called every frame
@@ -34,10 +38,13 @@ private:
 	FVector _endPosition;
 	FRotator _shotDirection;
 
-	const float BASE_SPEED = 2000.0f;
+	const float BASE_SPEED = 8000.0f;
 
 	float _duration;
 	float _elapsedTime = 0.0f;
 
 	bool _canShot;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Explode")
+	TSubclassOf<AExplosionEffect> _explosionEffect;
 };

@@ -26,14 +26,14 @@ bool URayObject::IsHit(const AActor* shotActor, const AActor* targetActor, const
 	{
 		if (hitResult.GetActor())
 		{
-			UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("Hit Actor: %s"), *hitResult.GetActor()->GetName()), true, true, FColor::Green, 2.0f);
+			//UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("Hit Actor: %s"), *hitResult.GetActor()->GetName()), true, true, FColor::Green, 2.0f);
 		}
 
 		DrawDebugLine(world, startPosition, endPosition, _rayColor, false, 0.1f, 0, 2.0f);
 		return true;
 	}
 
-	UKismetSystemLibrary::PrintString(this, TEXT("false"), true, true, FColor::Red, 2.0f);
+	//UKismetSystemLibrary::PrintString(this, TEXT("false"), true, true, FColor::Red, 2.0f);
 
 	return false;
 }
