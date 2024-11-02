@@ -68,13 +68,17 @@ private:
 	const float RAY_SPAN = 0.5f;
 	float _elapsedRayTime;
 
-	const float SHOT_DURATION = 2.5f;
+	const float SHOT_DURATION = 3.0f;
 	float _shotLimit;
 	bool _isTargetLockOn;
+	const FRotator SHOT_ROTATION_OFFSET = FRotator(90, 0, 0);
+	const FVector TARGET_OFFSET = FVector(0, 0, -100);
 
 	URayObject* _rayObject;
 
 	UWorld* _cacheWorld;
+
+	FTimerHandle _nextMoveTimerHandle;
 
 public:
 	void ChangeState(ISniperEnemyState* newState);

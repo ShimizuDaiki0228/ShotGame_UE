@@ -6,6 +6,7 @@
 #include "../Utility/EasingAnimationUtility.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "../SpawnManager.h"
 
 // Sets default values
 AEnemyShotActor::AEnemyShotActor()
@@ -34,6 +35,24 @@ void AEnemyShotActor::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	_beamMeshComponent->OnComponentHit.AddDynamic(this, &AEnemyShotActor::OnHit);
+}
+
+void AEnemyShotActor::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+{
+	UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("HIT!!!!!!!!!!!!! : %s"), *OtherActor->GetName()), true, true, FColor::Green, 2.f);
+
+	if (OtherActor && (OtherActor != this))
+	{
+		USpawnManager* spawnManager = NewObject<USpawnManager>();
+		FActorSpawnParameters spawnParameters;
+		spawnParameters.Owner = this;
+		spawnParameters.Instigator = GetInstigator();
+		spawnManager->SetUp(spawnParameters, GetActorLocation());
+		spawnManager->SpawnActor(_explosionEffect);
+
+		Destroy();
+	}
 }
 
 // Called every frame
