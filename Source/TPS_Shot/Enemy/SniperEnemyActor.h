@@ -50,9 +50,6 @@ private:
 
 	AActor* _nextPosition;
 
-	
-	bool bCanShot;
-
 	/*UPROPERTY(EditDefaultsOnly, Category = "Beam")
 	TSubclassOf<AEnemyBeamEffect> _beamEffect;*/
 
@@ -70,6 +67,10 @@ private:
 	// ‚ ‚Ü‚è‚É”ò‚Î‚µ‚·‚¬‚é‚Æ•‰‰×‚ª‘å‚«‚¢‚½‚ß
 	const float RAY_SPAN = 0.5f;
 	float _elapsedRayTime;
+
+	const float SHOT_DURATION = 2.5f;
+	float _shotLimit;
+	bool _isTargetLockOn;
 
 	URayObject* _rayObject;
 
