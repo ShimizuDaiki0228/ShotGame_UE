@@ -124,6 +124,12 @@ private:
 
 	bool bAiming;
 
+	void GrabClip();
+
+	void ReleaseClip();
+
+	bool bMovingClip;
+
 private:
 	FTimerHandle _reloadTimerHandle;
 
