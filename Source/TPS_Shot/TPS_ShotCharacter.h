@@ -46,6 +46,9 @@ class ATPS_ShotCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* ShotAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* ReloadAction;
+
 public:
 	ATPS_ShotCharacter();
 	
@@ -101,6 +104,9 @@ private:
 	class UAnimMontage* _hipFireMontage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
+	class UAnimMontage* _reloadMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
 	UParticleSystem* _impatctParticle;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
@@ -113,6 +119,10 @@ private:
 	TSharedPtr<ReactiveProperty<int>> _scoreProp = MakeShared<ReactiveProperty<int>>();
 
 	TSharedPtr<ReactiveProperty<int>> _numberOfBulletProp = MakeShared<ReactiveProperty<int>>();
+
+	void Reload();
+
+	bool bAiming;
 
 private:
 	FTimerHandle _reloadTimerHandle;
@@ -128,6 +138,8 @@ public:
 
 	TSharedPtr<ReadOnlyReactiveProperty<int>> NumberOfBulletProp 
 		= MakeShared<ReadOnlyReactiveProperty<int>>(_numberOfBulletProp);
+
+	FORCEINLINE bool GetAiming() const { return bAiming; }
 
 public:
 	void Initialized();
