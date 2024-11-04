@@ -102,6 +102,7 @@ void ATPS_ShotCharacter::SetupPlayerInputComponent(class UInputComponent* Player
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ATPS_ShotCharacter::Look);
 
 		EnhancedInputComponent->BindAction(ShotAction, ETriggerEvent::Triggered, this, &ATPS_ShotCharacter::CreateBullet);
+		EnhancedInputComponent->BindAction(ReloadAction, ETriggerEvent::Triggered, this, &ATPS_ShotCharacter::Reload);
 	}
 
 }
@@ -219,6 +220,22 @@ void ATPS_ShotCharacter::Look(const FInputActionValue& Value)
 		// add yaw and pitch input to controller
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
+	}
+}
+
+void ATPS_ShotCharacter::Reload()
+{
+	UKismetSystemLibrary::PrintString(this, "Reload", true, true, FColor::Cyan, 2.f, TEXT("None"));
+	UAnimInstance* animInstance = GetMesh()->GetAnimInstance();
+	if (animInstance && _reloadMontage)
+	{
+		UKismetSystemLibrary::PrintString(this, "Reload Animation", true, true, FColor::Cyan, 2.f, TEXT("None"));
+
+		// TODO　武器を複数使用する場合、武器のタイプによって変更できるようにする必要がある
+		FName montageSection(TEXT("Reload SMG"));
+
+		animInstance->Montage_Play(_reloadMontage);
+		animInstance->Montage_JumpToSection(montageSection);
 	}
 }
 
