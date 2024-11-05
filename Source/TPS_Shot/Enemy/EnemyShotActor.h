@@ -38,25 +38,24 @@ private:
 	FVector _endPosition;
 	FVector _alphaPoint;
 	FVector _betaPoint;
-	FVector _midPointAlphaAndBeta;
 	FVector directionUnitVector;
 	FVector _alphaPointUnitVector;
 	FVector _betaPointUnitVector;
 	FVector _alphaToBetaUnitVector;
 	FRotator _shotDirection;
 
-	const float BASE_SPEED = 80.0f;
+	const float BASE_SPEED = 2000.0f;
 	const float RADIUS = 200.0f;
 	const float TEST = 100.0f;
 
 	float _duration;
-	float _durationStartToAlpha;
-	float _durationAlphaToBeta;
-	float _durationBetaToEnd;
 	float _elapsedTime = 0.0f;
 
 	bool _canShot;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Explode")
 	TSubclassOf<AExplosionEffect> _explosionEffect;
+
+	// 前回のフレームと比較して現在の進行方向を取得するために使用する
+	FVector _cachedPosition;
 };

@@ -66,100 +66,23 @@ void AEnemyShotActor::Tick(float DeltaTime)
 		_elapsedTime += DeltaTime;
 		FVector currentLocation;
 
-		DrawDebugLine(
-			GetWorld(),
+		float durationPercentageTime = FMath::Clamp(_elapsedTime / _duration, 0.0f, 1.0f);
+		float easeTime = EasingAnimationUtility::EaseInSine(durationPercentageTime);
+		currentLocation = EasingAnimationUtility::CalculateBezierPoint(easeTime,
 			_startPosition,
-			_alphaPoint,
-			FColor::Green,        // 線の色
-			false,              // 永続化しない（trueにすると常に描画）
-			2.0f,               // 描画時間（秒）
-			0,                  // 深度優先の設定（デフォルト 0）
-			2.0f                // 線の太さ
-		);
-
-		DrawDebugLine(
-			GetWorld(),
-			_startPosition,
+			_alphaPoint - directionUnitVector * TEST,
+			_alphaPoint + directionUnitVector * TEST,
 			_betaPoint,
-			FColor::Blue,        // 線の色
-			false,              // 永続化しない（trueにすると常に描画）
-			2.0f,               // 描画時間（秒）
-			0,                  // 深度優先の設定（デフォルト 0）
-			2.0f                // 線の太さ
-		);
+			_endPosition);
 
-		DrawDebugLine(
-			GetWorld(),
-			_startPosition,
-			_endPosition,
-			FColor::Yellow,        // 線の色
-			false,              // 永続化しない（trueにすると常に描画）
-			2.0f,               // 描画時間（秒）
-			0,                  // 深度優先の設定（デフォルト 0）
-			2.0f                // 線の太さ
-		);
-
-		DrawDebugLine(
-			GetWorld(),
-			_startPosition,
-			_midPointAlphaAndBeta,
-			FColor::Orange,        // 線の色
-			false,              // 永続化しない（trueにすると常に描画）
-			2.0f,               // 描画時間（秒）
-			0,                  // 深度優先の設定（デフォルト 0）
-			2.0f                // 線の太さ
-		);
-
-		float t;
-
-		if (_elapsedTime < _durationStartToAlpha)
-		{
-			//UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("OK")), true, true, FColor::Red, 2.f);
-
-			t = EasingAnimationUtility::EaseOutCubic(_elapsedTime / _durationStartToAlpha);
-			currentLocation = EasingAnimationUtility::CalculateBezierPoint(t,
-				_startPosition,
-				_startPosition + _alphaPointUnitVector * TEST,
-				_alphaPoint - directionUnitVector * TEST,
-				_alphaPoint);
-		}
-		else if (_elapsedTime < _durationStartToAlpha + _durationAlphaToBeta)
-		{
-			t = EasingAnimationUtility::EaseOutCubic((_elapsedTime - _durationStartToAlpha) / _durationAlphaToBeta);
-			if (t < 0.5f)
-			{
-				//UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("OK")), true, true, FColor::Yellow, 2.f);
-
-				currentLocation = EasingAnimationUtility::CalculateBezierPoint(t,
-					_alphaPoint,
-					_alphaPoint + directionUnitVector * TEST / 2,
-					_midPointAlphaAndBeta - _alphaToBetaUnitVector * TEST / 2,
-					_midPointAlphaAndBeta);
-			}
-			else
-			{
-				//UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("OK")), true, true, FColor::Blue, 2.f);
-
-				currentLocation = EasingAnimationUtility::CalculateBezierPoint(t,
-					_midPointAlphaAndBeta,
-					_midPointAlphaAndBeta + _alphaToBetaUnitVector * TEST / 2,
-					_betaPoint - directionUnitVector * TEST / 2,
-					_betaPoint);
-			}			
-		}
-		else if(_elapsedTime < _durationStartToAlpha + _durationAlphaToBeta + _durationBetaToEnd)
-		{
-			//UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("OK")), true, true, FColor::Green, 2.f);
-
-			t = EasingAnimationUtility::EaseOutCubic((_elapsedTime - _durationStartToAlpha - _durationAlphaToBeta) / _durationBetaToEnd);
-			currentLocation = EasingAnimationUtility::CalculateBezierPoint(t,
-				_betaPoint,
-				_betaPoint + directionUnitVector * TEST,
-				_endPosition - _betaPointUnitVector * TEST,
-				_endPosition);
-		}
-
+		
 		SetActorLocation(currentLocation);
+		FVector progressDirection = (currentLocation - _cachedPosition).GetSafeNormal();
+		FRotator newRotation = progressDirection.Rotation();
+		newRotation.Pitch += 90.0f;
+		SetActorRotation(newRotation);
+
+		_cachedPosition = currentLocation;
 
 		if (_elapsedTime >= _duration)
 		{
@@ -205,22 +128,12 @@ void AEnemyShotActor::Initialized(const FVector& startPosition, const FVector& e
 
 	_alphaPoint += directionUnitVector * 0.3f * distance;
 	_betaPoint += directionUnitVector * 0.8f * distance;
-	_midPointAlphaAndBeta = (_alphaPoint + _betaPoint) / 2;
 
 	float distanceStartToAlpha = FVector::Dist(startPosition, _alphaPoint);
 	float distanceAlphaToBeta = FVector::Dist(_alphaPoint, _betaPoint);
 	float distanceBetaToEnd = FVector::Dist(_betaPoint, _endPosition);
-	/*_durationStartToAlpha = _duration * (distanceStartToAlpha / distance);
-	_durationAlphaToBeta = _duration * (distanceAlphaToBeta / distance);
-	_durationBetaToEnd = _duration * (distanceBetaToEnd / distance);*/
-	_durationStartToAlpha = 1.0f;
-	_durationAlphaToBeta = 1.0f;
-	_durationBetaToEnd = 1.0f;
 
-	UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("duration a : %f"), _durationStartToAlpha), true, true, FColor::Black, 2.f);
-	UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("duration b : %f"), _durationAlphaToBeta), true, true, FColor::Black, 2.f);
-	UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("duration c : %f"), _durationBetaToEnd), true, true, FColor::Black, 2.f);
-
+	_cachedPosition = _startPosition;
 	
 	_canShot = true;
 }
