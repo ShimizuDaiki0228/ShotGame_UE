@@ -39,14 +39,14 @@ private:
 	FVector _alphaPoint;
 	FVector _betaPoint;
 	FVector directionUnitVector;
-	FVector _alphaPointUnitVector;
-	FVector _betaPointUnitVector;
-	FVector _alphaToBetaUnitVector;
 	FRotator _shotDirection;
+	float _alphaPointFromStartDistance;
+	float _betaPointFromEndDistance;
 
 	const float BASE_SPEED = 2000.0f;
 	const float RADIUS = 200.0f;
 	const float TEST = 100.0f;
+	const float RANDOM_OFFSET = 100.0f;
 
 	float _duration;
 	float _elapsedTime = 0.0f;
