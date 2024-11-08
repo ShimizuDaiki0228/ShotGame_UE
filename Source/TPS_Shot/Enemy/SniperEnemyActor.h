@@ -80,6 +80,8 @@ private:
 
 	FTimerHandle _nextMoveTimerHandle;
 
+	bool btest;
+
 public:
 	void ChangeState(ISniperEnemyState* newState);
 	virtual void Initialized(ATPS_ShotCharacter* character, ALevelManager* levelManager) override;

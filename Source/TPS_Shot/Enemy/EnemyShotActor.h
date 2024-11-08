@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "../Niagara/ExplosionEffect.h"
+#include "../PoolManager.h"
+#include "../LevelManager.h"
 #include "EnemyShotActor.generated.h"
 
 UCLASS()
@@ -28,7 +30,10 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 public:
-	void Initialized(const FVector& startPosition, const FVector& endPosition, const FRotator& shotDirection);
+	void Initialized(const FVector& startPosition, const FVector& endPosition, const FRotator& shotDirection, const ALevelManager* levelManager);
+
+private:
+	void SetShotRoot(const FVector& startPosition, const FVector& endPosition);
 
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Beam", meta = (AllowPrivateAccess = "true"))
@@ -53,9 +58,17 @@ private:
 
 	bool _canShot;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Explode")
-	TSubclassOf<AExplosionEffect> _explosionEffect;
+	UPROPERTY(EditDefaultsOnly, Category = "Particle")
+	UParticleSystem* _shotHitParticle;
+
+	UPROPERTY(Category = "Test", VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<UParticleSystemComponent> reusableHitEffect;
 
 	// 前回のフレームと比較して現在の進行方向を取得するために使用する
 	FVector _cachedPosition;
+
+	/*UPROPERTY(EditDefaultsOnly, Category = "Effect")
+	APoolManager* _impactEffectPool;*/
+
+	const ALevelManager* _levelManager;
 };

@@ -46,7 +46,7 @@ void ASpawnVolumeActor::SpawnEnemy(ALevelManager* levelManager, USpawnManager* e
 		{
 			spawnedEnemy->Initialized(_character, levelManager);
 		}
-		TimeManagerUtility::GetInstance().Delay(world, this, &ASpawnVolumeActor::SpawnEnemy, _spawnDelay, _spawnEnemyTimerHandle, levelManager, enemySpawnManager);
+		//TimeManagerUtility::GetInstance().Delay(world, this, &ASpawnVolumeActor::SpawnEnemy, _spawnDelay, _spawnEnemyTimerHandle, levelManager, enemySpawnManager);
 	}
 }
 

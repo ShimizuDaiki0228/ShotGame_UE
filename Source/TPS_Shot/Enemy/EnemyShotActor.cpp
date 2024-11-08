@@ -6,6 +6,8 @@
 #include "../Utility/EasingAnimationUtility.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Kismet/GameplayStatics.h"
+#include "Particles/ParticleSystemComponent.h"
 #include "../SpawnManager.h"
 
 // Sets default values
@@ -40,16 +42,41 @@ void AEnemyShotActor::BeginPlay()
 
 void AEnemyShotActor::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("HIT!!!!!!!!!!!!! : %s"), *OtherActor->GetName()), true, true, FColor::Green, 2.f);
 
 	if (OtherActor && (OtherActor != this))
 	{
-		USpawnManager* spawnManager = NewObject<USpawnManager>();
-		FActorSpawnParameters spawnParameters;
-		spawnParameters.Owner = this;
-		spawnParameters.Instigator = GetInstigator();
-		spawnManager->SetUp(spawnParameters, GetActorLocation());
-		spawnManager->SpawnActor(_explosionEffect);
+		//reusableHitEffect = UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), _shotHitParticle, GetActorLocation());
+
+		//APoolManager* enemyEffectPool = _levelManager->GetEnemyShotPoolManager();
+		//UParticleSystemComponent* hitEffectSystemComponent = enemyEffectPool->GetPoolObject<UParticleSystemComponent>(GetWorld());
+		//if (hitEffectSystemComponent == nullptr)
+		//{
+		//	//UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("Null : %s"), *OtherActor->GetName()), true, true, FColor::Green, 2.f);
+
+		//	UParticleSystemComponent* particleSystemComponent = UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), _shotHitParticle, GetActorLocation());
+		//	enemyEffectPool->RestorePoolObject<UParticleSystemComponent>(particleSystemComponent);
+		//	hitEffectSystemComponent = enemyEffectPool->GetPoolObject<UParticleSystemComponent>(GetWorld());
+		//}
+
+		//if (hitEffectSystemComponent != nullptr)
+		//{
+		//	//UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("OK : %s"), *OtherActor->GetName()), true, true, FColor::Green, 2.f);
+		//}
+		//hitEffectSystemComponent->SetWorldLocation(GetActorLocation());
+
+
+
+		if (reusableHitEffect)
+		{
+			//UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("HIT!!!!!!!!!!!!! : %s"), *OtherActor->GetName()), true, true, FColor::Green, 2.f);
+			/*reusableHitEffect->bAutoDestroy = false;
+			reusableHitEffect->SetWorldLocation(GetActorLocation());
+			reusableHitEffect->Activate();
+			reusableHitEffect->SetTemplate(_shotHitParticle);*/
+			//UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("pos : %s"), *reusableHitEffect->GetName()), true, true, FColor::Green, 2.f);
+		}
+		
+		//UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), _shotHitParticle, GetActorLocation());
 
 		Destroy();
 	}
@@ -62,6 +89,7 @@ void AEnemyShotActor::Tick(float DeltaTime)
 
 	if (_canShot)
 	{
+		
 
 		_elapsedTime += DeltaTime;
 		FVector currentLocation;
@@ -92,12 +120,20 @@ void AEnemyShotActor::Tick(float DeltaTime)
 	}
 }
 
-void AEnemyShotActor::Initialized(const FVector& startPosition, const FVector& endPosition, const FRotator& shotDirection)
+void AEnemyShotActor::Initialized(const FVector& startPosition, const FVector& endPosition, const FRotator& shotDirection, const ALevelManager* levelManager)
 {
+	_levelManager = levelManager;
+
 	_startPosition = startPosition;
 	_endPosition = endPosition;
 	_shotDirection = shotDirection;
 
+	SetShotRoot(startPosition, endPosition);
+	_canShot = true;
+}
+
+void AEnemyShotActor::SetShotRoot(const FVector& startPosition, const FVector& endPosition)
+{
 	float distance = FVector::Dist(startPosition, endPosition);
 	_duration = distance / BASE_SPEED;
 
@@ -123,6 +159,5 @@ void AEnemyShotActor::Initialized(const FVector& startPosition, const FVector& e
 	_betaPoint += directionPerpendicular1 * betaOffset1 + directionPerpendicular2 * betaOffset2;
 
 	_cachedPosition = _startPosition;
-	
-	_canShot = true;
+
 }

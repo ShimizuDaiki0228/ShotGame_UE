@@ -38,6 +38,7 @@ protected:
 
 	ATPS_ShotCharacter* _character;
 
+	ALevelManager* _levelManager;
 public:
 	virtual void Initialized(ATPS_ShotCharacter* character, ALevelManager* levelManager);
 
@@ -45,14 +46,11 @@ public:
 
 	UStaticMeshComponent* GetMesh() const { return _mesh; }
 
-	ALevelManager* GetLevelManager() const { return _levelManager; }
-
 	// hpがある一定の値以下になった場合に破棄してスコアを上げるためにbool型
 	bool DecreaseHP();
 
 	AExplosionEffect* Explosion();
 private:
-	ALevelManager* _levelManager;
 
 	const int MAX_HP = 3;
 	int _hp;
