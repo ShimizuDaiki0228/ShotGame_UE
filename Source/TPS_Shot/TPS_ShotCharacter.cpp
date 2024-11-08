@@ -239,6 +239,15 @@ void ATPS_ShotCharacter::Reload()
 	}
 }
 
+void ATPS_ShotCharacter::GrabClip()
+{
+	
+}
+
+void ATPS_ShotCharacter::ReleaseClip()
+{
+}
+
 void ATPS_ShotCharacter::ChangeHP(int newHP)
 {
 	_currentHPProp->SetValue(newHP);

@@ -55,12 +55,16 @@ void ASniperEnemyActor::Tick(float DeltaTime)
 		SetActorRotation(lookAtRotation);
 	}
 
-	if (_elapsedRayTime <= 0)
+	if (!btest)
 	{
-		_elapsedRayTime = RAY_SPAN;
-		if (_rayObject->IsHit(this, GetTarget(), _cacheWorld))
+		if (_elapsedRayTime <= 0)
 		{
-			_isTargetLockOn = true;
+			_elapsedRayTime = RAY_SPAN;
+			if (_rayObject->IsHit(this, GetTarget(), _cacheWorld))
+			{
+				_isTargetLockOn = true;
+				btest = true;
+			}
 		}
 	}
 
@@ -141,7 +145,7 @@ void ASniperEnemyActor::Initialized(ATPS_ShotCharacter* character, ALevelManager
 
 void ASniperEnemyActor::SetPatrolAreaOrder()
 {
-	TMap<AActor*, bool> map = GetLevelManager()->GetPatrolAreaMap();
+	/*TMap<AActor*, bool> map = GetLevelManager()->GetPatrolAreaMap();
 
 	int8 mapSize = map.Num();
 
@@ -161,12 +165,12 @@ void ASniperEnemyActor::SetPatrolAreaOrder()
 		_alreadyAppearanceNumber.Add(random);
 	}
 	
-	SelectPosition();
+	SelectPosition();*/
 }
 
 void ASniperEnemyActor::SelectPosition()
 {
-	const TMap<AActor*, bool>& patrolAreaMap = GetLevelManager()->GetPatrolAreaMap();
+	const TMap<AActor*, bool>& patrolAreaMap = _levelManager->GetPatrolAreaMap();
 
 	if (!patrolAreaMap.IsEmpty())
 	{
@@ -182,7 +186,7 @@ void ASniperEnemyActor::SelectPosition()
 
 			if (!isSelected)
 			{
-				GetLevelManager()->SetPatrolAreaMap(_nextPosition, patrolArea);
+				_levelManager->SetPatrolAreaMap(_nextPosition, patrolArea);
 				_nextPosition = patrolArea;
 				return;
 			}
@@ -205,7 +209,7 @@ void ASniperEnemyActor::BeamShot()
 	_shotSpawnManager->SetTransform(GetActorLocation(), shotRotation);
 	AEnemyShotActor* shotActor = _shotSpawnManager->SpawnActor(_enemyShotActorClass);
 	FVector targetLocation = GetTarget()->GetActorLocation() + TARGET_OFFSET;
-	shotActor->Initialized(GetActorLocation(), targetLocation, GetActorRotation());
+	shotActor->Initialized(GetActorLocation(), targetLocation, GetActorRotation(), _levelManager);
 }
 
 void ASniperEnemyActor::SetupCurrentPatrolArea()
@@ -214,7 +218,7 @@ void ASniperEnemyActor::SetupCurrentPatrolArea()
 
 void ASniperEnemyActor::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-	GetLevelManager()->SetPatrolAreaMap(nullptr, _nextPosition);
+	_levelManager->SetPatrolAreaMap(nullptr, _nextPosition);
 
 	TimeManagerUtility::GetInstance().Cancel(_cacheWorld, _createBulletTimerHandle);
 }

@@ -6,6 +6,8 @@
 #include "../Utility/EasingAnimationUtility.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Kismet/GameplayStatics.h"
+#include "Particles/ParticleSystemComponent.h"
 #include "../SpawnManager.h"
 
 // Sets default values
@@ -40,16 +42,41 @@ void AEnemyShotActor::BeginPlay()
 
 void AEnemyShotActor::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("HIT!!!!!!!!!!!!! : %s"), *OtherActor->GetName()), true, true, FColor::Green, 2.f);
 
 	if (OtherActor && (OtherActor != this))
 	{
-		USpawnManager* spawnManager = NewObject<USpawnManager>();
-		FActorSpawnParameters spawnParameters;
-		spawnParameters.Owner = this;
-		spawnParameters.Instigator = GetInstigator();
-		spawnManager->SetUp(spawnParameters, GetActorLocation());
-		spawnManager->SpawnActor(_explosionEffect);
+		//reusableHitEffect = UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), _shotHitParticle, GetActorLocation());
+
+		//APoolManager* enemyEffectPool = _levelManager->GetEnemyShotPoolManager();
+		//UParticleSystemComponent* hitEffectSystemComponent = enemyEffectPool->GetPoolObject<UParticleSystemComponent>(GetWorld());
+		//if (hitEffectSystemComponent == nullptr)
+		//{
+		//	//UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("Null : %s"), *OtherActor->GetName()), true, true, FColor::Green, 2.f);
+
+		//	UParticleSystemComponent* particleSystemComponent = UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), _shotHitParticle, GetActorLocation());
+		//	enemyEffectPool->RestorePoolObject<UParticleSystemComponent>(particleSystemComponent);
+		//	hitEffectSystemComponent = enemyEffectPool->GetPoolObject<UParticleSystemComponent>(GetWorld());
+		//}
+
+		//if (hitEffectSystemComponent != nullptr)
+		//{
+		//	//UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("OK : %s"), *OtherActor->GetName()), true, true, FColor::Green, 2.f);
+		//}
+		//hitEffectSystemComponent->SetWorldLocation(GetActorLocation());
+
+
+
+		if (reusableHitEffect)
+		{
+			//UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("HIT!!!!!!!!!!!!! : %s"), *OtherActor->GetName()), true, true, FColor::Green, 2.f);
+			/*reusableHitEffect->bAutoDestroy = false;
+			reusableHitEffect->SetWorldLocation(GetActorLocation());
+			reusableHitEffect->Activate();
+			reusableHitEffect->SetTemplate(_shotHitParticle);*/
+			//UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("pos : %s"), *reusableHitEffect->GetName()), true, true, FColor::Green, 2.f);
+		}
+		
+		//UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), _shotHitParticle, GetActorLocation());
 
 		Destroy();
 	}
@@ -62,32 +89,75 @@ void AEnemyShotActor::Tick(float DeltaTime)
 
 	if (_canShot)
 	{
+		
 
 		_elapsedTime += DeltaTime;
+		FVector currentLocation;
 
-		float t = FMath::Clamp(_elapsedTime / _duration, 0.0f, 1.0f);
-		float ease = EasingAnimationUtility::EaseInCirc(t);
-
-		FVector currentLocation = FMath::Lerp(_startPosition, _endPosition, ease);
+		float durationPercentageTime = FMath::Clamp(_elapsedTime / _duration, 0.0f, 1.0f);
+		float easeTime = EasingAnimationUtility::EaseInQuart(durationPercentageTime);
+		currentLocation = EasingAnimationUtility::CalculateBezierPoint(easeTime,
+			_startPosition,
+			_alphaPoint - directionUnitVector * _alphaPointFromStartDistance / 2,
+			_alphaPoint + directionUnitVector * _alphaPointFromStartDistance / 2,
+			_betaPoint,
+			_endPosition);
+		
 		SetActorLocation(currentLocation);
+		FVector progressDirection = (currentLocation - _cachedPosition).GetSafeNormal();
+		FRotator newRotation = progressDirection.Rotation();
+		newRotation.Pitch += 90.0f;
+		SetActorRotation(newRotation);
 
-		if (t >= 1.0f)
+		_cachedPosition = currentLocation;
+
+		if (_elapsedTime >= _duration)
 		{
+			UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("End")), true, true, FColor::Black, 2.f);
+			_beamMeshComponent->SetEnableGravity(true);
 			_canShot = false;
 		}
 	}
 }
 
-void AEnemyShotActor::Initialized(const FVector& startPosition, const FVector& endPosition, const FRotator& shotDirection)
+void AEnemyShotActor::Initialized(const FVector& startPosition, const FVector& endPosition, const FRotator& shotDirection, const ALevelManager* levelManager)
 {
+	_levelManager = levelManager;
+
 	_startPosition = startPosition;
 	_endPosition = endPosition;
 	_shotDirection = shotDirection;
 
+	SetShotRoot(startPosition, endPosition);
+	_canShot = true;
+}
+
+void AEnemyShotActor::SetShotRoot(const FVector& startPosition, const FVector& endPosition)
+{
 	float distance = FVector::Dist(startPosition, endPosition);
 	_duration = distance / BASE_SPEED;
 
-	_canShot = true;
+	// 目標への方向と、その垂直方向
+	directionUnitVector = _shotDirection.Vector().GetSafeNormal();
+	FVector directionPerpendicular1 = FVector(-directionUnitVector.Y, directionUnitVector.X, 0).GetSafeNormal();
+	FVector directionPerpendicular2 = FVector(directionUnitVector.Z, 0, -directionUnitVector.X).GetSafeNormal();
 
+	// α地点とβ地点は象限が(0,0)で対象の位置にいるように
+	float alphaOffset1 = FMath::RandRange(-RADIUS, RADIUS) + RANDOM_OFFSET;
+	float alphaOffset2 = FMath::RandRange(-RADIUS, RADIUS) + RANDOM_OFFSET;
+	float betaOffset1 = alphaOffset1 < RANDOM_OFFSET ? FMath::RandRange(0.0f, RADIUS) + RANDOM_OFFSET : FMath::RandRange(-RADIUS, 0.0f) + RANDOM_OFFSET;
+	float betaOffset2 = alphaOffset2 < RANDOM_OFFSET ? FMath::RandRange(0.0f, RADIUS) + RANDOM_OFFSET : FMath::RandRange(-RADIUS, 0.0f) + RANDOM_OFFSET;
+
+	// スタート地点からのalphaの位置を求めるのに使用
+	_alphaPointFromStartDistance = FMath::RandRange(0.1f, 0.4f) * distance;
+	// エンド地点からのbetaの位置を求めるのに使用
+	_betaPointFromEndDistance = FMath::RandRange(0.1f, 0.4f) * distance;
+
+	_alphaPoint = _startPosition + directionUnitVector * _alphaPointFromStartDistance;
+	_alphaPoint += directionPerpendicular1 * alphaOffset1 + directionPerpendicular2 * alphaOffset2;
+	_betaPoint = _startPosition + directionUnitVector * (distance - _alphaPointFromStartDistance);
+	_betaPoint += directionPerpendicular1 * betaOffset1 + directionPerpendicular2 * betaOffset2;
+
+	_cachedPosition = _startPosition;
 
 }

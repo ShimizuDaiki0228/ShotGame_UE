@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "PoolManager.h"
 #include "LevelManager.generated.h"
 
 UCLASS()
@@ -22,9 +23,14 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "PatrolArea", meta = (AllowPrivateAccess = "true"))
 		TMap<AActor*, bool> _patrolAreaMap;
 
+	//UPROPERTY(EditDefaultsOnly, Category = "Manager")
+	//APoolManager* _enemyShotPoolManager;
+
 public:
 	ASpawnVolumeActor* GetVolumeActor() const { return _volumeActor; }
 
 	const TMap<AActor*, bool> GetPatrolAreaMap() const { return _patrolAreaMap; }
 	void SetPatrolAreaMap(AActor* currentPatrolArea, AActor* newPatrolArea);
+
+	//APoolManager* GetEnemyShotPoolManager() const { return _enemyShotPoolManager; }
 };
