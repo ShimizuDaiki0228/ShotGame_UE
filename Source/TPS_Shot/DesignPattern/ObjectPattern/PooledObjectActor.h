@@ -4,9 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "ObjectPoolActor.h"
 #include "PooledObjectActor.generated.h"
 
-class AObjectPoolActor;
 
 UCLASS()
 class TPS_SHOT_API APooledObjectActor : public AActor
@@ -16,7 +16,7 @@ class TPS_SHOT_API APooledObjectActor : public AActor
 public:
 	AObjectPoolActor* Pool;
 
-	FORCEINLINE void Relase()
+	FORCEINLINE void Release()
 	{
 		Pool->ReturnToPool(this);
 	}

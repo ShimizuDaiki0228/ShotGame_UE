@@ -89,7 +89,16 @@ void AEnemyShotActor::Tick(float DeltaTime)
 
 	if (_canShot)
 	{
-		
+		//UParticleSystemComponent* newComponent = UGameplayStatics::SpawnEmitterAtLocation(
+		//	GetWorld(),
+		//	_shotHitParticle,
+		//	GetActorLocation(),  // 相対位置
+		//	FRotator::ZeroRotator,
+		//	true  // bAutoDestroy パラメータ（必要に応じて変更可能）
+		//);
+
+		//newComponent->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepWorldTransform);
+		//newComponent->SetAutoActivate(true);
 
 		_elapsedTime += DeltaTime;
 		FVector currentLocation;

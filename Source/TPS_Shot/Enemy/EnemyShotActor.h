@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "../Niagara/ExplosionEffect.h"
-#include "../PoolManager.h"
 #include "../LevelManager.h"
 #include "EnemyShotActor.generated.h"
 
