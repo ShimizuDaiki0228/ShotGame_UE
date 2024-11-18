@@ -8,6 +8,7 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystemComponent.h"
+#include "../DesignPattern/ObjectPattern/PooledParticleSystemComponent.h"
 #include "../SpawnManager.h"
 
 // Sets default values
@@ -64,7 +65,7 @@ void AEnemyShotActor::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActo
 		//}
 		//hitEffectSystemComponent->SetWorldLocation(GetActorLocation());
 
-
+		UPooledParticleSystemComponent* testSystemComponent = _levelManager->GetPool()->GetPooledObject(this);
 
 		if (reusableHitEffect)
 		{

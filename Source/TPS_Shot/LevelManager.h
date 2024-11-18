@@ -4,8 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "PoolManager.h"
+#include "DesignPattern/ObjectPattern/ObjectPoolUObject.h"
 #include "LevelManager.generated.h"
+
+class AParticleSystemPoolActor;
 
 UCLASS()
 class TPS_SHOT_API ALevelManager : public AActor
@@ -23,6 +25,9 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "PatrolArea", meta = (AllowPrivateAccess = "true"))
 		TMap<AActor*, bool> _patrolAreaMap;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Spawning", meta = (AllowPrivateAccess = "true"))
+	class AParticleSystemPoolActor* _testPool;
+
 	//UPROPERTY(EditDefaultsOnly, Category = "Manager")
 	//APoolManager* _enemyShotPoolManager;
 
@@ -31,6 +36,8 @@ public:
 
 	const TMap<AActor*, bool> GetPatrolAreaMap() const { return _patrolAreaMap; }
 	void SetPatrolAreaMap(AActor* currentPatrolArea, AActor* newPatrolArea);
+
+	AParticleSystemPoolActor* GetPool() const { return _testPool; }
 
 	//APoolManager* GetEnemyShotPoolManager() const { return _enemyShotPoolManager; }
 };

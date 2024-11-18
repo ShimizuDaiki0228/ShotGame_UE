@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Particles/ParticleSystemComponent.h"
-#include "ObjectPoolUObject.h"
+#include "ParticleSystemPoolActor.h"
 #include "PooledParticleSystemComponent.generated.h"
 
 /**
@@ -23,7 +23,7 @@ private:
 	void OnParticleSystemFinished(UParticleSystemComponent* PSystem);
 
 public:
-	UObjectPoolUObject* Pool;
+	AParticleSystemPoolActor* Pool;
 
 	// ‚±‚±‚©‚ç‘±‚«
 	void Release();
