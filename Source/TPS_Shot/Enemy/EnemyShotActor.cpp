@@ -43,41 +43,12 @@ void AEnemyShotActor::BeginPlay()
 
 void AEnemyShotActor::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-
 	if (OtherActor && (OtherActor != this))
 	{
-		//reusableHitEffect = UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), _shotHitParticle, GetActorLocation());
-
-		//APoolManager* enemyEffectPool = _levelManager->GetEnemyShotPoolManager();
-		//UParticleSystemComponent* hitEffectSystemComponent = enemyEffectPool->GetPoolObject<UParticleSystemComponent>(GetWorld());
-		//if (hitEffectSystemComponent == nullptr)
-		//{
-		//	//UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("Null : %s"), *OtherActor->GetName()), true, true, FColor::Green, 2.f);
-
-		//	UParticleSystemComponent* particleSystemComponent = UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), _shotHitParticle, GetActorLocation());
-		//	enemyEffectPool->RestorePoolObject<UParticleSystemComponent>(particleSystemComponent);
-		//	hitEffectSystemComponent = enemyEffectPool->GetPoolObject<UParticleSystemComponent>(GetWorld());
-		//}
-
-		//if (hitEffectSystemComponent != nullptr)
-		//{
-		//	//UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("OK : %s"), *OtherActor->GetName()), true, true, FColor::Green, 2.f);
-		//}
-		//hitEffectSystemComponent->SetWorldLocation(GetActorLocation());
-
-		UPooledParticleSystemComponent* testSystemComponent = _levelManager->GetPool()->GetPooledObject(this);
-
-		if (reusableHitEffect)
+		if (_levelManager)
 		{
-			//UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("HIT!!!!!!!!!!!!! : %s"), *OtherActor->GetName()), true, true, FColor::Green, 2.f);
-			/*reusableHitEffect->bAutoDestroy = false;
-			reusableHitEffect->SetWorldLocation(GetActorLocation());
-			reusableHitEffect->Activate();
-			reusableHitEffect->SetTemplate(_shotHitParticle);*/
-			//UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("pos : %s"), *reusableHitEffect->GetName()), true, true, FColor::Green, 2.f);
+			UPooledParticleSystemComponent* hitParticleSystemComponent = _levelManager->GetPool()->GetPooledObject(this);
 		}
-		
-		//UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), _shotHitParticle, GetActorLocation());
 
 		Destroy();
 	}
@@ -90,17 +61,6 @@ void AEnemyShotActor::Tick(float DeltaTime)
 
 	if (_canShot)
 	{
-		//UParticleSystemComponent* newComponent = UGameplayStatics::SpawnEmitterAtLocation(
-		//	GetWorld(),
-		//	_shotHitParticle,
-		//	GetActorLocation(),  // 相対位置
-		//	FRotator::ZeroRotator,
-		//	true  // bAutoDestroy パラメータ（必要に応じて変更可能）
-		//);
-
-		//newComponent->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepWorldTransform);
-		//newComponent->SetAutoActivate(true);
-
 		_elapsedTime += DeltaTime;
 		FVector currentLocation;
 

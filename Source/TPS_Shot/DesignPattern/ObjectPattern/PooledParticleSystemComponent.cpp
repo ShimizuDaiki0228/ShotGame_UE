@@ -11,7 +11,7 @@ UPooledParticleSystemComponent::UPooledParticleSystemComponent()
 
 void UPooledParticleSystemComponent::OnParticleSystemFinished(UParticleSystemComponent* PSystem)
 {
-	UKismetSystemLibrary::PrintString(this, TEXT("OK"), true, true, FColor::Red, 2.f);
+	UKismetSystemLibrary::PrintString(this, TEXT("object return to pool"), true, true, FColor::Red, 2.f);
 
 	Pool->ReturnToPool(this);
 }

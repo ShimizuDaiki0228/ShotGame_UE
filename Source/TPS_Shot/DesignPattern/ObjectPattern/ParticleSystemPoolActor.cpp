@@ -21,51 +21,28 @@ void AParticleSystemPoolActor::BeginPlay()
 {
 	Super::BeginPlay();
 
-	//if (_owner)
-	//{
-	//	_rootComponent->SetupAttachment(_owner->GetRootComponent());
-	//}
-
 	if (_particleSystem)
 	{
 		for (int i = 0; i < _initPoolSize; i++)
 		{
-			UPooledParticleSystemComponent* newComponent = CreateNewPooledObject(this);
+			UPooledParticleSystemComponent* newComponent = CreateNewPooledObject();
 			newComponent->Pool = this;
 		}
 	}
-
-	/*TimeManagerUtility::GetInstance().Delay(GetWorld(), [this]() {
-		aaa = GetPooledObject();
-		}, 1.0f, handle);*/
 }
 
-
-
-UPooledParticleSystemComponent* AParticleSystemPoolActor::GetPooledObject(AActor* owner)
+UPooledParticleSystemComponent* AParticleSystemPoolActor::GetPooledObject(const AActor* owner)
 {
 	UPooledParticleSystemComponent* pooledObject;
 
 	if (_pooledObjectStack.Num() == 0)
 	{
-		UKismetSystemLibrary::PrintString(this, TEXT("create particle"), true, true, FColor::Red, 2.f);
-		pooledObject = CreateNewPooledObject(owner);
+		pooledObject = CreateNewPooledObject();
 	}
 	else
 	{
-		UKismetSystemLibrary::PrintString(this, TEXT("pop particle"), true, true, FColor::Blue, 2.f);
-
 		pooledObject = _pooledObjectStack.Pop();
-
-		//pooledObject->DeactivateSystem();
-		//pooledObject->ResetParticles();
-
-		// パーティクルを再度アクティブ化
 	}
-
-	//TimeManagerUtility::GetInstance().Delay(GetWorld(), [this]() {
-	//	aaa = GetPooledObject();
-	//	}, 2.0f, handle);
 
 	pooledObject->ActivateSystem();
 	pooledObject->SetWorldLocation(owner->GetActorLocation());
@@ -81,91 +58,26 @@ void AParticleSystemPoolActor::ReturnToPool(UPooledParticleSystemComponent* part
 	}
 }
 
-UPooledParticleSystemComponent* AParticleSystemPoolActor::CreateNewPooledObject(AActor* owner)
+UPooledParticleSystemComponent* AParticleSystemPoolActor::CreateNewPooledObject()
 {
-
 	if (_particleSystem)
 	{
+		UPooledParticleSystemComponent* newPooledComponent = NewObject<UPooledParticleSystemComponent>(this);
 
-		/*UParticleSystemComponent* newComponent = UGameplayStatics::SpawnEmitterAtLocation(
-			_owner->GetWorld(),
-			_particleSystem,
-			FVector::ZeroVector,
-			FRotator::ZeroRotator);*/
-
-			//UPooledParticleSystemComponent* newComponent = UGameplayStatics::SpawnEmitterAtLocation(
-			//	GetWorld(),
-			//	_particleSystem,
-			//	_owner->GetActorLocation(),  // 相対位置
-			//	FRotator::ZeroRotator,
-			//	true  // bAutoDestroy パラメータ（必要に応じて変更可能）
-			//);
-
-
-			//if (newComponent)
+		if (newPooledComponent)
 		{
-			//UKismetSystemLibrary::PrintString(this, TEXT("particle Created"), true, true, FColor::Yellow, 2.f);
+			newPooledComponent->bAutoActivate = false;
+			newPooledComponent->SetTemplate(_particleSystem);
+			newPooledComponent->SetWorldLocation(FVector::ZeroVector);
+			newPooledComponent->SetWorldRotation(FRotator::ZeroRotator);
 
-			//UPooledParticleSystemComponent* newPooledComponent = Cast<UPooledParticleSystemComponent>(newComponent);
-			UPooledParticleSystemComponent* newPooledComponent = NewObject<UPooledParticleSystemComponent>(owner);
-
-			if (newPooledComponent)
-			{
-				newPooledComponent->bAutoActivate = false;
-				newPooledComponent->SetTemplate(_particleSystem);
-				newPooledComponent->SetWorldLocation(owner->GetActorLocation());
-				newPooledComponent->SetWorldRotation(FRotator::ZeroRotator);
-
-				newPooledComponent->RegisterComponent();
-				newPooledComponent->SetAutoActivate(false);
-				_pooledObjectStack.Add(newPooledComponent);
-				/*newPooledComponent->SetAutoActivate(false);
-				newPooledComponent->bAutoActivate = false;
-				newPooledComponent->RegisterComponent();*/
-				return newPooledComponent;
-			}
+			newPooledComponent->RegisterComponent();
+			newPooledComponent->SetAutoActivate(false);
+			_pooledObjectStack.Add(newPooledComponent);
+			return newPooledComponent;
 		}
-
 	}
 
 	UKismetSystemLibrary::PrintString(this, TEXT("particle doesn't Created"), true, true, FColor::Red, 2.f);
 	return nullptr;
-}
-
-void AParticleSystemPoolActor::ActiveChange(UPooledParticleSystemComponent* pooledObjectComponent, bool isPopObject)
-{
-	pooledObjectComponent->SetActive(isPopObject);
-}
-
-void AParticleSystemPoolActor::Test()
-{
-	UKismetSystemLibrary::PrintString(this, TEXT("I Key Clicked"), true, true, FColor::Red, 2.f);
-
-
-
-	if (_particleSystem)
-	{
-		{
-			UPooledParticleSystemComponent* newPooledComponent = NewObject<UPooledParticleSystemComponent>(this);
-
-			if (newPooledComponent)
-			{
-				newPooledComponent->bAutoActivate = true;
-				newPooledComponent->SetTemplate(_particleSystem);
-				newPooledComponent->SetWorldLocation(this->GetActorLocation());
-				newPooledComponent->SetWorldRotation(FRotator::ZeroRotator);
-
-				newPooledComponent->RegisterComponent();
-				//newPooledComponent->SetAutoActivate(false);
-				_pooledObjectStack.Add(newPooledComponent);
-				/*newPooledComponent->SetAutoActivate(false);
-				newPooledComponent->bAutoActivate = false;
-				newPooledComponent->RegisterComponent();*/
-				return;
-			}
-		}
-
-	}
-
-	UKismetSystemLibrary::PrintString(this, TEXT("particle doesn't Created"), true, true, FColor::Red, 2.f);
 }

@@ -25,10 +25,7 @@ private:
 		TMap<AActor*, bool> _patrolAreaMap;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Spawning", meta = (AllowPrivateAccess = "true"))
-	class AParticleSystemPoolActor* _testPool;
-
-	//UPROPERTY(EditDefaultsOnly, Category = "Manager")
-	//APoolManager* _enemyShotPoolManager;
+	class AParticleSystemPoolActor* _enemyHitEffectPool;
 
 public:
 	ASpawnVolumeActor* GetVolumeActor() const { return _volumeActor; }
@@ -36,7 +33,5 @@ public:
 	const TMap<AActor*, bool> GetPatrolAreaMap() const { return _patrolAreaMap; }
 	void SetPatrolAreaMap(AActor* currentPatrolArea, AActor* newPatrolArea);
 
-	AParticleSystemPoolActor* GetPool() const { return _testPool; }
-
-	//APoolManager* GetEnemyShotPoolManager() const { return _enemyShotPoolManager; }
+	AParticleSystemPoolActor* GetPool() const { return _enemyHitEffectPool; }
 };

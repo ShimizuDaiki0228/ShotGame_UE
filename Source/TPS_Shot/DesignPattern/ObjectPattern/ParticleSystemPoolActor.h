@@ -32,27 +32,13 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Pool")
 	UParticleSystem* _particleSystem;
 
-	//UPROPERTY(EditAnywhere, Category = "Pool")
-	//AActor* _owner;
-
-	UPROPERTY(EditAnywhere, Category = "Components")
-	UActorComponent* TargetComponent;
-
 public:
-	UPooledParticleSystemComponent* GetPooledObject(AActor* owner);
+	UPooledParticleSystemComponent* GetPooledObject(const AActor* owner);
 
 	void ReturnToPool(UPooledParticleSystemComponent* particleComponent);
 
 private:
-	UPooledParticleSystemComponent* CreateNewPooledObject(AActor* owner);
-
-	void ActiveChange(UPooledParticleSystemComponent* pooledObjectComponent, bool isPopObject);
+	UPooledParticleSystemComponent* CreateNewPooledObject();
 
 	USceneComponent* _rootComponent;
-
-	void Test();
-
-	UPooledParticleSystemComponent* aaa;
-	FTimerHandle handle;
-
 };
