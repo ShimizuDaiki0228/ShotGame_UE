@@ -39,6 +39,4 @@ public:
 
 private:
 	UPooledParticleSystemComponent* CreateNewPooledObject();
-
-	USceneComponent* _rootComponent;
 };
