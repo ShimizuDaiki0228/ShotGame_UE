@@ -4,8 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "PoolManager.h"
 #include "LevelManager.generated.h"
+
+class AParticleSystemPoolActor;
 
 UCLASS()
 class TPS_SHOT_API ALevelManager : public AActor
@@ -23,8 +24,8 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "PatrolArea", meta = (AllowPrivateAccess = "true"))
 		TMap<AActor*, bool> _patrolAreaMap;
 
-	//UPROPERTY(EditDefaultsOnly, Category = "Manager")
-	//APoolManager* _enemyShotPoolManager;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Spawning", meta = (AllowPrivateAccess = "true"))
+	class AParticleSystemPoolActor* _enemyHitEffectPool;
 
 public:
 	ASpawnVolumeActor* GetVolumeActor() const { return _volumeActor; }
@@ -32,5 +33,5 @@ public:
 	const TMap<AActor*, bool> GetPatrolAreaMap() const { return _patrolAreaMap; }
 	void SetPatrolAreaMap(AActor* currentPatrolArea, AActor* newPatrolArea);
 
-	//APoolManager* GetEnemyShotPoolManager() const { return _enemyShotPoolManager; }
+	AParticleSystemPoolActor* GetPool() const { return _enemyHitEffectPool; }
 };
