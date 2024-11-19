@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "DesignPattern/ObjectPattern/ObjectPoolUObject.h"
 #include "LevelManager.generated.h"
 
 class AParticleSystemPoolActor;
