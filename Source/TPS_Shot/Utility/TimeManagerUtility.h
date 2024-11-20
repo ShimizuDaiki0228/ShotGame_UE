@@ -39,7 +39,17 @@ public:
 		}
 	}
 
-	void Delay(UWorld* world, TFunction<void()> callback, float delayTime, FTimerHandle& timerHandle);
+	template<typename TFunction>
+	void Delay(UWorld* world, TFunction callback, float delayTime, FTimerHandle& timerHandle)
+	{
+		if (world)
+		{
+			world->GetTimerManager().SetTimer(timerHandle, [callback]()
+				{
+					callback();
+				}, delayTime, false);
+		}
+	}
 
 	void Cancel(UWorld* world, FTimerHandle& timerHandle)
 	{
