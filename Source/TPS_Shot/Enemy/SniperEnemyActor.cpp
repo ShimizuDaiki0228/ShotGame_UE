@@ -34,7 +34,8 @@ void ASniperEnemyActor::Tick(float DeltaTime)
 		_shotLimit -= DeltaTime;
 		if (_shotLimit <= 0.0f)
 		{
-			BeamShot();
+			int rand = FMath::RandRange(2, 4);
+			BeamShot(rand);
 			_shotLimit = SHOT_DURATION;
 			_isTargetLockOn = false;
 		}
@@ -198,8 +199,10 @@ void ASniperEnemyActor::SelectPosition()
 	}
 }
 
-void ASniperEnemyActor::BeamShot()
+void ASniperEnemyActor::BeamShot(int shotNum)
 {
+	shotNum--;
+
 	if (_beamShotSound)
 	{
 		SoundManagerUtility::GetInstance().Play(_beamShotSound, this);
@@ -210,6 +213,14 @@ void ASniperEnemyActor::BeamShot()
 	AEnemyShotActor* shotActor = _shotSpawnManager->SpawnActor(_enemyShotActorClass);
 	FVector targetLocation = GetTarget()->GetActorLocation() + TARGET_OFFSET;
 	shotActor->Initialized(GetActorLocation(), targetLocation, GetActorRotation(), _levelManager);
+
+	if (shotNum > 0)
+	{
+		TimeManagerUtility::GetInstance().Delay(_cacheWorld, [this, shotNum]()
+			{
+				BeamShot(shotNum);
+			}, 0.1f, _shotTimeHandle);
+	}
 }
 
 void ASniperEnemyActor::SetupCurrentPatrolArea()
@@ -220,7 +231,7 @@ void ASniperEnemyActor::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	_levelManager->SetPatrolAreaMap(nullptr, _nextPosition);
 
-	TimeManagerUtility::GetInstance().Cancel(_cacheWorld, _createBulletTimerHandle);
+	TimeManagerUtility::GetInstance().Cancel(_cacheWorld, _shotTimeHandle);
 }
 
 void ASniperEnemyActor::SelfDestroy()

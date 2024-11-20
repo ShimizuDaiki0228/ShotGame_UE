@@ -39,6 +39,8 @@ private:
 	// 後々プレイヤーと同様の弾を使いたいので消したい
 	
 	FTimerHandle _createBulletTimerHandle;
+	FTimerHandle _shotTimeHandle;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Spawning", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<AActor> _bulletActor;
 
@@ -86,7 +88,7 @@ public:
 	void ChangeState(ISniperEnemyState* newState);
 	virtual void Initialized(ATPS_ShotCharacter* character, ALevelManager* levelManager) override;
 
-	void BeamShot();
+	void BeamShot(int shotNum);
 
 	void SetupCurrentPatrolArea();
 	TArray<int8> PatrolAreaOrder;
