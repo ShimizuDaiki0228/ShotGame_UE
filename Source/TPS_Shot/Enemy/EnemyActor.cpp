@@ -5,6 +5,7 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "../Utility/SoundManagerUtility.h"
 #include "../Utility/TimeManagerUtility.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AEnemyActor::AEnemyActor()
@@ -20,17 +21,89 @@ AEnemyActor::AEnemyActor()
 void AEnemyActor::BeginPlay()
 {
 	Super::BeginPlay();
+
+	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+	if (!PlayerController)
+	{
+		return;
+	}
+
+	_healthBarWidget = CreateWidget<UEnemyHpBarUserWidget>(GetWorld(), _healthBarComponent);
+	if (_healthBarWidget.IsValid())
+	{
+		_healthBarWidget->AddToViewport();
+	}
+
+	FVector2D screenPosition;
+	bool bProjected = UGameplayStatics::ProjectWorldToScreen(PlayerController, GetActorLocation(), screenPosition);
+
+	if (bProjected)
+	{
+		// �E�B�W�F�b�g�̃T�C�Y���擾
+		FVector2D widgetSize = _healthBarWidget->GetDesiredSize();
+		FVector2D centeredPosition = screenPosition - (widgetSize);
+
+		// �X�N���[�����W���E�B�W�F�b�g�̈ʒu�ɓK�p
+		_healthBarWidget->SetVisibility(ESlateVisibility::Visible);
+		_healthBarWidget->SetPositionInViewport(centeredPosition, true);
+	}
+	else
+	{
+		// ��ʊO�̏ꍇ�A�E�B�W�F�b�g���\���ɂ���i�I�v�V�����j
+		_healthBarWidget->SetVisibility(ESlateVisibility::Hidden);
+	}
+
+	CurrentHpProp->OnValueChanged.AddLambda([this](const int& newValue)
+		{
+			_healthBarWidget->UpdateHpBar(static_cast<float>(newValue) / static_cast<float>(MAX_HP));
+		});
 }
 
 void AEnemyActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+	if (!PlayerController)
+	{
+		return;
+	}
+	if (_healthBarWidget != nullptr)
+	{
+		_healthBarWidget->AddToViewport();
+	}
+
+	FVector2D screenPosition;
+	bool bProjected = UGameplayStatics::ProjectWorldToScreen(PlayerController, GetActorLocation() + FVector(0, 0, 100), screenPosition);
+
+	if (bProjected)
+	{
+		// �E�B�W�F�b�g�̃T�C�Y���擾
+		FVector2D widgetSize = _healthBarWidget->GetDesiredSize();
+		FVector2D centeredPosition = screenPosition - (widgetSize * 0.5);
+
+		// �X�N���[�����W���E�B�W�F�b�g�̈ʒu�ɓK�p
+		_healthBarWidget->SetVisibility(ESlateVisibility::Visible);
+		_healthBarWidget->SetPositionInViewport(centeredPosition, true);
+	}
+	else
+	{
+		// ��ʊO�̏ꍇ�A�E�B�W�F�b�g���\���ɂ���i�I�v�V�����j
+		_healthBarWidget->SetVisibility(ESlateVisibility::Hidden);
+	}
 }
 
 void AEnemyActor::SelfDestroy()
 {
 	TimeManagerUtility::GetInstance().Cancel(GetWorld(), _destroyTimerHandle);
 
+	// ウィジェットを削除
+	if (_healthBarWidget.IsValid())
+	{
+		_healthBarWidget->RemoveFromParent();
+		_healthBarWidget = nullptr; // ポインタを無効化
+	}
+	
 	Destroy();
 }
 
@@ -74,16 +147,20 @@ void AEnemyActor::Initialized(ATPS_ShotCharacter* character, ALevelManager* leve
 	_character = character;
 	_levelManager = levelManager;
 
-	_hp = MAX_HP;
+	_currentHpProp->SetValue(MAX_HP);
 }
 
-bool AEnemyActor::DecreaseHP()
+bool AEnemyActor::DecreaseHP(int damage)
 {
-	_hp--;
-
-	if (_hp <= 0)
+	if (_currentHpProp.IsValid())
 	{
-		return true;
+		_currentHpProp->SetValue(_currentHpProp->GetValue() - damage);
+		
+		if (_currentHpProp->GetValue() <= 0)
+		{
+			SelfDestroy();
+			return true;
+		}
 	}
 	return false;
 }

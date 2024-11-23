@@ -179,7 +179,7 @@ bool ATPS_ShotCharacter::ChangeNumberOfBullet(int currentNumberOfBullet)
 {
 	if (currentNumberOfBullet <= 0)
 	{
-		// ”ñ“¯Šú‚ÅƒŠƒ[ƒhƒAƒjƒ[ƒVƒ‡ƒ“‚ÆƒŠƒ[ƒhƒeƒLƒXƒgƒAƒjƒ[ƒVƒ‡ƒ“‚ğs‚Á‚ÄbIsReloading‚ğfalse‚É‚µ‚½‚¢
+		// ï¿½ñ“¯Šï¿½ï¿½Åƒï¿½ï¿½ï¿½ï¿½[ï¿½hï¿½Aï¿½jï¿½ï¿½ï¿½[ï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½Æƒï¿½ï¿½ï¿½ï¿½[ï¿½hï¿½eï¿½Lï¿½Xï¿½gï¿½Aï¿½jï¿½ï¿½ï¿½[ï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½ï¿½sï¿½ï¿½ï¿½ï¿½bIsReloadingï¿½ï¿½falseï¿½É‚ï¿½ï¿½ï¿½ï¿½ï¿½
 		return true;
 	}
 	return false;
@@ -231,7 +231,7 @@ void ATPS_ShotCharacter::Reload()
 	{
 		UKismetSystemLibrary::PrintString(this, "Reload Animation", true, true, FColor::Cyan, 2.f, TEXT("None"));
 
-		// TODO@•Ší‚ğ•¡”g—p‚·‚éê‡A•Ší‚Ìƒ^ƒCƒv‚É‚æ‚Á‚Ä•ÏX‚Å‚«‚é‚æ‚¤‚É‚·‚é•K—v‚ª‚ ‚é
+		// TODOï¿½@ï¿½ï¿½ï¿½ï¿½ğ•¡ï¿½ï¿½gï¿½pï¿½ï¿½ï¿½ï¿½ê‡ï¿½Aï¿½ï¿½ï¿½ï¿½Ìƒ^ï¿½Cï¿½vï¿½É‚ï¿½ï¿½ï¿½Ä•ÏXï¿½Å‚ï¿½ï¿½ï¿½æ‚¤ï¿½É‚ï¿½ï¿½ï¿½Kï¿½vï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		FName montageSection(TEXT("Reload SMG"));
 
 		animInstance->Montage_Play(_reloadMontage);
@@ -284,7 +284,7 @@ bool ATPS_ShotCharacter::GetBeamEndLocation(const FVector& muzzleSocketLocation,
 	FVector crosshairWorldPosition;
 	FVector crosshairWorldDirection;
 
-	// ƒXƒNƒŠ[ƒ“À•W‚ğƒ[ƒ‹ƒhÀ•W‚É•ÏŠ·
+	// ï¿½Xï¿½Nï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½Wï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½hï¿½ï¿½ï¿½Wï¿½É•ÏŠï¿½
 	bool bScreenToWorld = UGameplayStatics::DeprojectScreenToWorld(
 		UGameplayStatics::GetPlayerController(this, 0),
 		crosshairLocation,
@@ -311,16 +311,16 @@ bool ATPS_ShotCharacter::GetBeamEndLocation(const FVector& muzzleSocketLocation,
 				AEnemyActor* enemy = Cast<AEnemyActor>(hitActor);
 				if (enemy)
 				{
-					if (enemy->DecreaseHP())
+					// ï¿½ï¿½ï¿½ï¿½ï¿½Æƒ_ï¿½ï¿½ï¿½[ï¿½Wï¿½ï¿½İ’è‚·ï¿½ï¿½Aï¿½ï¿½ï¿½Íï¿½ï¿½ï¿½
+					if (enemy->DecreaseHP(50))
 					{
-						enemy->SelfDestroy();
 						_scoreProp->SetValue(_scoreProp->GetValue()+1);
 					}
 				}
 			}
 		}
 
-		// ƒNƒƒXƒwƒA‚©‚ç‚ÌƒgƒŒ[ƒX‚Æ•Ší‚©‚ç‚ÌƒgƒŒ[ƒX‚Å·ˆÙ‚ª¶‚Ü‚ê‚é‚½‚ß‚æ‚è³Šm‚É‚·‚é‚½‚ß‚É
+		// ï¿½Nï¿½ï¿½ï¿½Xï¿½wï¿½Aï¿½ï¿½ï¿½ï¿½Ìƒgï¿½ï¿½ï¿½[ï¿½Xï¿½Æ•ï¿½ï¿½í‚©ï¿½ï¿½Ìƒgï¿½ï¿½ï¿½[ï¿½Xï¿½Åï¿½ï¿½Ù‚ï¿½ï¿½ï¿½ï¿½Ü‚ï¿½é‚½ï¿½ß‚ï¿½è³ï¿½mï¿½É‚ï¿½ï¿½é‚½ï¿½ß‚ï¿½
 		FHitResult weaponTraceHit;
 		const FVector weaponTraceStart = muzzleSocketLocation;
 		const FVector weaponTraceEnd = outBeamLocation;
