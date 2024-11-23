@@ -35,7 +35,7 @@ void AExplosionEffect::Initialized(ATPS_ShotCharacter* player)
 }
 
 
-void AExplosionEffect::LauncherPlayer(ATPS_ShotCharacter* player)
+void AExplosionEffect::LauncherPlayer(ATPS_ShotCharacter* player) const
 {
 	float proximityValue = CalculateBlastPowerRatio(player);
 
@@ -47,7 +47,7 @@ void AExplosionEffect::LauncherPlayer(ATPS_ShotCharacter* player)
 	}
 }
 
-float AExplosionEffect::CalculateBlastPowerRatio(ATPS_ShotCharacter* player)
+float AExplosionEffect::CalculateBlastPowerRatio(ATPS_ShotCharacter* player) const
 {
 	FVector effectCenterPosition = GetActorLocation();
 	FVector playerCenterPosition = player->GetActorLocation();
@@ -63,7 +63,7 @@ float AExplosionEffect::CalculateBlastPowerRatio(ATPS_ShotCharacter* player)
 	return blastPowerRatio;
 }
 
-FVector AExplosionEffect::CalculateLaunchVelocity(ATPS_ShotCharacter* player, float proximityValue)
+FVector AExplosionEffect::CalculateLaunchVelocity(ATPS_ShotCharacter* player, float proximityValue) const
 {
 	FVector LaunchDirection = player->GetActorLocation() - GetActorLocation();
 	LaunchDirection.Normalize();
