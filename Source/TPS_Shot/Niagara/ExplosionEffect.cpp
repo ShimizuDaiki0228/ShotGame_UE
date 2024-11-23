@@ -56,8 +56,8 @@ float AExplosionEffect::CalculateBlastPowerRatio(ATPS_ShotCharacter* player)
 	float maxRadius = collisionSphere->GetScaledSphereRadius();
 
 	int damage = FMath::Clamp(1.0f - (distance / maxRadius), 0, 1.0f) * 300;
-	//player->ChangeHP(player->GetHP() - damage);
-	player->ChangeHP(0);
+	player->ChangeHP(player->GetHP() - damage);
+	// player->ChangeHP(0);
 
 	float blastPowerRatio = FMath::Clamp(1.0f - (distance / (maxRadius * 1.2)), 0, 1.0f);
 	return blastPowerRatio;

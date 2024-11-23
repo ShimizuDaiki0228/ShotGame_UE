@@ -158,7 +158,7 @@ bool AEnemyActor::DecreaseHP(int damage)
 		
 		if (_currentHpProp->GetValue() <= 0)
 		{
-			SelfDestroy();
+			Explosion();
 			return true;
 		}
 	}
