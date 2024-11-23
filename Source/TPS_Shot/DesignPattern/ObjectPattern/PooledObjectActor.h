@@ -14,6 +14,7 @@ class TPS_SHOT_API APooledObjectActor : public AActor
 	GENERATED_BODY()
 
 public:
+	UPROPERTY()
 	AObjectPoolActor* Pool;
 
 	FORCEINLINE void Release()

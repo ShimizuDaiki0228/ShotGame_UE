@@ -23,8 +23,9 @@ private:
 	void OnParticleSystemFinished(UParticleSystemComponent* PSystem);
 
 public:
+	UPROPERTY()
 	AParticleSystemPoolActor* Pool;
 
-	// ‚±‚±‚©‚ç‘±‚«
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ç‘±ï¿½ï¿½
 	void Release();
 };
