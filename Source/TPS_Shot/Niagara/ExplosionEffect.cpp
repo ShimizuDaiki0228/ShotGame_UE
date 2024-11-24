@@ -7,11 +7,6 @@
 
 AExplosionEffect::AExplosionEffect()
 {
-	if (GetRootComponent() == nullptr)
-	{
-		RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
-	}
-
 	collisionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionSphere"));
 	if (collisionSphere == nullptr)
 	{
@@ -24,14 +19,24 @@ AExplosionEffect::AExplosionEffect()
 		collisionSphere->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
 
 		collisionSphere->SetupAttachment(GetRootComponent());
-
 	}
 }
 
 
-void AExplosionEffect::Initialized(ATPS_ShotCharacter* player)
+void AExplosionEffect::Initialized(ATPS_ShotCharacter* player) const
 {
+	auto niagaraComponent = GetNiagaraComponent();
+	if (niagaraComponent)
+	{
+		// エフェクトをリセットして再生
+		niagaraComponent->Activate(true);
+	}
 	LauncherPlayer(player);
+}
+
+void AExplosionEffect::BeginPlay()
+{
+	Super::BeginPlay();
 }
 
 

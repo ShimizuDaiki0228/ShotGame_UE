@@ -3,3 +3,12 @@
 
 #include "NiagaraEffect.h"
 
+ANiagaraEffect::ANiagaraEffect() : ANiagaraActor(FObjectInitializer::Get())
+{
+	if (GetRootComponent() == nullptr)
+	{
+		RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
+	}
+	
+	GetNiagaraComponent()->SetupAttachment(RootComponent);
+}

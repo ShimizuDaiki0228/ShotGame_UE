@@ -12,6 +12,7 @@
 #include "../Utility/SoundManagerUtility.h"
 #include "Components/WidgetComponent.h"
 #include "../Widget/EnemyHpBarUserWidget.h"
+#include "TPS_Shot/DesignPattern/ObjectPattern/PooledObjectActorComponent.h"
 #include "EnemyActor.generated.h"
 
 
@@ -48,7 +49,7 @@ protected:
 public:
 	virtual void Initialized(ATPS_ShotCharacter* character, ALevelManager* levelManager);
 
-	AExplosionEffect* Explosion();
+	UPooledObjectActorComponent* Explosion();
 public:
 	// hp��������̒l�ȉ��ɂȂ����ꍇ�ɔj�����ăX�R�A���グ�邽�߂�bool�^
 	bool DecreaseHP(int damage);

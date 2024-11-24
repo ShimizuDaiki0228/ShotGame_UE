@@ -27,11 +27,16 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Spawning", meta = (AllowPrivateAccess = "true"))
 	class AParticleSystemPoolActor* _enemyHitEffectPool;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Spawning", meta = (AllowPrivateAccess = "true"))
+	class AObjectPoolActor* _enemyExplosionPool;
+
 public:
 	ASpawnVolumeActor* GetVolumeActor() const { return _volumeActor; }
 
 	const TMap<AActor*, bool> GetPatrolAreaMap() const { return _patrolAreaMap; }
 	void SetPatrolAreaMap(AActor* currentPatrolArea, AActor* newPatrolArea);
 
-	AParticleSystemPoolActor* GetPool() const { return _enemyHitEffectPool; }
+	AParticleSystemPoolActor* GetEnemyEffectPool() const { return _enemyHitEffectPool; }
+
+	AObjectPoolActor* GetEnemyExplosionPool() const {return _enemyExplosionPool;}
 };

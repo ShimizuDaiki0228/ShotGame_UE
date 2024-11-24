@@ -3,17 +3,17 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
+#include "Components/ActorComponent.h"
 #include "ObjectPoolActor.h"
-#include "PooledObjectActor.generated.h"
+#include "PooledObjectActorComponent.generated.h"
 
 
-UCLASS()
-class TPS_SHOT_API APooledObjectActor : public AActor
+UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+class TPS_SHOT_API UPooledObjectActorComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
-public:
+public:	
 	UPROPERTY()
 	AObjectPoolActor* Pool;
 

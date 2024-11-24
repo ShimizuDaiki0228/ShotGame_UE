@@ -107,7 +107,7 @@ void AEnemyActor::SelfDestroy()
 	Destroy();
 }
 
-AExplosionEffect* AEnemyActor::Explosion()
+UPooledObjectActorComponent* AEnemyActor::Explosion()
 {
 	if (_explosionEffect)
 	{
@@ -115,28 +115,21 @@ AExplosionEffect* AEnemyActor::Explosion()
 		{
 			SoundManagerUtility::GetInstance().Play(_explosionSound, this);
 		}
-		
-		_explosionEffectSpawnManager = NewObject<USpawnManager>();
-		FActorSpawnParameters explodeEffectSpawnParameters;
-		explodeEffectSpawnParameters.Owner = this;
-		explodeEffectSpawnParameters.Instigator = GetInstigator();
-		FVector location = GetActorLocation();
-		_explosionEffectSpawnManager->SetUp(explodeEffectSpawnParameters, location);
 
-		AExplosionEffect* spawnedExplosionEffect = _explosionEffectSpawnManager->SpawnActor(_explosionEffect);
-		
+		UPooledObjectActorComponent* object = _levelManager->GetEnemyExplosionPool()->GetPooledObject(this);
+		AExplosionEffect* spawnedExplosionEffect = static_cast<AExplosionEffect*>(object->GetOwner());
 		if (spawnedExplosionEffect)
 		{
 			spawnedExplosionEffect->Initialized(GetTarget());
-			TimeManagerUtility::GetInstance().Delay(GetWorld(), [this, spawnedExplosionEffect]()
-				{
-					spawnedExplosionEffect->Destroy();
-				}, 3.0f, _destroyTimerHandle);
+			// 	TimeManagerUtility::GetInstance().Delay(GetWorld(), [this, spawnedExplosionEffect]()
+			// 		{
+			// 			spawnedExplosionEffect->Destroy();
+			// 		}, 3.0f, _destroyTimerHandle);
 		}
 		
 		SelfDestroy();
 
-		return spawnedExplosionEffect;
+		return object;
 	}
 
 	return nullptr;
@@ -158,7 +151,7 @@ bool AEnemyActor::DecreaseHP(int damage)
 		
 		if (_currentHpProp->GetValue() <= 0)
 		{
-			Explosion();
+			UPooledObjectActorComponent* explosionPoolActor = Explosion();
 			return true;
 		}
 	}

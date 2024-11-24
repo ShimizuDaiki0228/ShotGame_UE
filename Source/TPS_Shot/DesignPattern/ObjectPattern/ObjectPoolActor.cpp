@@ -3,17 +3,20 @@
 
 #include "ObjectPoolActor.h"
 #include "PooledObjectActor.h"
+#include "PooledObjectActorComponent.h"
+#include "Kismet/KismetSystemLibrary.h"
+#include "NiagaraActor.h"
+#include "TPS_Shot/Niagara/NiagaraEffect.h"
 
-
-void AObjectPoolActor::ReturnToPool(APooledObjectActor* pooledObject)
+void AObjectPoolActor::ReturnToPool(UPooledObjectActorComponent* pooledObject)
 {
 	_pooledObjectStack.Push(pooledObject);
-	ActiveChange(pooledObject, false);
+	ActiveChange(pooledObject->GetOwner(), false);
 }
 
-APooledObjectActor* AObjectPoolActor::GetPooledObject()
+UPooledObjectActorComponent* AObjectPoolActor::GetPooledObject(const AActor* owner)
 {
-	APooledObjectActor* pooledObject;
+	UPooledObjectActorComponent* pooledObject;
 
 	if (_pooledObjectStack.Num() == 0)
 	{
@@ -24,7 +27,8 @@ APooledObjectActor* AObjectPoolActor::GetPooledObject()
 		pooledObject = _pooledObjectStack.Pop();
 	}
 
-	ActiveChange(pooledObject, true);
+	ActiveChange(pooledObject->GetOwner(), true);
+	pooledObject->GetOwner()->SetActorLocation(owner->GetActorLocation());
 	return pooledObject;
 }
 
@@ -34,12 +38,11 @@ void AObjectPoolActor::BeginPlay()
 
 	for (int i = 0; i < _initPoolSize; i++)
 	{
-		APooledObjectActor* newObject = CreateNewPooledObject();
-		newObject->Pool = this;
+		UPooledObjectActorComponent* newObject = CreateNewPooledObject();
 	}
 }
 
-APooledObjectActor* AObjectPoolActor::CreateNewPooledObject()
+UPooledObjectActorComponent* AObjectPoolActor::CreateNewPooledObject()
 {
 	if (_objectToPool)
 	{
@@ -48,13 +51,31 @@ APooledObjectActor* AObjectPoolActor::CreateNewPooledObject()
 		{
 			FActorSpawnParameters spawnParams;
 			spawnParams.Owner = this;
-			APooledObjectActor* newObject = world->SpawnActor<APooledObjectActor>(_objectToPool, FVector::ZeroVector, FRotator::ZeroRotator, spawnParams);
+			AActor* newObject = world->SpawnActor<AActor>(_objectToPool, FVector::ZeroVector, FRotator::ZeroRotator, spawnParams);
 			if (newObject)
 			{
-				ActiveChange(newObject, false);
-				newObject->Pool = this;
-				_pooledObjectStack.Add(newObject);
-				return newObject;
+				// 生成するのがナイアガラエフェクトの場合は特別処理
+				ANiagaraEffect* niagaraEffect = static_cast<ANiagaraEffect*>(newObject);
+				if (niagaraEffect)
+				{
+					auto niagaraComponent = niagaraEffect->GetNiagaraComponent();
+					niagaraComponent->Deactivate();
+					niagaraComponent->SetAutoActivate(false);
+				}
+				else
+				{
+					ActiveChange(newObject, false);
+				}
+				
+				UPooledObjectActorComponent* pooledObjectActorComponent = NewObject<UPooledObjectActorComponent>(newObject);
+				
+				if (pooledObjectActorComponent)
+				{
+					pooledObjectActorComponent->RegisterComponent();
+					pooledObjectActorComponent->Pool = this;
+					_pooledObjectStack.Add(pooledObjectActorComponent);
+					return pooledObjectActorComponent;
+				}
 			}
 		}
 	}
@@ -62,7 +83,7 @@ APooledObjectActor* AObjectPoolActor::CreateNewPooledObject()
 	return nullptr;
 }
 
-void AObjectPoolActor::ActiveChange(APooledObjectActor* pooledObjectActor, bool isPopObject)
+void AObjectPoolActor::ActiveChange(AActor* pooledObjectActor, bool isPopObject)
 {
 	pooledObjectActor->SetActorHiddenInGame(!isPopObject);
 	pooledObjectActor->SetActorEnableCollision(isPopObject);
