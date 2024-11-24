@@ -5,6 +5,8 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "../Utility/SoundManagerUtility.h"
 #include "../Utility/TimeManagerUtility.h"
+#include "Components/CanvasPanelSlot.h"
+#include "Components/ProgressBar.h"
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values
@@ -78,6 +80,31 @@ void AEnemyActor::Tick(float DeltaTime)
 
 	if (bProjected)
 	{
+		FBoxSphereBounds bounds = GetComponentsBoundingBox();
+		FVector origin;
+		FVector boxExtent;
+		GetActorBounds(false, origin, boxExtent);
+
+		if (PlayerController)
+		{
+			FVector2D ScreenPos1, ScreenPos2;
+			FVector Corner1 = origin - boxExtent; // 左下前
+			FVector Corner2 = origin + boxExtent; // 右上後
+
+			PlayerController->ProjectWorldLocationToScreen(Corner1, ScreenPos1);
+			PlayerController->ProjectWorldLocationToScreen(Corner2, ScreenPos2);
+
+			
+			UCanvasPanelSlot* canvasSlot = Cast<UCanvasPanelSlot>(_healthBarWidget->GetHpBar()->Slot);
+			if (canvasSlot != nullptr)
+			{
+				UKismetSystemLibrary::PrintString(this, TEXT("canvasSlot exsit"), true, true , FColor::Red);
+				float thisScreenSize = FMath::Abs(ScreenPos2.X - ScreenPos1.X);
+				FVector2D healthBarSize = FVector2D(thisScreenSize, canvasSlot->GetSize().Y);
+				canvasSlot->SetSize(healthBarSize);
+			}
+		}
+		
 		// �E�B�W�F�b�g�̃T�C�Y���擾
 		FVector2D widgetSize = _healthBarWidget->GetDesiredSize();
 		FVector2D centeredPosition = screenPosition - (widgetSize * 0.5);
@@ -147,7 +174,8 @@ bool AEnemyActor::DecreaseHP(int damage)
 {
 	if (_currentHpProp.IsValid())
 	{
-		_currentHpProp->SetValue(_currentHpProp->GetValue() - damage);
+		// _currentHpProp->SetValue(_currentHpProp->GetValue() - damage);
+		_currentHpProp->SetValue(0);
 		
 		if (_currentHpProp->GetValue() <= 0)
 		{

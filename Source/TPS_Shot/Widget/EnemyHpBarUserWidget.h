@@ -23,4 +23,6 @@ public:
 	void UpdateHpBar(float newHpPercentage);
 
 	void Test(float newHpPercentage);
+
+	UProgressBar* GetHpBar() const {return _hpBar;}
 };
