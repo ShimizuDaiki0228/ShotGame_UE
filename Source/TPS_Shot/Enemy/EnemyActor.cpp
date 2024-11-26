@@ -83,8 +83,7 @@ void AEnemyActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	APlayerController* playerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
-	SetWidgetSetting(playerController);
+	SetWidgetSetting(_cachedPlayerController);
 }
 
 void AEnemyActor::SelfDestroy()
@@ -115,6 +114,9 @@ UPooledObjectActorComponent* AEnemyActor::Explosion()
 		if (spawnedExplosionEffect)
 		{
 			spawnedExplosionEffect->Initialized(GetTarget());
+
+			// TODO
+			// 実装する
 			// 	TimeManagerUtility::GetInstance().Delay(GetWorld(), [this, spawnedExplosionEffect]()
 			// 		{
 			// 			spawnedExplosionEffect->Destroy();

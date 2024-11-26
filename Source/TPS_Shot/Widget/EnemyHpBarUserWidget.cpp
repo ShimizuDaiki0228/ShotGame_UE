@@ -16,14 +16,6 @@ void UEnemyHpBarUserWidget::UpdateHpBar(float newHpPercentage)
 	}
 }
 
-void UEnemyHpBarUserWidget::Test(float newHpPercentage)
-{
-	if (_hpBar != nullptr)
-	{
-		_hpBar->SetPercent(newHpPercentage);
-	}
-}
-
 void UEnemyHpBarUserWidget::SetSize(UCanvasPanelSlot* canvasSlot, float width, float height)
 {
 	if (canvasSlot != nullptr)

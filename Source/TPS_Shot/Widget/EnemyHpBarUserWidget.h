@@ -22,9 +22,7 @@ private:
 public:
 	UFUNCTION()
 	void UpdateHpBar(float newHpPercentage);
-
-	void Test(float newHpPercentage);
-
+	
 	UProgressBar* GetHpBar() const {return _hpBar;}
 
 	virtual void SetSize(UCanvasPanelSlot* canvasSlot, float width, float height) override;
