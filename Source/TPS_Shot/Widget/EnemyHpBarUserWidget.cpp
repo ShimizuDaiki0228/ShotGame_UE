@@ -23,3 +23,12 @@ void UEnemyHpBarUserWidget::Test(float newHpPercentage)
 		_hpBar->SetPercent(newHpPercentage);
 	}
 }
+
+void UEnemyHpBarUserWidget::SetSize(UCanvasPanelSlot* canvasSlot, float width, float height)
+{
+	if (canvasSlot != nullptr)
+	{
+		FVector2D healthBarSize = FVector2D(width, canvasSlot->GetSize().Y);
+		canvasSlot->SetSize(healthBarSize);
+	}
+}

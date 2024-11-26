@@ -8,6 +8,7 @@
 #include "Components/CanvasPanelSlot.h"
 #include "Components/ProgressBar.h"
 #include "Kismet/GameplayStatics.h"
+#include "../ActorScreenSizeCalculator.h"
 
 // Sets default values
 AEnemyActor::AEnemyActor()
@@ -24,36 +25,9 @@ void AEnemyActor::BeginPlay()
 {
 	Super::BeginPlay();
 
-	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
-	if (!PlayerController)
-	{
-		return;
-	}
-
+	_cachedPlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 	_healthBarWidget = CreateWidget<UEnemyHpBarUserWidget>(GetWorld(), _healthBarComponent);
-	if (_healthBarWidget.IsValid())
-	{
-		_healthBarWidget->AddToViewport();
-	}
-
-	FVector2D screenPosition;
-	bool bProjected = UGameplayStatics::ProjectWorldToScreen(PlayerController, GetActorLocation(), screenPosition);
-
-	if (bProjected)
-	{
-		// �E�B�W�F�b�g�̃T�C�Y���擾
-		FVector2D widgetSize = _healthBarWidget->GetDesiredSize();
-		FVector2D centeredPosition = screenPosition - (widgetSize);
-
-		// �X�N���[�����W���E�B�W�F�b�g�̈ʒu�ɓK�p
-		_healthBarWidget->SetVisibility(ESlateVisibility::Visible);
-		_healthBarWidget->SetPositionInViewport(centeredPosition, true);
-	}
-	else
-	{
-		// ��ʊO�̏ꍇ�A�E�B�W�F�b�g���\���ɂ���i�I�v�V�����j
-		_healthBarWidget->SetVisibility(ESlateVisibility::Hidden);
-	}
+	SetWidgetSetting(_cachedPlayerController);
 
 	CurrentHpProp->OnValueChanged.AddLambda([this](const int& newValue)
 		{
@@ -61,50 +35,35 @@ void AEnemyActor::BeginPlay()
 		});
 }
 
-void AEnemyActor::Tick(float DeltaTime)
+void AEnemyActor::SetWidgetSetting(TWeakObjectPtr<APlayerController> playerController)
 {
-	Super::Tick(DeltaTime);
-
-	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
-	if (!PlayerController)
+	if (!playerController.IsValid())
 	{
 		return;
 	}
-	if (_healthBarWidget != nullptr)
-	{
-		_healthBarWidget->AddToViewport();
-	}
 
 	FVector2D screenPosition;
-	bool bProjected = UGameplayStatics::ProjectWorldToScreen(PlayerController, GetActorLocation() + FVector(0, 0, 100), screenPosition);
+	bool bProjected = UGameplayStatics::ProjectWorldToScreen(playerController.Get(), GetActorLocation() + FVector(0, 0, 100), screenPosition);
 
 	if (bProjected)
 	{
-		FBoxSphereBounds bounds = GetComponentsBoundingBox();
-		FVector origin;
-		FVector boxExtent;
-		GetActorBounds(false, origin, boxExtent);
-
-		if (PlayerController)
+		if (!_healthBarWidget->IsInViewport())
 		{
-			FVector2D ScreenPos1, ScreenPos2;
-			FVector Corner1 = origin - boxExtent; // 左下前
-			FVector Corner2 = origin + boxExtent; // 右上後
-
-			PlayerController->ProjectWorldLocationToScreen(Corner1, ScreenPos1);
-			PlayerController->ProjectWorldLocationToScreen(Corner2, ScreenPos2);
-
-			
-			UCanvasPanelSlot* canvasSlot = Cast<UCanvasPanelSlot>(_healthBarWidget->GetHpBar()->Slot);
-			if (canvasSlot != nullptr)
-			{
-				UKismetSystemLibrary::PrintString(this, TEXT("canvasSlot exsit"), true, true , FColor::Red);
-				float thisScreenSize = FMath::Abs(ScreenPos2.X - ScreenPos1.X);
-				FVector2D healthBarSize = FVector2D(thisScreenSize, canvasSlot->GetSize().Y);
-				canvasSlot->SetSize(healthBarSize);
-			}
+			_healthBarWidget->AddToViewport();
 		}
 		
+		float thisScreenSize = UActorScreenSizeCalculator::CalculateScreenSize(this,
+			playerController.Get(),
+			_healthBarWidget->HPBAR_CLAMP_SIZE_MIN,
+			_healthBarWidget->HPBAR_CLAMP_SIZE_MAX
+			);
+
+		if (thisScreenSize != 0)
+		{
+			UCanvasPanelSlot* canvasSlot = Cast<UCanvasPanelSlot>(_healthBarWidget->GetHpBar()->Slot);
+			_healthBarWidget->SetSize(canvasSlot, thisScreenSize, canvasSlot->GetSize().Y);
+		}
+
 		// �E�B�W�F�b�g�̃T�C�Y���擾
 		FVector2D widgetSize = _healthBarWidget->GetDesiredSize();
 		FVector2D centeredPosition = screenPosition - (widgetSize * 0.5);
@@ -118,6 +77,14 @@ void AEnemyActor::Tick(float DeltaTime)
 		// ��ʊO�̏ꍇ�A�E�B�W�F�b�g���\���ɂ���i�I�v�V�����j
 		_healthBarWidget->SetVisibility(ESlateVisibility::Hidden);
 	}
+}
+
+void AEnemyActor::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	APlayerController* playerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+	SetWidgetSetting(playerController);
 }
 
 void AEnemyActor::SelfDestroy()

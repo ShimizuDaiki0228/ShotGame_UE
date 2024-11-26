@@ -28,6 +28,7 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	void SetWidgetSetting(TWeakObjectPtr<APlayerController> playerController);
 
 public:	
 	// Called every frame
@@ -78,6 +79,8 @@ private:
 	TSubclassOf<UEnemyHpBarUserWidget> _healthBarComponent;
 	TWeakObjectPtr<UEnemyHpBarUserWidget> _healthBarWidget;
 
+	TWeakObjectPtr<APlayerController> _cachedPlayerController;
+	
 private:
 	TSharedPtr<ReactiveProperty<int>> _currentHpProp = MakeShared<ReactiveProperty<int>>();
 

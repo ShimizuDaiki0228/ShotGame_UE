@@ -2,7 +2,6 @@
 
 
 #include "ObjectPoolActor.h"
-#include "PooledObjectActor.h"
 #include "PooledObjectActorComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "NiagaraActor.h"
