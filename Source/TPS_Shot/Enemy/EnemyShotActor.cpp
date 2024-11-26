@@ -47,7 +47,7 @@ void AEnemyShotActor::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActo
 	{
 		if (_levelManager)
 		{
-			UPooledParticleSystemComponent* hitParticleSystemComponent = _levelManager->GetPool()->GetPooledObject(this);
+			UPooledParticleSystemComponent* hitParticleSystemComponent = _levelManager->GetEnemyEffectPool()->GetPooledObject(this);
 		}
 
 		Destroy();
@@ -107,20 +107,20 @@ void AEnemyShotActor::SetShotRoot(const FVector& startPosition, const FVector& e
 	float distance = FVector::Dist(startPosition, endPosition);
 	_duration = distance / BASE_SPEED;
 
-	// –Ú•W‚Ö‚Ì•ûŒü‚ÆA‚»‚Ì‚’¼•ûŒü
+	// ï¿½Ú•Wï¿½Ö‚Ì•ï¿½ï¿½ï¿½ï¿½ÆAï¿½ï¿½ï¿½Ìï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	directionUnitVector = _shotDirection.Vector().GetSafeNormal();
 	FVector directionPerpendicular1 = FVector(-directionUnitVector.Y, directionUnitVector.X, 0).GetSafeNormal();
 	FVector directionPerpendicular2 = FVector(directionUnitVector.Z, 0, -directionUnitVector.X).GetSafeNormal();
 
-	// ƒ¿’n“_‚ÆƒÀ’n“_‚ÍÛŒÀ‚ª(0,0)‚Å‘ÎÛ‚ÌˆÊ’u‚É‚¢‚é‚æ‚¤‚É
+	// ï¿½ï¿½ï¿½nï¿½_ï¿½Æƒï¿½ï¿½nï¿½_ï¿½ÍÛŒï¿½ï¿½ï¿½(0,0)ï¿½Å‘ÎÛ‚ÌˆÊ’uï¿½É‚ï¿½ï¿½ï¿½æ‚¤ï¿½ï¿½
 	float alphaOffset1 = FMath::RandRange(-RADIUS, RADIUS) + RANDOM_OFFSET;
 	float alphaOffset2 = FMath::RandRange(-RADIUS, RADIUS) + RANDOM_OFFSET;
 	float betaOffset1 = alphaOffset1 < RANDOM_OFFSET ? FMath::RandRange(0.0f, RADIUS) + RANDOM_OFFSET : FMath::RandRange(-RADIUS, 0.0f) + RANDOM_OFFSET;
 	float betaOffset2 = alphaOffset2 < RANDOM_OFFSET ? FMath::RandRange(0.0f, RADIUS) + RANDOM_OFFSET : FMath::RandRange(-RADIUS, 0.0f) + RANDOM_OFFSET;
 
-	// ƒXƒ^[ƒg’n“_‚©‚ç‚Ìalpha‚ÌˆÊ’u‚ğ‹‚ß‚é‚Ì‚Ég—p
+	// ï¿½Xï¿½^ï¿½[ï¿½gï¿½nï¿½_ï¿½ï¿½ï¿½ï¿½ï¿½alphaï¿½ÌˆÊ’uï¿½ï¿½ï¿½ï¿½ï¿½ß‚ï¿½Ì‚Égï¿½p
 	_alphaPointFromStartDistance = FMath::RandRange(0.1f, 0.4f) * distance;
-	// ƒGƒ“ƒh’n“_‚©‚ç‚Ìbeta‚ÌˆÊ’u‚ğ‹‚ß‚é‚Ì‚Ég—p
+	// ï¿½Gï¿½ï¿½ï¿½hï¿½nï¿½_ï¿½ï¿½ï¿½ï¿½ï¿½betaï¿½ÌˆÊ’uï¿½ï¿½ï¿½ï¿½ï¿½ß‚ï¿½Ì‚Égï¿½p
 	_betaPointFromEndDistance = FMath::RandRange(0.1f, 0.4f) * distance;
 
 	_alphaPoint = _startPosition + directionUnitVector * _alphaPointFromStartDistance;

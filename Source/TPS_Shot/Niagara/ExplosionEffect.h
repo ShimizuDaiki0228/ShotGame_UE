@@ -20,15 +20,17 @@ public:
 	// Sets default values for this actor's properties
 	AExplosionEffect();
 
-	void Initialized(ATPS_ShotCharacter* player);
+	void Initialized(ATPS_ShotCharacter* player) const;
+
+	virtual void BeginPlay() override;
 
 private:
 	USphereComponent* collisionSphere;
 
-	void LauncherPlayer(ATPS_ShotCharacter* player);
+	void LauncherPlayer(ATPS_ShotCharacter* player) const;
 
 	const float BLAST_RANGE = 250.0f;
 
-	float CalculateBlastPowerRatio(ATPS_ShotCharacter* player);
-	FVector CalculateLaunchVelocity(ATPS_ShotCharacter* player, float proximityValue);
+	float CalculateBlastPowerRatio(ATPS_ShotCharacter* player) const;
+	FVector CalculateLaunchVelocity(ATPS_ShotCharacter* player, float proximityValue) const;
 };

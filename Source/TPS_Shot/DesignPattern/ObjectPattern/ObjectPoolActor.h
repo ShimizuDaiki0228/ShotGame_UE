@@ -4,7 +4,8 @@
 #include "GameFramework/Actor.h"
 #include "ObjectPoolActor.generated.h"
 
-class APooledObjectActor;
+// class APooledObjectActor;
+class UPooledObjectActorComponent;
 
 UCLASS()
 class TPS_SHOT_API AObjectPoolActor : public AActor
@@ -13,23 +14,23 @@ class TPS_SHOT_API AObjectPoolActor : public AActor
 
 protected:
 	// To add mapping context
-	virtual void BeginPlay();
+	virtual void BeginPlay() override;
 	
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "Pool")
 	int _initPoolSize = 3;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Pool")
-	TSubclassOf<APooledObjectActor> _objectToPool;
+	TSubclassOf<AActor> _objectToPool;
 
-	TArray<APooledObjectActor*> _pooledObjectStack;
+	TArray<UPooledObjectActorComponent*> _pooledObjectStack;
 
-	APooledObjectActor* CreateNewPooledObject();
+	UPooledObjectActorComponent* CreateNewPooledObject();
 
-	void ActiveChange(APooledObjectActor* pooledObjectActor, bool isPopObject);
+	static void ActiveChange(AActor* pooledObjectActor, bool isPopObject);
 
 public:
-	void ReturnToPool(APooledObjectActor* pooledObject);
+	void ReturnToPool(UPooledObjectActorComponent* pooledObject);
 
-	APooledObjectActor* GetPooledObject();
+	UPooledObjectActorComponent* GetPooledObject(const AActor* owner);
 };

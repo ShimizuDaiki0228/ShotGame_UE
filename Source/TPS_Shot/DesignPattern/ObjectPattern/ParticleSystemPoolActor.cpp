@@ -2,14 +2,13 @@
 
 
 #include "ParticleSystemPoolActor.h"
-#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "PooledParticleSystemComponent.h"
-#include "../../Utility/TimeManagerUtility.h"
+FCriticalSection PoolLock;
 
 // Sets default values
-AParticleSystemPoolActor::AParticleSystemPoolActor()
+AParticleSystemPoolActor::AParticleSystemPoolActor(): _particleSystem(nullptr)
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
@@ -50,10 +49,19 @@ UPooledParticleSystemComponent* AParticleSystemPoolActor::GetPooledObject(const 
 
 void AParticleSystemPoolActor::ReturnToPool(UPooledParticleSystemComponent* particleComponent)
 {
-	if (particleComponent)
+	if (particleComponent && IsValid(particleComponent))
 	{
 		particleComponent->DeactivateSystem();
-		_pooledObjectStack.Push(particleComponent);
+
+		// 同時にアクセスする場合も考えられるのでスコープ内でのみ一時的にロック
+		{
+			FScopeLock Lock(&PoolLock);
+			_pooledObjectStack.Push(particleComponent);
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Invalid particleComponent passed to ReturnToPool."));
 	}
 }
 

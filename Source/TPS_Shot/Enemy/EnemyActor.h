@@ -10,6 +10,9 @@
 #include "../SpawnManager.h"
 #include "../Niagara/ExplosionEffect.h"
 #include "../Utility/SoundManagerUtility.h"
+#include "Components/WidgetComponent.h"
+#include "../Widget/EnemyHpBarUserWidget.h"
+#include "TPS_Shot/DesignPattern/ObjectPattern/PooledObjectActorComponent.h"
 #include "EnemyActor.generated.h"
 
 
@@ -25,6 +28,7 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	void SetWidgetSetting(TWeakObjectPtr<APlayerController> playerController);
 
 public:	
 	// Called every frame
@@ -34,34 +38,53 @@ public:
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Mesh")
-		class UStaticMeshComponent* _mesh;
+	class UStaticMeshComponent* _mesh;
 
+	
+
+protected:
 	ATPS_ShotCharacter* _character;
 
 	ALevelManager* _levelManager;
+
 public:
 	virtual void Initialized(ATPS_ShotCharacter* character, ALevelManager* levelManager);
 
-	ATPS_ShotCharacter* GetTarget() const { return _character; }
+	UPooledObjectActorComponent* Explosion();
+public:
+	// hpï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ì’lï¿½È‰ï¿½ï¿½É‚È‚ï¿½ï¿½ï¿½ï¿½ê‡ï¿½É”jï¿½ï¿½ï¿½ï¿½ï¿½ÄƒXï¿½Rï¿½Aï¿½ï¿½ï¿½ã‚°ï¿½é‚½ï¿½ß‚ï¿½boolï¿½^
+	bool DecreaseHP(int damage);
 
+public:
+	ATPS_ShotCharacter* GetTarget() const { return _character; }
 	UStaticMeshComponent* GetMesh() const { return _mesh; }
 
-	// hp‚ª‚ ‚éˆê’è‚Ì’lˆÈ‰º‚É‚È‚Á‚½ê‡‚É”jŠü‚µ‚ÄƒXƒRƒA‚ğã‚°‚é‚½‚ß‚ÉboolŒ^
-	bool DecreaseHP();
 
-	AExplosionEffect* Explosion();
 private:
-
-	const int MAX_HP = 3;
-	int _hp;
+	const int MAX_HP = 500;
+	//int _hp;
 
 	USpawnManager* _explosionEffectSpawnManager;
 
+	FTimerHandle _destroyTimerHandle;
+
+private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effect", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<AExplosionEffect> _explosionEffect;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Audio", meta = (AllowPrivateAccess = "true"))
 	USoundBase* _explosionSound;
 
-	FTimerHandle _destroyTimerHandle;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<UEnemyHpBarUserWidget> _healthBarComponent;
+	TWeakObjectPtr<UEnemyHpBarUserWidget> _healthBarWidget;
+
+	TWeakObjectPtr<APlayerController> _cachedPlayerController;
+	
+private:
+	TSharedPtr<ReactiveProperty<int>> _currentHpProp = MakeShared<ReactiveProperty<int>>();
+
+public:
+	TSharedPtr<ReadOnlyReactiveProperty<int>> CurrentHpProp
+		= MakeShared<ReadOnlyReactiveProperty<int>>(_currentHpProp);
 };

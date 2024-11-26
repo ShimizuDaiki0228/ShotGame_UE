@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "NiagaraActor.h"
+#include "NiagaraComponent.h"
 #include "NiagaraEffect.generated.h"
 
 /**
@@ -13,5 +14,7 @@ UCLASS()
 class TPS_SHOT_API ANiagaraEffect : public ANiagaraActor
 {
 	GENERATED_BODY()
-	
+
+public:
+	ANiagaraEffect();
 };
