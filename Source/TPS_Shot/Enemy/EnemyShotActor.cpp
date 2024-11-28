@@ -47,7 +47,7 @@ void AEnemyShotActor::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActo
 	{
 		if (_levelManager)
 		{
-			UPooledParticleSystemComponent* hitParticleSystemComponent = _levelManager->GetEnemyEffectPool()->GetPooledObject(this);
+			TWeakObjectPtr<UPooledParticleSystemComponent> hitParticleSystemComponent = _levelManager->GetEnemyEffectPool()->GetPooledObject(this);
 		}
 
 		Destroy();
