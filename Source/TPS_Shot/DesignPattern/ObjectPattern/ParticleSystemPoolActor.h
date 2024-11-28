@@ -27,16 +27,16 @@ private:
 	int _initPoolSize = 3;
 
 	UPROPERTY(VisibleAnywhere, Category = "Pool")
-	TArray<UPooledParticleSystemComponent*> _pooledObjectStack;
+	TArray<TWeakObjectPtr<UPooledParticleSystemComponent>> _pooledObjectStack;
 
 	UPROPERTY(EditAnywhere, Category = "Pool")
 	UParticleSystem* _particleSystem;
 
 public:
-	UPooledParticleSystemComponent* GetPooledObject(const AActor* owner);
+	TWeakObjectPtr<UPooledParticleSystemComponent> GetPooledObject(const AActor* owner);
 
-	void ReturnToPool(UPooledParticleSystemComponent* particleComponent);
+	void ReturnToPool(TWeakObjectPtr<UPooledParticleSystemComponent> particleComponent);
 
 private:
-	UPooledParticleSystemComponent* CreateNewPooledObject();
+	TWeakObjectPtr<UPooledParticleSystemComponent> CreateNewPooledObject();
 };

@@ -106,7 +106,7 @@ void ASniperEnemyActor::Initialized(ATPS_ShotCharacter* character, ALevelManager
 
 	if (_nextPosition != nullptr)
 	{
-		//‰Šúó‘Ô‚ÍIdle‚Éİ’è
+		//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô‚ï¿½Idleï¿½Éİ’ï¿½
 		_currentState = std::make_unique<SniperEnemyIdleState>();
 		_currentState->EnterState(this);
 	}
@@ -193,7 +193,7 @@ void ASniperEnemyActor::SelectPosition()
 			}
 		}
 
-		// ‚à‚µˆÚ“®‚·‚éêŠ‚ª‚È‚¢ê‡‚Í“G‚Ì”‚ªŒÀŠE‚Ü‚Å‚¢‚é‚½‚ß”jŠü‚·‚é
+		// ï¿½ï¿½ï¿½ï¿½ï¿½Ú“ï¿½ï¿½ï¿½ï¿½ï¿½êŠï¿½ï¿½ï¿½È‚ï¿½ï¿½ê‡ï¿½Í“Gï¿½Ìï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Eï¿½Ü‚Å‚ï¿½ï¿½é‚½ï¿½ß”jï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		UKismetSystemLibrary::PrintString(this, TEXT("Position is Null, this enemy destroy"), true, true, FColor::Green, 2.f);
 		SelfDestroy();
 	}

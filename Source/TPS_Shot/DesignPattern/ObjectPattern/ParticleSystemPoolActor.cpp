@@ -23,18 +23,20 @@ void AParticleSystemPoolActor::BeginPlay()
 	{
 		for (int i = 0; i < _initPoolSize; i++)
 		{
-			UPooledParticleSystemComponent* newComponent = CreateNewPooledObject();
+			TWeakObjectPtr<UPooledParticleSystemComponent> newComponent = CreateNewPooledObject();
 			newComponent->Pool = this;
 		}
 	}
 }
 
-UPooledParticleSystemComponent* AParticleSystemPoolActor::GetPooledObject(const AActor* owner)
+TWeakObjectPtr<UPooledParticleSystemComponent> AParticleSystemPoolActor::GetPooledObject(const AActor* owner)
 {
-	UPooledParticleSystemComponent* pooledObject;
-
+	TWeakObjectPtr<UPooledParticleSystemComponent> pooledObject;
+	
 	if (_pooledObjectStack.Num() == 0)
 	{
+		UKismetSystemLibrary::PrintString(this, TEXT("Create!!!!"), true, true, FColor::Yellow, 2.f);
+
 		pooledObject = CreateNewPooledObject();
 	}
 	else
@@ -47,25 +49,29 @@ UPooledParticleSystemComponent* AParticleSystemPoolActor::GetPooledObject(const 
 	return pooledObject;
 }
 
-void AParticleSystemPoolActor::ReturnToPool(UPooledParticleSystemComponent* particleComponent)
+///GetPooledObjectとタイミングがかぶった時に_pooledObjectStack.Num() == 0の部分でクラッシュしていそう
+///現状プールの中で保持しているオブジェクト数を増やすことで対処しているが今後考える必要性はある
+void AParticleSystemPoolActor::ReturnToPool(TWeakObjectPtr<UPooledParticleSystemComponent> particleComponent)
 {
-	if (particleComponent && IsValid(particleComponent))
+	if (particleComponent.IsValid())
 	{
 		particleComponent->DeactivateSystem();
 
 		// 同時にアクセスする場合も考えられるのでスコープ内でのみ一時的にロック
+		PoolLock.Lock();
 		{
 			FScopeLock Lock(&PoolLock);
 			_pooledObjectStack.Push(particleComponent);
 		}
+		PoolLock.Unlock();
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Invalid particleComponent passed to ReturnToPool."));
+		UKismetSystemLibrary::PrintString(this, TEXT("pool is Locked"), true, true, FColor::Purple);
 	}
 }
 
-UPooledParticleSystemComponent* AParticleSystemPoolActor::CreateNewPooledObject()
+TWeakObjectPtr<UPooledParticleSystemComponent> AParticleSystemPoolActor::CreateNewPooledObject()
 {
 	if (_particleSystem)
 	{
