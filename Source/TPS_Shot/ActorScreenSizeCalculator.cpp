@@ -5,6 +5,7 @@
 
 #include "GameFramework/PlayerController.h"
 
+// 画面に描画されているアクターのサイズを取得
 float UActorScreenSizeCalculator::CalculateScreenSize(AActor* actor, APlayerController* playerController, float clampMin, float clampMax)
 {
 	FVector2D min, max;
@@ -26,12 +27,13 @@ bool UActorScreenSizeCalculator::GetScreenBounds(AActor* actor, APlayerControlle
 		FVector origin, boxExtent;
 		actor->GetActorBounds(false, origin, boxExtent);
 
+		// カメラの距離でアクターの描画サイズが変わるのでそれに合わせる
 		FVector cameraLocation = playerController->PlayerCameraManager->GetCameraLocation();
 		float distanceToCamera = FVector::Dist(cameraLocation, origin);
 		
 		float scaledSize = BASE_SIZE * (SCALE_FACTOR / distanceToCamera);
 		
-		outMin = FVector2D(-scaledSize / 2, -scaledSize / 2); // サイズを中央に基づいて設定
+		outMin = FVector2D(-scaledSize / 2, -scaledSize / 2);
 		outMax = FVector2D(scaledSize / 2, scaledSize / 2); 
 		
 		return true;

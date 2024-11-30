@@ -27,6 +27,7 @@ void AEnemyActor::BeginPlay()
 
 	_cachedPlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 	_healthBarWidget = CreateWidget<UEnemyHpBarUserWidget>(GetWorld(), _healthBarComponent);
+	_healthBarWidget->ManualBeginPlay();
 	SetWidgetSetting(_cachedPlayerController);
 
 	CurrentHpProp->OnValueChanged.AddLambda([this](const int& newValue)
@@ -60,8 +61,7 @@ void AEnemyActor::SetWidgetSetting(TWeakObjectPtr<APlayerController> playerContr
 
 		if (thisScreenSize != 0)
 		{
-			UCanvasPanelSlot* canvasSlot = Cast<UCanvasPanelSlot>(_healthBarWidget->GetHpBar()->Slot);
-			_healthBarWidget->SetSize(canvasSlot, thisScreenSize, canvasSlot->GetSize().Y);
+			_healthBarWidget->SetSize(thisScreenSize, _healthBarWidget->GetHpBar()->GetDesiredSize().Y);
 		}
 
 		// �E�B�W�F�b�g�̃T�C�Y���擾
@@ -143,8 +143,8 @@ bool AEnemyActor::DecreaseHP(int damage)
 {
 	if (_currentHpProp.IsValid())
 	{
-		// _currentHpProp->SetValue(_currentHpProp->GetValue() - damage);
-		_currentHpProp->SetValue(0);
+		_currentHpProp->SetValue(_currentHpProp->GetValue() - damage);
+		// _currentHpProp->SetValue(0);
 		
 		if (_currentHpProp->GetValue() <= 0)
 		{

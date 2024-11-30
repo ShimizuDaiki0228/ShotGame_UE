@@ -19,5 +19,5 @@ class TPS_SHOT_API IIFollowActorWidget
 	GENERATED_BODY()
 
 public:
-	virtual void SetSize(UCanvasPanelSlot* canvasSlot, float width, float height) = 0;
+	virtual void SetSize(float width, float height) = 0;
 };
