@@ -20,7 +20,4 @@ class TPS_SHOT_API IIFollowActorWidget
 
 public:
 	virtual void SetSize(float width, float height) = 0;
-
-	virtual void TestSetSize(UCanvasPanelSlot* canvasSlot, float width, float height) = 0;
-
 };

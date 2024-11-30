@@ -61,11 +61,7 @@ void AEnemyActor::SetWidgetSetting(TWeakObjectPtr<APlayerController> playerContr
 
 		if (thisScreenSize != 0)
 		{
-			UCanvasPanelSlot* canvasSlot = Cast<UCanvasPanelSlot>(_healthBarWidget->GetHpBar()->Slot);
-			UCanvasPanelSlot* canvasSlot2 = Cast<UCanvasPanelSlot>(_healthBarWidget->GetDamageBar()->Slot);
-			_healthBarWidget->TestSetSize(canvasSlot, thisScreenSize, canvasSlot->GetSize().Y);
-			_healthBarWidget->TestSetSize(canvasSlot2, thisScreenSize, canvasSlot2->GetSize().Y);
-			// _healthBarWidget->SetSize(thisScreenSize, _healthBarWidget->GetHpBar()->GetDesiredSize().Y);
+			_healthBarWidget->SetSize(thisScreenSize, _healthBarWidget->GetHpBar()->GetDesiredSize().Y);
 		}
 
 		// �E�B�W�F�b�g�̃T�C�Y���擾

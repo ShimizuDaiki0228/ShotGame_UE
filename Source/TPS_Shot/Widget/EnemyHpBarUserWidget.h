@@ -44,10 +44,8 @@ public:
 	void UpdateHpBar(float newHpPercentage);
 	
 	UProgressBar* GetHpBar() const {return _hpBar;}
-	UProgressBar* GetDamageBar() const {return _damageBar;}
 
 	virtual void SetSize(float width, float height) override;
-	virtual void TestSetSize(UCanvasPanelSlot* canvasSlot, float width, float height) override;
 
 public:
 	static constexpr float HPBAR_CLAMP_SIZE_MIN = 150;
