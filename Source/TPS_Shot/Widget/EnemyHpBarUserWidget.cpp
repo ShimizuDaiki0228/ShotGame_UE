@@ -5,10 +5,6 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "../Utility/TimeManagerUtility.h"
 #include "Components/ProgressBar.h"
-#include "Async/Async.h"
-#include "Tasks/Task.h"
-
-using namespace UE::Tasks;
 
 void UEnemyHpBarUserWidget::ManualBeginPlay()
 {
