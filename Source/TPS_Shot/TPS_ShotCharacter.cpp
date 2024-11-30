@@ -312,7 +312,7 @@ bool ATPS_ShotCharacter::GetBeamEndLocation(const FVector& muzzleSocketLocation,
 				if (enemy)
 				{
 					// �����ƃ_���[�W��ݒ肷��A���͎���
-					if (enemy->DecreaseHP(50))
+					if (enemy->DecreaseHP(100))
 					{
 						_scoreProp->SetValue(_scoreProp->GetValue()+1);
 					}

@@ -14,19 +14,42 @@ UCLASS(BlueprintType, Blueprintable)
 class TPS_SHOT_API UEnemyHpBarUserWidget : public UUserWidget, public IIFollowActorWidget
 {
 	GENERATED_BODY()
+
+public:
+	
 	
 private:
 	UPROPERTY(meta = (BindWidget))
 	class UProgressBar* _hpBar;
 
+	UPROPERTY(meta = (BindWidget))
+	class UProgressBar* _damageBar;
+
+
+private:
+	FTimerHandle _damageBarAnimationTimerHandle;
+
+	UPROPERTY()
+	TArray<UCanvasPanelSlot*> _canvasSlots;
+
+	// 赤ゲージが残っているときにダメージを食らったときにゲージアニメーションをいったん終わらせるため
+	float _cacheNewHpValue;
+
+	bool bTimerHandleActive = false;
+
 public:
+	void ManualBeginPlay();
+	
 	UFUNCTION()
 	void UpdateHpBar(float newHpPercentage);
 	
 	UProgressBar* GetHpBar() const {return _hpBar;}
+	UProgressBar* GetDamageBar() const {return _damageBar;}
 
-	virtual void SetSize(UCanvasPanelSlot* canvasSlot, float width, float height) override;
+	virtual void SetSize(float width, float height) override;
+	virtual void TestSetSize(UCanvasPanelSlot* canvasSlot, float width, float height) override;
 
+public:
 	static constexpr float HPBAR_CLAMP_SIZE_MIN = 150;
 	static constexpr float HPBAR_CLAMP_SIZE_MAX = 300;
 };
