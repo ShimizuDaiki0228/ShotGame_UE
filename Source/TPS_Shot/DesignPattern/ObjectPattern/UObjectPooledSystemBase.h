@@ -47,7 +47,7 @@ public:
 	///GetPooledObjectとタイミングがかぶった時に_pooledObjectStack.Num() == 0の部分でクラッシュしていそう
 	///現状プールの中で保持しているオブジェクト数を増やすことで対処しているが今後考える必要性はある
 	template<typename T>
-	void ReturnToPool(TWeakObjectPtr<T> object)
+	void ReturnToPoolBase(TWeakObjectPtr<T> object)
 	{
 		if (object.IsValid())
 		{

@@ -44,7 +44,7 @@ void AParticleSystemPoolActor::ReturnToPool(TWeakObjectPtr<UPooledParticleSystem
 	if (particleComponent.IsValid())
 	{
 		particleComponent->DeactivateSystem();
-		AUObjectPooledSystemBase::ReturnToPool(particleComponent);
+		ReturnToPoolBase(particleComponent);
 	}
 	else
 	{

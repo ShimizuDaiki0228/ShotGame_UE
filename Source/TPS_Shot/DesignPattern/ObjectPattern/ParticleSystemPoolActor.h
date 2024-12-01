@@ -10,7 +10,7 @@
 class UPooledParticleSystemComponent;
 
 UCLASS()
-class TPS_SHOT_API AParticleSystemPoolActor : public AUObjectPooledSystemBase
+class TPS_SHOT_API AParticleSystemPoolActor : public AUObjectPooledSystemBase 
 {
 	GENERATED_BODY()
 
@@ -19,9 +19,9 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	virtual TWeakObjectPtr<UPooledParticleSystemComponent> GetPooledObject(const AActor* owner);
+	TWeakObjectPtr<UPooledParticleSystemComponent> GetPooledObject(const AActor* owner);
 
-	virtual void ReturnToPool(TWeakObjectPtr<UPooledParticleSystemComponent> particleComponent);
+	void ReturnToPool(TWeakObjectPtr<UPooledParticleSystemComponent> particleComponent);
 
 private:
 	bool SetParticleSystem(const TWeakObjectPtr<UPooledParticleSystemComponent>& pooledObject) const;
