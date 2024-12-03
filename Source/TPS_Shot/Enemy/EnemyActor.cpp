@@ -28,7 +28,14 @@ void AEnemyActor::BeginPlay()
 	_cachedPlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 	_healthBarWidget = CreateWidget<UEnemyHpBarUserWidget>(GetWorld(), _healthBarComponent);
 	_healthBarWidget->ManualBeginPlay();
-	SetWidgetSetting(_cachedPlayerController);
+
+	_characterWidgetController = NewObject<UCharacterWidgetController>();
+	_characterWidgetController->SetWidgetSetting(this,
+		_healthBarWidget,
+		_cachedPlayerController,
+		_healthBarWidget->HPBAR_CLAMP_SIZE_MIN,
+		_healthBarWidget->HPBAR_CLAMP_SIZE_MAX,
+		_healthBarWidget->GetHpBar()->GetDesiredSize().Y);
 
 	CurrentHpProp->OnValueChanged.AddLambda([this](const int& newValue)
 		{
@@ -36,54 +43,16 @@ void AEnemyActor::BeginPlay()
 		});
 }
 
-void AEnemyActor::SetWidgetSetting(TWeakObjectPtr<APlayerController> playerController)
-{
-	if (!playerController.IsValid())
-	{
-		return;
-	}
-
-	FVector2D screenPosition;
-	bool bProjected = UGameplayStatics::ProjectWorldToScreen(playerController.Get(), GetActorLocation() + FVector(0, 0, 100), screenPosition);
-
-	if (bProjected)
-	{
-		if (!_healthBarWidget->IsInViewport())
-		{
-			_healthBarWidget->AddToViewport();
-		}
-		
-		float thisScreenSize = UActorScreenSizeCalculator::CalculateScreenSize(this,
-			playerController.Get(),
-			_healthBarWidget->HPBAR_CLAMP_SIZE_MIN,
-			_healthBarWidget->HPBAR_CLAMP_SIZE_MAX
-			);
-
-		if (thisScreenSize != 0)
-		{
-			_healthBarWidget->SetSize(thisScreenSize, _healthBarWidget->GetHpBar()->GetDesiredSize().Y);
-		}
-
-		// �E�B�W�F�b�g�̃T�C�Y���擾
-		FVector2D widgetSize = _healthBarWidget->GetDesiredSize();
-		FVector2D centeredPosition = screenPosition - (widgetSize * 0.5);
-
-		// �X�N���[�����W���E�B�W�F�b�g�̈ʒu�ɓK�p
-		_healthBarWidget->SetVisibility(ESlateVisibility::Visible);
-		_healthBarWidget->SetPositionInViewport(centeredPosition, true);
-	}
-	else
-	{
-		// ��ʊO�̏ꍇ�A�E�B�W�F�b�g���\���ɂ���i�I�v�V�����j
-		_healthBarWidget->SetVisibility(ESlateVisibility::Hidden);
-	}
-}
-
 void AEnemyActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	SetWidgetSetting(_cachedPlayerController);
+	_characterWidgetController->SetWidgetSetting(this,
+		_healthBarWidget,
+		_cachedPlayerController,
+		_healthBarWidget->HPBAR_CLAMP_SIZE_MIN,
+		_healthBarWidget->HPBAR_CLAMP_SIZE_MAX,
+		_healthBarWidget->GetHpBar()->GetDesiredSize().Y);
 }
 
 void AEnemyActor::SelfDestroy()
@@ -91,7 +60,7 @@ void AEnemyActor::SelfDestroy()
 	TimeManagerUtility::GetInstance().Cancel(GetWorld(), _destroyTimerHandle);
 
 	// ウィジェットを削除
-	if (_healthBarWidget.IsValid())
+	if (_healthBarWidget)
 	{
 		_healthBarWidget->RemoveFromParent();
 		_healthBarWidget = nullptr; // ポインタを無効化

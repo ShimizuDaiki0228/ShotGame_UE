@@ -5,14 +5,12 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "../TPS_ShotCharacter.h"
-#include "../EnemyState/IEnemyState.h"
 #include "../LevelManager.h"
 #include "../SpawnManager.h"
 #include "../Niagara/ExplosionEffect.h"
-#include "../Utility/SoundManagerUtility.h"
-#include "Components/WidgetComponent.h"
 #include "../Widget/EnemyHpBarUserWidget.h"
 #include "TPS_Shot/DesignPattern/ObjectPattern/PooledObjectActorComponent.h"
+#include "../CharacterWidgetController.h"
 #include "EnemyActor.generated.h"
 
 
@@ -28,7 +26,6 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	void SetWidgetSetting(TWeakObjectPtr<APlayerController> playerController);
 
 public:	
 	// Called every frame
@@ -64,11 +61,11 @@ private:
 	const int MAX_HP = 500;
 	//int _hp;
 
+	UPROPERTY()
 	USpawnManager* _explosionEffectSpawnManager;
 
 	FTimerHandle _destroyTimerHandle;
 
-private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Effect", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<AExplosionEffect> _explosionEffect;
 
@@ -77,9 +74,15 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<UEnemyHpBarUserWidget> _healthBarComponent;
-	TWeakObjectPtr<UEnemyHpBarUserWidget> _healthBarWidget;
 
-	TWeakObjectPtr<APlayerController> _cachedPlayerController;
+	UPROPERTY()
+	UEnemyHpBarUserWidget* _healthBarWidget;
+
+	UPROPERTY()
+	APlayerController* _cachedPlayerController;
+
+	UPROPERTY()
+	TWeakObjectPtr<UCharacterWidgetController> _characterWidgetController;
 	
 private:
 	TSharedPtr<ReactiveProperty<int>> _currentHpProp = MakeShared<ReactiveProperty<int>>();

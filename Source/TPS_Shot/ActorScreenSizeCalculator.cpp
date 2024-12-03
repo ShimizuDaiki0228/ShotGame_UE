@@ -6,7 +6,7 @@
 #include "GameFramework/PlayerController.h"
 
 // 画面に描画されているアクターのサイズを取得
-float UActorScreenSizeCalculator::CalculateScreenSize(AActor* actor, APlayerController* playerController, float clampMin, float clampMax)
+float UActorScreenSizeCalculator::CalculateScreenWidthSize(const AActor* actor, const APlayerController* playerController, const float clampMin, const float clampMax)
 {
 	FVector2D min, max;
 	if (GetScreenBounds(actor, playerController, min, max))
@@ -19,7 +19,7 @@ float UActorScreenSizeCalculator::CalculateScreenSize(AActor* actor, APlayerCont
 	return 0;
 }
 
-bool UActorScreenSizeCalculator::GetScreenBounds(AActor* actor, APlayerController* playerController,
+bool UActorScreenSizeCalculator::GetScreenBounds(const AActor* actor, const APlayerController* playerController,
 	FVector2D& outMin, FVector2D& outMax)
 {
 	if (playerController && actor)
