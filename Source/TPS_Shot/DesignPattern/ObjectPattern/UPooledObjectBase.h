@@ -20,16 +20,16 @@ public:
 	UPROPERTY()
 	T* Pool;
 
-private:
-	void ReleaseBase()
+protected:
+	void ReleaseBase(TWeakObjectPtr<> pooledObject) const
 	{
 		if (AUObjectPooledSystemBase* PooledSystem = static_cast<AUObjectPooledSystemBase*>(Pool))
 		{
-			PooledSystem->ReturnToPool(this);
+			PooledSystem->ReturnToPoolBase(pooledObject);
 		}
 		else
 		{
-			UKismetSystemLibrary::PrintString(this, TEXT("can't cast to UObjectPooledSystemBase"), true, true, FColor::Purple);
+			UKismetSystemLibrary::PrintString(pooledObject.Get(), TEXT("can't cast to UObjectPooledSystemBase"), true, true, FColor::Purple);
 		}
 	}
 };

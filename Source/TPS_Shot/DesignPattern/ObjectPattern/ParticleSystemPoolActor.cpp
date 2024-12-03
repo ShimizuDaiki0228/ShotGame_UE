@@ -11,7 +11,7 @@ void AParticleSystemPoolActor::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	if (_poolObject != nullptr)
+	if (_pooledObject != nullptr)
 	{
 		for (int i = 0; i < _initPoolSize; i++)
 		{

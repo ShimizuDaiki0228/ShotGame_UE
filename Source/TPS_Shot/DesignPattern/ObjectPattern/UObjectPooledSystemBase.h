@@ -21,7 +21,7 @@ protected:
 	TArray<TWeakObjectPtr<UObject>> _pooledObjectStack;
 	
 	UPROPERTY(EditAnywhere, Category = "Pool")
-	UObject* _poolObject;
+	UObject* _pooledObject;
 	
 	UPROPERTY(EditAnywhere, Category = "Pool")
 	int _initPoolSize = 3;
