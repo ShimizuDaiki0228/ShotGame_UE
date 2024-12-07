@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "UObjectPooledSystemBase.h"
 #include "Kismet/KismetSystemLibrary.h"
 
 class AUObjectPooledSystemBase;
@@ -10,7 +11,7 @@ class AUObjectPooledSystemBase;
 /**
  * 
  */
-template<typename T>
+template<typename TObjectPoolSystem, typename TObjectClass>
 class TPS_SHOT_API UPooledObjectBase
 {
 public:
@@ -18,18 +19,30 @@ public:
 	virtual ~UPooledObjectBase() = default;
 
 	UPROPERTY()
-	T* Pool;
+	TObjectPoolSystem* Pool;
 
 protected:
-	void ReleaseBase(TWeakObjectPtr<> pooledObject) const
+	void ReleaseBase(TWeakObjectPtr<TObjectClass> pooledObject) const
 	{
 		if (AUObjectPooledSystemBase* PooledSystem = static_cast<AUObjectPooledSystemBase*>(Pool))
 		{
-			PooledSystem->ReturnToPoolBase(pooledObject);
+			PooledSystem->ReturnToPoolBase<TObjectClass>(pooledObject);
 		}
 		else
 		{
-			UKismetSystemLibrary::PrintString(pooledObject.Get(), TEXT("can't cast to UObjectPooledSystemBase"), true, true, FColor::Purple);
+			UKismetSystemLibrary::PrintString(pooledObject.Get(), TEXT("can't cast to UObjectPooledSystemBase"), true, true, FColor::Red);
+		}
+	}
+
+	void ReleaseWidgetBase(TWeakObjectPtr<TObjectClass> pooledObject) const
+	{
+		if (AUObjectPooledSystemBase* PooledSystem = static_cast<AUObjectPooledSystemBase*>(Pool))
+		{
+			PooledSystem->ReturnToPoolWidgetBase(pooledObject);
+		}
+		else
+		{
+			UKismetSystemLibrary::PrintString(pooledObject.Get(), TEXT("can't cast to UObjectPooledSystemBase"), true, true, FColor::Red);
 		}
 	}
 };

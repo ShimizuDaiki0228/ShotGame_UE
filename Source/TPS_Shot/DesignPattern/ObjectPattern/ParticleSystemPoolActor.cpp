@@ -26,7 +26,7 @@ void AParticleSystemPoolActor::BeginPlay()
 
 TWeakObjectPtr<UPooledParticleSystemComponent> AParticleSystemPoolActor::GetPooledObject(const AActor* owner)
 {
-	TWeakObjectPtr<UPooledParticleSystemComponent> pooledObject = GetPooledObjectBase<UPooledParticleSystemComponent>(owner);
+	TWeakObjectPtr<UPooledParticleSystemComponent> pooledObject = GetPooledObjectBase<UPooledParticleSystemComponent>();
 	
 	if (!pooledObject.IsValid())
 	{
@@ -54,8 +54,8 @@ void AParticleSystemPoolActor::ReturnToPool(TWeakObjectPtr<UPooledParticleSystem
 
 bool AParticleSystemPoolActor::SetParticleSystem(const TWeakObjectPtr<UPooledParticleSystemComponent>& pooledObject) const
 {
-	auto particleSystem = Cast<UParticleSystem>(_poolObject);
-	if (particleSystem != nullptr)
+	auto particleSystem = Cast<UParticleSystem>(_pooledObject);
+	if (::IsValid(particleSystem))
 	{
 		pooledObject->SetTemplate(particleSystem);
 		return true;

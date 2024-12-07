@@ -5,10 +5,10 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "../Utility/SoundManagerUtility.h"
 #include "../Utility/TimeManagerUtility.h"
-#include "Components/CanvasPanelSlot.h"
 #include "Components/ProgressBar.h"
 #include "Kismet/GameplayStatics.h"
-#include "../ActorScreenSizeCalculator.h"
+#include "../DesignPattern/ObjectPattern/UObject/Widget/PooledUText.h"
+#include "TPS_Shot/DesignPattern/ObjectPattern/UObject/Widget/UTextPoolActor.h"
 
 // Sets default values
 AEnemyActor::AEnemyActor()
@@ -114,6 +114,8 @@ bool AEnemyActor::DecreaseHP(int damage)
 	{
 		_currentHpProp->SetValue(_currentHpProp->GetValue() - damage);
 		// _currentHpProp->SetValue(0);
+
+		_levelManager->GetUserWidgetPool()->GetPooledObject();
 		
 		if (_currentHpProp->GetValue() <= 0)
 		{

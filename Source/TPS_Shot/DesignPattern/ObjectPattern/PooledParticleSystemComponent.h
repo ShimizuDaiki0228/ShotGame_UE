@@ -13,7 +13,7 @@
  */
 UCLASS()
 class TPS_SHOT_API UPooledParticleSystemComponent : public UParticleSystemComponent,
-public UPooledObjectBase<AParticleSystemPoolActor>
+public UPooledObjectBase<AParticleSystemPoolActor, UPooledParticleSystemComponent>
 {
 	GENERATED_BODY()
 	

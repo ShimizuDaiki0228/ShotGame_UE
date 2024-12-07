@@ -30,6 +30,9 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Spawning", meta = (AllowPrivateAccess = "true"))
 	class AObjectPoolActor* _enemyExplosionPool;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Spawning", meta = (AllowPrivateAccess = "true"))
+	class AUTextPoolActor* _userWidgetPool;
+
 public:
 	ASpawnVolumeActor* GetVolumeActor() const { return _volumeActor; }
 
@@ -39,4 +42,6 @@ public:
 	AParticleSystemPoolActor* GetEnemyEffectPool() const { return _enemyHitEffectPool; }
 
 	AObjectPoolActor* GetEnemyExplosionPool() const {return _enemyExplosionPool;}
+
+	AUTextPoolActor* GetUserWidgetPool() const {return _userWidgetPool;}
 };

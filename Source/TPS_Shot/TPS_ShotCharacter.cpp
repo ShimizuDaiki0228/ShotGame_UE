@@ -19,6 +19,7 @@
 #include "Engine/SkeletalMeshSocket.h"
 #include "DrawDebugHelpers.h"
 #include "Particles/ParticleSystemComponent.h"
+#include "Utility/SoundManagerUtility.h"
 #include "Enemy/EnemyActor.h"
 
 //////////////////////////////////////////////////////////////////////////

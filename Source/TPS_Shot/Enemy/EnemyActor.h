@@ -11,6 +11,7 @@
 #include "../Widget/EnemyHpBarUserWidget.h"
 #include "TPS_Shot/DesignPattern/ObjectPattern/PooledObjectActorComponent.h"
 #include "../CharacterWidgetController.h"
+#include "../Utility/SoundManagerUtility.h"
 #include "EnemyActor.generated.h"
 
 

@@ -3,42 +3,60 @@
 
 #include "UTextPoolActor.h"
 
-#include "NavigationSystemTypes.h"
+#include "PooledUserWidgetManager.h"
 #include "PooledUText.h"
-#include "Components/CanvasPanel.h"
-#include "Components/ProgressBar.h"
-#include "Components/TextBlock.h"
-#include "Components/CanvasPanelSlot.h"
-#include "Sections/MovieSceneLevelVisibilitySection.h"
+#include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Tasks/Task.h"
+
+using namespace UE::Tasks;
 
 void AUTextPoolActor::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (_pooledObject != nullptr)
+	_widgetManager = CreateWidget<UPooledUserWidgetManager>(GetWorld(), _pooledWidgetManagerClass);
+	
+	if (_widgetManager.IsValid())
 	{
-		for (int i = 0; i < _initPoolSize; i++)
-		{
-			CreateNewPooledObject();
-		}
+		_widgetManager->AddToViewport();
+		_widgetManager->SetVisibility(ESlateVisibility::Visible);
+		
+		FTask widgetManagerConstructTask = Launch
+		(TEXT("widgetManagerConstruct Busy Wait"), [this]()
+			{
+				while (!_widgetManager->IsConstructed())
+				{
+					FPlatformProcess::Sleep(0.1f);
+				}
+		
+				_pooledUTextClass = TSubclassOf<UPooledUText>(*_pooledWidgetClass);
+
+				// コンストラクト完了後の処理
+				for (int i = 0; i < _initPoolSize; i++)
+				{
+					auto pooledText = CreateNewPooledObject();
+					pooledText->Release();
+				}
+			}
+		);
+		widgetManagerConstructTask.BusyWait();
 	}
 	else
 	{
-		UKismetSystemLibrary::PrintString(this, TEXT("pool object is nullptr"), true, true, FColor::Red);
+		UKismetSystemLibrary::PrintString(this, TEXT("widget Manager isn't valid"), true, true, FColor::Red);
 	}
 }
 
-TWeakObjectPtr<UPooledUText> AUTextPoolActor::GetPooledObject(const AActor* owner)
+TWeakObjectPtr<UPooledUText> AUTextPoolActor::GetPooledObject()
 {
-	TWeakObjectPtr<UPooledUText> pooledText = GetPooledObjectBase<UPooledUText>(owner);
-
-	if (!pooledText.IsValid())
+	TWeakObjectPtr<UPooledUText> pooledText = GetPooledWidgetBase<UPooledUText>();
+	
+	if (pooledText.IsValid())
 	{
 		pooledText = CreateNewPooledObject();
+		UKismetSystemLibrary::PrintString(this, TEXT("pooledText new create"), true, true, FColor::Cyan);
 	}
-	
-	pooledText->SetVisibility(ESlateVisibility::Visible);
 	
 	return pooledText;
 }
@@ -48,7 +66,7 @@ void AUTextPoolActor::ReturnToPool(TWeakObjectPtr<UPooledUText> pooledText)
 	if (pooledText.IsValid())
 	{
 		pooledText->SetVisibility(ESlateVisibility::Collapsed);
-		ReturnToPoolBase(pooledText);
+		ReturnToPoolWidgetBase(pooledText);
 	}
 	else
 	{
@@ -58,24 +76,14 @@ void AUTextPoolActor::ReturnToPool(TWeakObjectPtr<UPooledUText> pooledText)
 
 TWeakObjectPtr<UPooledUText> AUTextPoolActor::CreateNewPooledObject()
 {
-	TWeakObjectPtr<UPooledUText> pooledText = Cast<UPooledUText>(_pooledObject);
-
+	TWeakObjectPtr<UPooledUText> pooledText = _widgetManager->TextInitialized(this, _pooledUTextClass);
+	
 	if (pooledText.IsValid())
 	{
-		UCanvasPanelSlot* canvasPanel = Cast<UCanvasPanelSlot>(pooledText->GetTextBlock()->Slot);
-		if (canvasPanel != nullptr)
-		{
-			canvasPanel->SetPosition(FVector2D::ZeroVector);
-			pooledText->SetVisibility(ESlateVisibility::Collapsed);
-			pooledText->Pool = this;
-			_pooledObjectStack.Add(pooledText);
-			return pooledText;
-		}
-
-		UKismetSystemLibrary::PrintString(this, TEXT("canvasSlot is nullptr"), true, true, FColor::Red);
-		return nullptr;
+		_pooledWidgetStack.Add(pooledText);
+		return pooledText;
 	}
-
-	UKismetSystemLibrary::PrintString(this, TEXT("pooledObject isn't valid"), true, true, FColor::Red);
+	
+	UKismetSystemLibrary::PrintString(this, TEXT("pooledText isn't valid"), true, true, FColor::Red);
 	return nullptr;
 }

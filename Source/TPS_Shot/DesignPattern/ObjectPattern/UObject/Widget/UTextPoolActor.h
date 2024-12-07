@@ -20,10 +20,12 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	TWeakObjectPtr<UPooledUText> GetPooledObject(const AActor* owner);
+	TWeakObjectPtr<UPooledUText> GetPooledObject();
 
 	void ReturnToPool(TWeakObjectPtr<UPooledUText> pooledText);
 
-private:
 	TWeakObjectPtr<UPooledUText> CreateNewPooledObject();
+
+private:
+	TSubclassOf<UPooledUText> _pooledUTextClass;
 };

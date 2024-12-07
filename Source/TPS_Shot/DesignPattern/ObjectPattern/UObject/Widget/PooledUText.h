@@ -5,28 +5,33 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "../../UPooledObjectBase.h"
-#include "UTextPoolActor.h"
+#include "Components/TextBlock.h"
+#include "Components/CanvasPanel.h"
 #include "PooledUText.generated.h"
 
+class AUTextPoolActor;
+
 /**
- * 
+ * UserWidgetを最初に1つ作ってしまって、そこにTextを量産していく
+ * UserWidgetを作り直す方法だとうまくいかないため
  */
 UCLASS()
-class TPS_SHOT_API UPooledUText : public UUserWidget, public UPooledObjectBase<AUTextPoolActor>
+class TPS_SHOT_API UPooledUText : public UUserWidget, public UPooledObjectBase<AUTextPoolActor, UPooledUText>
 {
 	GENERATED_BODY()
 
 public:
-	UPROPERTY()
-	AUTextPoolActor* Pool;
-
-private:
-	UPROPERTY(meta = (BindWidget))
-	class UTextBlock* _pooledText;
-	
+	void Initialized(AUTextPoolActor* poolActor, const UCanvasPanel* canvasPanel);
 
 public:
-	UTextBlock* GetTextBlock() const { return _pooledText; }
+	void SetText() const;
 
 	void Release();
+
+private:
+	UPROPERTY()
+	UTextBlock* _text;
+	
+	UPROPERTY()
+	UCanvasPanelSlot* _canvasSlot;
 };
