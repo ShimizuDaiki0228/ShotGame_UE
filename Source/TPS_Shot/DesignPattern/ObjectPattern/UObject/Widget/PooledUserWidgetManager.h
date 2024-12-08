@@ -24,18 +24,21 @@ public:
 
 public:
 	template<typename T, typename TClass>
-	TWeakObjectPtr<UPooledUText> TextInitialized(T* pooledObjectBase, TSubclassOf<TClass> pooledObjectClass)
+	TWeakObjectPtr<UPooledUText> TextInitialized(T* pooledObjectBase,
+		TSubclassOf<TClass> pooledObjectClass,
+		TWeakObjectPtr<APlayerController> playerController)
 	{
 		// コンパイル時点で正しく継承していないと引っかかる
 		static_assert(std::is_base_of_v<AUTextPoolActor, T>, "T must derive from AUObjectPooledSystemBase");
 		static_assert(std::is_base_of_v<UPooledUText, TClass>, "TClass must derive from UPooledUText");
 
-		return PooledTextCreate(pooledObjectBase, pooledObjectClass);
+		return PooledTextCreate(pooledObjectBase, pooledObjectClass, playerController);
 	}
 
 	TWeakObjectPtr<UPooledUText> PooledTextCreate(
 		AUTextPoolActor* pooledObjectBase,
-		TSubclassOf<UPooledUText> pooledObjectClass);
+		TSubclassOf<UPooledUText> pooledObjectClass,
+		TWeakObjectPtr<APlayerController> playerController);
 
 private:
 	UPROPERTY()

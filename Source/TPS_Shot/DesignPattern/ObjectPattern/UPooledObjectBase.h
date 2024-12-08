@@ -22,27 +22,27 @@ public:
 	TObjectPoolSystem* Pool;
 
 protected:
-	void ReleaseBase(TWeakObjectPtr<TObjectClass> pooledObject) const
-	{
-		if (AUObjectPooledSystemBase* PooledSystem = static_cast<AUObjectPooledSystemBase*>(Pool))
-		{
-			PooledSystem->ReturnToPoolBase<TObjectClass>(pooledObject);
-		}
-		else
-		{
-			UKismetSystemLibrary::PrintString(pooledObject.Get(), TEXT("can't cast to UObjectPooledSystemBase"), true, true, FColor::Red);
-		}
-	}
-
-	void ReleaseWidgetBase(TWeakObjectPtr<TObjectClass> pooledObject) const
-	{
-		if (AUObjectPooledSystemBase* PooledSystem = static_cast<AUObjectPooledSystemBase*>(Pool))
-		{
-			PooledSystem->ReturnToPoolWidgetBase(pooledObject);
-		}
-		else
-		{
-			UKismetSystemLibrary::PrintString(pooledObject.Get(), TEXT("can't cast to UObjectPooledSystemBase"), true, true, FColor::Red);
-		}
-	}
+	// void ReleaseBase(TWeakObjectPtr<TObjectClass> pooledObject) const
+	// {
+	// 	if (AUObjectPooledSystemBase* PooledSystem = static_cast<AUObjectPooledSystemBase*>(Pool))
+	// 	{
+	// 		PooledSystem->ReturnToPoolBase<TObjectClass>(pooledObject);
+	// 	}
+	// 	else
+	// 	{
+	// 		UKismetSystemLibrary::PrintString(pooledObject.Get(), TEXT("can't cast to UObjectPooledSystemBase"), true, true, FColor::Red);
+	// 	}
+	// }
+	//
+	// void ReleaseWidgetBase(TWeakObjectPtr<TObjectClass> pooledObject) const
+	// {
+	// 	if (AUObjectPooledSystemBase* PooledSystem = static_cast<AUObjectPooledSystemBase*>(Pool))
+	// 	{
+	// 		PooledSystem->ReturnToPoolWidgetBase(pooledObject);
+	// 	}
+	// 	else
+	// 	{
+	// 		UKismetSystemLibrary::PrintString(pooledObject.Get(), TEXT("can't cast to UObjectPooledSystemBase"), true, true, FColor::Red);
+	// 	}
+	// }
 };

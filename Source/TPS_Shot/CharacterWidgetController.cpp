@@ -8,28 +8,43 @@
 #include "Kismet/GameplayStatics.h"
 #include "Utility/WidgetUtility.h"
 
+void UCharacterWidgetController::Initialized(AActor* owner, APlayerController* playerController)
+{
+	_cachedOwner = owner;
+	_cachedPlayerController = playerController;
+}
+
+bool UCharacterWidgetController::IsCharacterProjected(FVector2D& screenPosition)
+{
+	if (!::IsValid(_cachedPlayerController))
+	{
+		UKismetSystemLibrary::PrintString(_cachedOwner, TEXT("widget or playerController isn't valid"), true, true, FColor::Red);
+		return false;
+	}
+
+	bool bProjected = UGameplayStatics::ProjectWorldToScreen(_cachedPlayerController,
+	                                                    _cachedOwner->GetActorLocation() + FVector(0, 0, 100),
+	                                                    screenPosition);
+	return bProjected;
+}
+
 /// 
 /// マルチプレイをするならTWeakObjectPtrで有効性を確認したほうがいい
 /// 
-void UCharacterWidgetController::SetWidgetSetting(AActor* owner,
+void UCharacterWidgetController::SetWidgetSetting(
 	UUserWidget* userWidget,
-	APlayerController* playerController,
 	float widthClampSizeMin,
 	float widthClampSizeMax,
 	float heightSize)
 {
-	if (!::IsValid(userWidget) || !::IsValid(playerController))
+	if (!::IsValid(userWidget))
 	{
-		UKismetSystemLibrary::PrintString(owner, TEXT("widget or playerController isn't valid"), true, true, FColor::Red);
 		return;
 	}
-
+	
 	FVector2D screenPosition;
-	bool bProjected = UGameplayStatics::ProjectWorldToScreen(playerController,
-		owner->GetActorLocation() + FVector(0, 0, 100),
-		screenPosition);
 
-	if (bProjected)
+	if (IsCharacterProjected(screenPosition))
 	{
 		if (!userWidget->IsInViewport())
 		{
@@ -37,9 +52,9 @@ void UCharacterWidgetController::SetWidgetSetting(AActor* owner,
 			userWidget->SetVisibility(ESlateVisibility::Visible);
 		}
 
-		UWidgetUtility::GetInstance()->SetWidgetWidthScale(owner,
+		UWidgetUtility::GetInstance()->SetWidgetWidthScale(_cachedOwner,
 			userWidget,
-			playerController,
+			_cachedPlayerController,
 			widthClampSizeMin,
 			widthClampSizeMax,
 			heightSize);
@@ -50,5 +65,32 @@ void UCharacterWidgetController::SetWidgetSetting(AActor* owner,
 	{
 		// ��ʊO�̏ꍇ�A�E�B�W�F�b�g���\���ɂ���i�I�v�V�����j
 		userWidget->SetVisibility(ESlateVisibility::Hidden);
+	}
+}
+
+void UCharacterWidgetController::SetTextSetting(UUserWidget* text,
+	const float& widthClampSizeMin,
+	const float& widthClampSizeMax,
+	const bool bIsRandomPos)
+{
+	if (!::IsValid(text))
+	{
+		return;
+	}
+
+	FVector2D screenPosition;
+	
+	if (IsCharacterProjected(screenPosition))
+	{
+		
+		FVector2D positionOffset = FVector2D::ZeroVector;
+		if (bIsRandomPos)
+		{
+			// TODO
+			// 自身の描画されているサイズの大きさ+-の幅のほうがよさそう
+			positionOffset = FVector2D(FMath::FRandRange(-TEXT_POSITION_OFFSET_X, TEXT_POSITION_OFFSET_X),
+								       FMath::FRandRange(-TEXT_POSITION_OFFSET_Y, TEXT_POSITION_OFFSET_Y));
+		}
+		UWidgetUtility::GetInstance()->SetWidgetPosition(text, screenPosition, positionOffset);
 	}
 }

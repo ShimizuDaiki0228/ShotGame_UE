@@ -10,6 +10,7 @@
 #include "PooledUText.generated.h"
 
 class AUTextPoolActor;
+class UCharacterWidgetController;
 
 /**
  * UserWidgetを最初に1つ作ってしまって、そこにTextを量産していく
@@ -21,10 +22,12 @@ class TPS_SHOT_API UPooledUText : public UUserWidget, public UPooledObjectBase<A
 	GENERATED_BODY()
 
 public:
-	void Initialized(AUTextPoolActor* poolActor, const UCanvasPanel* canvasPanel);
+	void Initialized(AUTextPoolActor* poolActor,
+		const UCanvasPanel* canvasPanel,
+		TWeakObjectPtr<APlayerController> playerController);
 
 public:
-	void SetText() const;
+	void SettingTextContents(const FString& text, UCharacterWidgetController* widgetController);
 
 	void Release();
 
@@ -34,4 +37,7 @@ private:
 	
 	UPROPERTY()
 	UCanvasPanelSlot* _canvasSlot;
+	
+	UPROPERTY()
+	TWeakObjectPtr<APlayerController> _cachedPlayerController;
 };

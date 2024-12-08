@@ -7,6 +7,7 @@
 #include "PooledUText.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Kismet/GameplayStatics.h"
 #include "Tasks/Task.h"
 
 using namespace UE::Tasks;
@@ -15,6 +16,8 @@ void AUTextPoolActor::BeginPlay()
 {
 	Super::BeginPlay();
 
+	_cachedPlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);;
+	
 	_widgetManager = CreateWidget<UPooledUserWidgetManager>(GetWorld(), _pooledWidgetManagerClass);
 	
 	if (_widgetManager.IsValid())
@@ -48,7 +51,9 @@ void AUTextPoolActor::BeginPlay()
 	}
 }
 
-TWeakObjectPtr<UPooledUText> AUTextPoolActor::GetPooledObject()
+TWeakObjectPtr<UPooledUText> AUTextPoolActor::GetPooledObject(
+	const FString& text,
+	UCharacterWidgetController* widgetController)
 {
 	TWeakObjectPtr<UPooledUText> pooledText = GetPooledWidgetBase<UPooledUText>();
 	
@@ -57,6 +62,8 @@ TWeakObjectPtr<UPooledUText> AUTextPoolActor::GetPooledObject()
 		pooledText = CreateNewPooledObject();
 		UKismetSystemLibrary::PrintString(this, TEXT("pooledText new create"), true, true, FColor::Cyan);
 	}
+
+	pooledText->SettingTextContents(text, widgetController);
 	
 	return pooledText;
 }
@@ -76,7 +83,7 @@ void AUTextPoolActor::ReturnToPool(TWeakObjectPtr<UPooledUText> pooledText)
 
 TWeakObjectPtr<UPooledUText> AUTextPoolActor::CreateNewPooledObject()
 {
-	TWeakObjectPtr<UPooledUText> pooledText = _widgetManager->TextInitialized(this, _pooledUTextClass);
+	TWeakObjectPtr<UPooledUText> pooledText = _widgetManager->TextInitialized(this, _pooledUTextClass, _cachedPlayerController);
 	
 	if (pooledText.IsValid())
 	{

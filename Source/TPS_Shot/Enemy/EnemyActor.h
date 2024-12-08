@@ -41,8 +41,10 @@ protected:
 	
 
 protected:
+	UPROPERTY()
 	ATPS_ShotCharacter* _character;
 
+	UPROPERTY()
 	ALevelManager* _levelManager;
 
 public:
@@ -83,7 +85,7 @@ private:
 	APlayerController* _cachedPlayerController;
 
 	UPROPERTY()
-	TWeakObjectPtr<UCharacterWidgetController> _characterWidgetController;
+	UCharacterWidgetController* _characterWidgetController;
 	
 private:
 	TSharedPtr<ReactiveProperty<int>> _currentHpProp = MakeShared<ReactiveProperty<int>>();

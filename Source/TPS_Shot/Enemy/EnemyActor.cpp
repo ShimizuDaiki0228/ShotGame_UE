@@ -30,9 +30,9 @@ void AEnemyActor::BeginPlay()
 	_healthBarWidget->ManualBeginPlay();
 
 	_characterWidgetController = NewObject<UCharacterWidgetController>();
-	_characterWidgetController->SetWidgetSetting(this,
+	_characterWidgetController->Initialized(this, _cachedPlayerController);
+	_characterWidgetController->SetWidgetSetting(
 		_healthBarWidget,
-		_cachedPlayerController,
 		_healthBarWidget->HPBAR_CLAMP_SIZE_MIN,
 		_healthBarWidget->HPBAR_CLAMP_SIZE_MAX,
 		_healthBarWidget->GetHpBar()->GetDesiredSize().Y);
@@ -47,9 +47,8 @@ void AEnemyActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	_characterWidgetController->SetWidgetSetting(this,
+	_characterWidgetController->SetWidgetSetting(
 		_healthBarWidget,
-		_cachedPlayerController,
 		_healthBarWidget->HPBAR_CLAMP_SIZE_MIN,
 		_healthBarWidget->HPBAR_CLAMP_SIZE_MAX,
 		_healthBarWidget->GetHpBar()->GetDesiredSize().Y);
@@ -115,7 +114,8 @@ bool AEnemyActor::DecreaseHP(int damage)
 		_currentHpProp->SetValue(_currentHpProp->GetValue() - damage);
 		// _currentHpProp->SetValue(0);
 
-		_levelManager->GetUserWidgetPool()->GetPooledObject();
+		_levelManager->GetUserWidgetPool()->GetPooledObject(FString::FromInt(damage), _characterWidgetController);
+		
 		
 		if (_currentHpProp->GetValue() <= 0)
 		{

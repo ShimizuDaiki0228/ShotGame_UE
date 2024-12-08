@@ -7,6 +7,7 @@
 #include "UTextPoolActor.generated.h"
 
 class UPooledUText;
+class UCharacterWidgetController;
 
 /**
  * 
@@ -20,7 +21,7 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	TWeakObjectPtr<UPooledUText> GetPooledObject();
+	TWeakObjectPtr<UPooledUText> GetPooledObject(const FString& text, UCharacterWidgetController* widgetController);
 
 	void ReturnToPool(TWeakObjectPtr<UPooledUText> pooledText);
 
@@ -28,4 +29,7 @@ public:
 
 private:
 	TSubclassOf<UPooledUText> _pooledUTextClass;
+
+	UPROPERTY()
+	TWeakObjectPtr<APlayerController> _cachedPlayerController;
 };

@@ -18,14 +18,15 @@ void UPooledUserWidgetManager::NativeConstruct()
 
 TWeakObjectPtr<UPooledUText> UPooledUserWidgetManager::PooledTextCreate(
 	AUTextPoolActor* pooledObjectBase,
-	TSubclassOf<UPooledUText> pooledObjectClass)
+	TSubclassOf<UPooledUText> pooledObjectClass,
+	TWeakObjectPtr<APlayerController> playerController)
 {
 	UPooledUText* pooledText = CreateWidget<UPooledUText>(GetWorld(), pooledObjectClass);
 	if (::IsValid(pooledText))
 	{
 		UKismetSystemLibrary::PrintString(this, TEXT("pooledText is valid"), true, true, FColor::Blue);
 		pooledText->AddToViewport();
-		pooledText->Initialized(pooledObjectBase, _canvasPanel);
+		pooledText->Initialized(pooledObjectBase, _canvasPanel, playerController);
 		pooledText->Pool = pooledObjectBase;
 		return pooledText;
 	}
