@@ -6,12 +6,12 @@
 
 UPooledParticleSystemComponent::UPooledParticleSystemComponent()
 {
-	OnSystemFinished.AddDynamic(this, &UPooledParticleSystemComponent::OnParticleSystemFinished);
+	OnSystemFinished.AddDynamic(this, &UPooledParticleSystemComponent::Release);
 }
 
-void UPooledParticleSystemComponent::OnParticleSystemFinished(UParticleSystemComponent* PSystem)
+void UPooledParticleSystemComponent::Release(UParticleSystemComponent* PSystem)
 {
-	UKismetSystemLibrary::PrintString(this, TEXT("object return to pool"), true, true, FColor::Red, 2.f);
+	// UKismetSystemLibrary::PrintString(this, TEXT("particle system finished"), true, true, FColor::Red, 2.f);
 
 	Pool->ReturnToPool(this);
 }

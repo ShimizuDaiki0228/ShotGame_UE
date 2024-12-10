@@ -12,10 +12,10 @@ class TPS_SHOT_API UActorScreenSizeCalculator : public UObject
 	GENERATED_BODY()
 
 public:
-	static float CalculateScreenSize(AActor* actor, APlayerController* playerController, float clampMin, float clampMax);
+	static FVector2D CalculateScreenSize(const AActor* actor, const APlayerController* playerController);
 
 private:
-	static bool GetScreenBounds(AActor* actor, APlayerController* playerController, FVector2D& outMin, FVector2D& outMax);
+	static bool GetScreenBounds(const AActor* actor, const APlayerController* playerController, FVector2D& outMin, FVector2D& outMax);
 
 private:
 	static constexpr float BASE_SIZE = 200.0f; // スクリーン上の基準となる幅（ピクセル）

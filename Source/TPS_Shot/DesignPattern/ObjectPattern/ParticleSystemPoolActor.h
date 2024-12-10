@@ -4,33 +4,19 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "UObjectPooledSystemBase.h"
 #include "ParticleSystemPoolActor.generated.h"
 
 class UPooledParticleSystemComponent;
 
 UCLASS()
-class TPS_SHOT_API AParticleSystemPoolActor : public AActor
+class TPS_SHOT_API AParticleSystemPoolActor : public AUObjectPooledSystemBase 
 {
 	GENERATED_BODY()
-	
-public:
-	AParticleSystemPoolActor();
 
 protected:
-
 	// Called when the game starts
 	virtual void BeginPlay() override;
-
-
-private:
-	UPROPERTY(EditAnywhere, Category = "Pool")
-	int _initPoolSize = 3;
-
-	UPROPERTY(VisibleAnywhere, Category = "Pool")
-	TArray<TWeakObjectPtr<UPooledParticleSystemComponent>> _pooledObjectStack;
-
-	UPROPERTY(EditAnywhere, Category = "Pool")
-	UParticleSystem* _particleSystem;
 
 public:
 	TWeakObjectPtr<UPooledParticleSystemComponent> GetPooledObject(const AActor* owner);
@@ -38,5 +24,7 @@ public:
 	void ReturnToPool(TWeakObjectPtr<UPooledParticleSystemComponent> particleComponent);
 
 private:
+	bool SetParticleSystem(const TWeakObjectPtr<UPooledParticleSystemComponent>& pooledObject) const;
+
 	TWeakObjectPtr<UPooledParticleSystemComponent> CreateNewPooledObject();
 };

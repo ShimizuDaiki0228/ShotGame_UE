@@ -5,10 +5,10 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "../Utility/SoundManagerUtility.h"
 #include "../Utility/TimeManagerUtility.h"
-#include "Components/CanvasPanelSlot.h"
 #include "Components/ProgressBar.h"
 #include "Kismet/GameplayStatics.h"
-#include "../ActorScreenSizeCalculator.h"
+#include "../DesignPattern/ObjectPattern/UObject/Widget/PooledUText.h"
+#include "TPS_Shot/DesignPattern/ObjectPattern/UObject/Widget/UTextPoolActor.h"
 
 // Sets default values
 AEnemyActor::AEnemyActor()
@@ -28,7 +28,14 @@ void AEnemyActor::BeginPlay()
 	_cachedPlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 	_healthBarWidget = CreateWidget<UEnemyHpBarUserWidget>(GetWorld(), _healthBarComponent);
 	_healthBarWidget->ManualBeginPlay();
-	SetWidgetSetting(_cachedPlayerController);
+
+	_characterWidgetController = NewObject<UCharacterWidgetController>();
+	_characterWidgetController->Initialized(this, _cachedPlayerController);
+	_characterWidgetController->SetWidgetSetting(
+		_healthBarWidget,
+		_healthBarWidget->HPBAR_CLAMP_SIZE_MIN,
+		_healthBarWidget->HPBAR_CLAMP_SIZE_MAX,
+		_healthBarWidget->GetHpBar()->GetDesiredSize().Y);
 
 	CurrentHpProp->OnValueChanged.AddLambda([this](const int& newValue)
 		{
@@ -36,54 +43,15 @@ void AEnemyActor::BeginPlay()
 		});
 }
 
-void AEnemyActor::SetWidgetSetting(TWeakObjectPtr<APlayerController> playerController)
-{
-	if (!playerController.IsValid())
-	{
-		return;
-	}
-
-	FVector2D screenPosition;
-	bool bProjected = UGameplayStatics::ProjectWorldToScreen(playerController.Get(), GetActorLocation() + FVector(0, 0, 100), screenPosition);
-
-	if (bProjected)
-	{
-		if (!_healthBarWidget->IsInViewport())
-		{
-			_healthBarWidget->AddToViewport();
-		}
-		
-		float thisScreenSize = UActorScreenSizeCalculator::CalculateScreenSize(this,
-			playerController.Get(),
-			_healthBarWidget->HPBAR_CLAMP_SIZE_MIN,
-			_healthBarWidget->HPBAR_CLAMP_SIZE_MAX
-			);
-
-		if (thisScreenSize != 0)
-		{
-			_healthBarWidget->SetSize(thisScreenSize, _healthBarWidget->GetHpBar()->GetDesiredSize().Y);
-		}
-
-		// �E�B�W�F�b�g�̃T�C�Y���擾
-		FVector2D widgetSize = _healthBarWidget->GetDesiredSize();
-		FVector2D centeredPosition = screenPosition - (widgetSize * 0.5);
-
-		// �X�N���[�����W���E�B�W�F�b�g�̈ʒu�ɓK�p
-		_healthBarWidget->SetVisibility(ESlateVisibility::Visible);
-		_healthBarWidget->SetPositionInViewport(centeredPosition, true);
-	}
-	else
-	{
-		// ��ʊO�̏ꍇ�A�E�B�W�F�b�g���\���ɂ���i�I�v�V�����j
-		_healthBarWidget->SetVisibility(ESlateVisibility::Hidden);
-	}
-}
-
 void AEnemyActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	SetWidgetSetting(_cachedPlayerController);
+	_characterWidgetController->SetWidgetSetting(
+		_healthBarWidget,
+		_healthBarWidget->HPBAR_CLAMP_SIZE_MIN,
+		_healthBarWidget->HPBAR_CLAMP_SIZE_MAX,
+		_healthBarWidget->GetHpBar()->GetDesiredSize().Y);
 }
 
 void AEnemyActor::SelfDestroy()
@@ -91,7 +59,7 @@ void AEnemyActor::SelfDestroy()
 	TimeManagerUtility::GetInstance().Cancel(GetWorld(), _destroyTimerHandle);
 
 	// ウィジェットを削除
-	if (_healthBarWidget.IsValid())
+	if (_healthBarWidget)
 	{
 		_healthBarWidget->RemoveFromParent();
 		_healthBarWidget = nullptr; // ポインタを無効化
@@ -145,6 +113,9 @@ bool AEnemyActor::DecreaseHP(int damage)
 	{
 		_currentHpProp->SetValue(_currentHpProp->GetValue() - damage);
 		// _currentHpProp->SetValue(0);
+
+		_levelManager->GetUserWidgetPool()->GetPooledObject(FString::FromInt(damage), _characterWidgetController);
+		
 		
 		if (_currentHpProp->GetValue() <= 0)
 		{
