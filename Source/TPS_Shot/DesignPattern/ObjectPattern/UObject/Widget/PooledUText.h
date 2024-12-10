@@ -28,6 +28,8 @@ public:
 		const UCanvasPanel* canvasPanel,
 		TWeakObjectPtr<APlayerController> playerController);
 
+	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
+
 public:
 	void SettingTextContents(const FString& text, UCharacterWidgetController* widgetController);
 
@@ -45,6 +47,14 @@ private:
 
 	FSlateFontInfo _fontInfo;
 
+	float _elapsedTime;
+
+	FVector2D _screenPosition;
+	
+private:
+	const float FADE_DURATION = 2.0f;
+	// テキストが表示されてからどれくらい上昇するか
+	const float MAX_FLOATING_AMOUNT = 70.0f;
 
 private:
 	virtual void SetSize(const FVector2D& size) override;

@@ -9,6 +9,7 @@
 #include "../../UPooledObjectBase.h"
 #include "Kismet/GameplayStatics.h"
 #include "TPS_Shot/CharacterWidgetController.h"
+#include "TPS_Shot/Utility/EasingAnimationUtility.h"
 
 
 void UPooledUText::Initialized(AUTextPoolActor* poolActor,
@@ -45,6 +46,29 @@ void UPooledUText::Initialized(AUTextPoolActor* poolActor,
 
 }
 
+void UPooledUText::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
+{
+	Super::NativeTick(MyGeometry, InDeltaTime);
+
+	_elapsedTime += InDeltaTime;
+
+	if (_text)
+	{
+		float fadeDurationRation = (static_cast<float>(_elapsedTime) / static_cast<float>(FADE_DURATION));
+		float opacity = 1.0f - EasingAnimationUtility::EaseInOutQuart(fadeDurationRation);
+		float floatingAmount = MAX_FLOATING_AMOUNT * EasingAnimationUtility::EaseInOutQuart(fadeDurationRation);
+
+		_text->SetRenderOpacity(opacity);
+		SetPositionInViewport(_screenPosition - FVector2D(0, floatingAmount), true);
+
+		if (opacity <= 0.1f)
+		{
+			Release();
+		}
+	}
+
+}
+
 void UPooledUText::SettingTextContents(const FString& text, UCharacterWidgetController* widgetController)
 {
 	if (!_text)
@@ -56,7 +80,7 @@ void UPooledUText::SettingTextContents(const FString& text, UCharacterWidgetCont
 	if (::IsValid(_canvasSlot))
 	{
 		_text->SetText(FText::FromString(text));
-		widgetController->SetWidgetSetting(this, 30, 100, 30, 100, true);
+		_screenPosition = widgetController->SetWidgetSetting(this, 30, 100, 30, 100, true);
 	}
 	
 	UE_LOG(LogTemp, Log, TEXT("Widget initialized successfully"));

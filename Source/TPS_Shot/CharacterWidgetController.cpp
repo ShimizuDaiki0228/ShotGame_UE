@@ -31,7 +31,7 @@ bool UCharacterWidgetController::IsCharacterProjected(FVector2D& screenPosition)
 /// 
 /// マルチプレイをするならTWeakObjectPtrで有効性を確認したほうがいい
 /// 
-void UCharacterWidgetController::SetWidgetSetting(
+FVector2D UCharacterWidgetController::SetWidgetSetting(
 	 UUserWidget* userWidget,
 	 float widthClampSizeMin,
 	 float widthClampSizeMax,
@@ -41,7 +41,7 @@ void UCharacterWidgetController::SetWidgetSetting(
 {
 	if (!::IsValid(userWidget))
 	{
-		return;
+		return FVector2D::ZeroVector;
 	}
 	
 	FVector2D screenPosition;
@@ -66,18 +66,20 @@ void UCharacterWidgetController::SetWidgetSetting(
 			heightClampSizeMin,
 			heightClampSizeMax);
 
+		FVector2D positionOffset;
 		if (bIsRandomPos)
 		{
-			FVector2D positionOffset;
 			positionOffset.X = FMath::RandRange(-ownerScreenSize.X, ownerScreenSize.X);
 			positionOffset.Y = FMath::RandRange(-ownerScreenSize.Y / 2, ownerScreenSize.Y / 2);
-			screenPosition += positionOffset;
+			screenPosition += FVector2D(positionOffset.X, positionOffset.Y);
 		}
 		UWidgetUtility::GetInstance()->SetWidgetPosition(userWidget, screenPosition);
+		return screenPosition;
 	}
 	else
 	{
 		// ��ʊO�̏ꍇ�A�E�B�W�F�b�g���\���ɂ���i�I�v�V�����j
 		userWidget->SetVisibility(ESlateVisibility::Hidden);
+		return FVector2D::ZeroVector;
 	}
 }

@@ -57,12 +57,9 @@ void UWidgetUtility::SetWidgetScale(
 	}
 }
 
-void UWidgetUtility::SetWidgetPosition(UUserWidget* widget,
-                                       const FVector2D& screenPosition,
-                                       const FVector2D& positionOffset)
+void UWidgetUtility::SetWidgetPosition(UUserWidget* widget, const FVector2D& screenPosition)
 {
 	FVector2D widgetSize = widget->GetDesiredSize();
-	FVector2D centeredPosition = screenPosition - (widgetSize * 0.5f);
-	FVector2D offSetPosition = centeredPosition + positionOffset;
-	widget->SetPositionInViewport(offSetPosition, true);
+	FVector2D definitePosition = screenPosition - (widgetSize * 0.5f);
+	widget->SetPositionInViewport(definitePosition, true);
 }

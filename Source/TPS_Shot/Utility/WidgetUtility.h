@@ -30,8 +30,7 @@ public:
 	// 画面に表示する際の大きさ設定
 	static void SetWidgetPosition(
 		UUserWidget* widget,
-		const FVector2D& screenPosition,
-		const FVector2D& positionOffset = FVector2D::ZeroVector);
+		const FVector2D& screenPosition);
 
 private:
 	static UWidgetUtility* _instance;

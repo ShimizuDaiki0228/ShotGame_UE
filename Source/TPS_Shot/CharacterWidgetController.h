@@ -20,7 +20,7 @@ public:
 
 public:
 	// 現状高さは固定で考える
-	void SetWidgetSetting(UUserWidget* userWidget,
+	FVector2D SetWidgetSetting(UUserWidget* userWidget,
 	                             float widthClampSizeMin = 0,
 	                             float widthClampSizeMax = 0,
 	                             float heightClampSizeMin = 0,

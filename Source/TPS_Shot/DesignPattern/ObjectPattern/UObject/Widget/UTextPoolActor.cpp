@@ -64,6 +64,7 @@ TWeakObjectPtr<UPooledUText> AUTextPoolActor::GetPooledObject(
 	}
 
 	pooledText->SettingTextContents(text, widgetController);
+	pooledText->SetIsEnabled(true);
 	
 	return pooledText;
 }
@@ -72,6 +73,7 @@ void AUTextPoolActor::ReturnToPool(TWeakObjectPtr<UPooledUText> pooledText)
 {
 	if (pooledText.IsValid())
 	{
+		pooledText->SetIsEnabled(false);
 		pooledText->SetVisibility(ESlateVisibility::Collapsed);
 		ReturnToPoolWidgetBase(pooledText);
 	}
