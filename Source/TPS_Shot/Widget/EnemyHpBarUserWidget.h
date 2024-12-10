@@ -45,7 +45,7 @@ public:
 	
 	UProgressBar* GetHpBar() const {return _hpBar;}
 
-	virtual void SetSize(float width, float height) override;
+	virtual void SetSize(const FVector2D& size) override;
 
 public:
 	static constexpr float HPBAR_CLAMP_SIZE_MIN = 150;

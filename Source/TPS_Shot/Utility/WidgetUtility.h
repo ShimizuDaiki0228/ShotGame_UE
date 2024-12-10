@@ -17,14 +17,16 @@ class TPS_SHOT_API UWidgetUtility : public UObject
 public:
 	static UWidgetUtility* GetInstance();
 
-	static void SetWidgetWidthScale(
+	static void SetWidgetScale(
+		FVector2D& ownerScreenSize,
 		const AActor* owner,
 		UUserWidget* widget,
 		const APlayerController* playerController,
-		const float widthClampSizeMin,
-		const float widthClampSizeMax,
-		const float heightSize);
-	
+		const float widthClampSizeMin = 0,
+		const float widthClampSizeMax = 0,
+		const float heightClampSizeMin = 0,
+		const float heightClampSizeMax = 0);
+
 	// 画面に表示する際の大きさ設定
 	static void SetWidgetPosition(
 		UUserWidget* widget,

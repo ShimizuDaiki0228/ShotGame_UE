@@ -16,19 +16,16 @@ class TPS_SHOT_API UCharacterWidgetController : public UObject
 
 public:
 	void Initialized(AActor* owner, APlayerController* playerController);
-	bool IsCharacterProjected(FVector2D& screenPosition);
+	bool IsCharacterProjected(FVector2D& screenPosition) const;
 
 public:
 	// 現状高さは固定で考える
 	void SetWidgetSetting(UUserWidget* userWidget,
-	                             float widthClampSizeMin,
-	                             float widthClampSizeMax,
-	                             float heightSize);
-
-	void SetTextSetting(UUserWidget* text,
-						const float& widthClampSizeMin,
-						const float& widthClampSizeMax,
-						const bool bIsRandomPos = false);
+	                             float widthClampSizeMin = 0,
+	                             float widthClampSizeMax = 0,
+	                             float heightClampSizeMin = 0,
+	                             float heightClampSizeMax = 0,
+								 const bool bIsRandomPos = false);
 
 private:
 	UPROPERTY()
@@ -36,8 +33,4 @@ private:
 
 	UPROPERTY()
 	APlayerController* _cachedPlayerController;
-
-private:
-	const float TEXT_POSITION_OFFSET_X = 150.0f;
-	const float TEXT_POSITION_OFFSET_Y = 50.0f;
 };

@@ -7,6 +7,7 @@
 #include "../../UPooledObjectBase.h"
 #include "Components/TextBlock.h"
 #include "Components/CanvasPanel.h"
+#include "TPS_Shot/Widget/IFollowActorWidget.h"
 #include "PooledUText.generated.h"
 
 class AUTextPoolActor;
@@ -17,7 +18,8 @@ class UCharacterWidgetController;
  * UserWidgetを作り直す方法だとうまくいかないため
  */
 UCLASS()
-class TPS_SHOT_API UPooledUText : public UUserWidget, public UPooledObjectBase<AUTextPoolActor, UPooledUText>
+class TPS_SHOT_API UPooledUText : public UUserWidget, public UPooledObjectBase<AUTextPoolActor, UPooledUText>,
+								  public IIFollowActorWidget
 {
 	GENERATED_BODY()
 
@@ -40,4 +42,10 @@ private:
 	
 	UPROPERTY()
 	TWeakObjectPtr<APlayerController> _cachedPlayerController;
+
+	FSlateFontInfo _fontInfo;
+
+
+private:
+	virtual void SetSize(const FVector2D& size) override;
 };

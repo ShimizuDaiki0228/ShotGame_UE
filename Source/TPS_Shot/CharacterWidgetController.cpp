@@ -14,7 +14,7 @@ void UCharacterWidgetController::Initialized(AActor* owner, APlayerController* p
 	_cachedPlayerController = playerController;
 }
 
-bool UCharacterWidgetController::IsCharacterProjected(FVector2D& screenPosition)
+bool UCharacterWidgetController::IsCharacterProjected(FVector2D& screenPosition) const
 {
 	if (!::IsValid(_cachedPlayerController))
 	{
@@ -32,10 +32,12 @@ bool UCharacterWidgetController::IsCharacterProjected(FVector2D& screenPosition)
 /// マルチプレイをするならTWeakObjectPtrで有効性を確認したほうがいい
 /// 
 void UCharacterWidgetController::SetWidgetSetting(
-	UUserWidget* userWidget,
-	float widthClampSizeMin,
-	float widthClampSizeMax,
-	float heightSize)
+	 UUserWidget* userWidget,
+	 float widthClampSizeMin,
+	 float widthClampSizeMax,
+	 float heightClampSizeMin,
+	 float heightClampSizeMax,
+	 const bool bIsRandomPos)
 {
 	if (!::IsValid(userWidget))
 	{
@@ -52,45 +54,30 @@ void UCharacterWidgetController::SetWidgetSetting(
 			userWidget->SetVisibility(ESlateVisibility::Visible);
 		}
 
-		UWidgetUtility::GetInstance()->SetWidgetWidthScale(_cachedOwner,
+		FVector2D ownerScreenSize;
+
+		UWidgetUtility::GetInstance()->SetWidgetScale(
+			ownerScreenSize,
+			_cachedOwner,
 			userWidget,
 			_cachedPlayerController,
 			widthClampSizeMin,
 			widthClampSizeMax,
-			heightSize);
+			heightClampSizeMin,
+			heightClampSizeMax);
 
+		if (bIsRandomPos)
+		{
+			FVector2D positionOffset;
+			positionOffset.X = FMath::RandRange(-ownerScreenSize.X, ownerScreenSize.X);
+			positionOffset.Y = FMath::RandRange(-ownerScreenSize.Y / 2, ownerScreenSize.Y / 2);
+			screenPosition += positionOffset;
+		}
 		UWidgetUtility::GetInstance()->SetWidgetPosition(userWidget, screenPosition);
 	}
 	else
 	{
 		// ��ʊO�̏ꍇ�A�E�B�W�F�b�g���\���ɂ���i�I�v�V�����j
 		userWidget->SetVisibility(ESlateVisibility::Hidden);
-	}
-}
-
-void UCharacterWidgetController::SetTextSetting(UUserWidget* text,
-	const float& widthClampSizeMin,
-	const float& widthClampSizeMax,
-	const bool bIsRandomPos)
-{
-	if (!::IsValid(text))
-	{
-		return;
-	}
-
-	FVector2D screenPosition;
-	
-	if (IsCharacterProjected(screenPosition))
-	{
-		
-		FVector2D positionOffset = FVector2D::ZeroVector;
-		if (bIsRandomPos)
-		{
-			// TODO
-			// 自身の描画されているサイズの大きさ+-の幅のほうがよさそう
-			positionOffset = FVector2D(FMath::FRandRange(-TEXT_POSITION_OFFSET_X, TEXT_POSITION_OFFSET_X),
-								       FMath::FRandRange(-TEXT_POSITION_OFFSET_Y, TEXT_POSITION_OFFSET_Y));
-		}
-		UWidgetUtility::GetInstance()->SetWidgetPosition(text, screenPosition, positionOffset);
 	}
 }

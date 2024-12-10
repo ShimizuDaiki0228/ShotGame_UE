@@ -12,7 +12,7 @@ class TPS_SHOT_API UActorScreenSizeCalculator : public UObject
 	GENERATED_BODY()
 
 public:
-	static float CalculateScreenWidthSize(const AActor* actor, const APlayerController* playerController, const float clampMin, const float clampMax);
+	static FVector2D CalculateScreenSize(const AActor* actor, const APlayerController* playerController);
 
 private:
 	static bool GetScreenBounds(const AActor* actor, const APlayerController* playerController, FVector2D& outMin, FVector2D& outMax);

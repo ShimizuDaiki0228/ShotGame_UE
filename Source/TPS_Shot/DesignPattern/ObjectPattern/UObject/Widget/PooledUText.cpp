@@ -23,8 +23,9 @@ void UPooledUText::Initialized(AUTextPoolActor* poolActor,
 	}
 	
 	_text = Cast<UTextBlock>(GetWidgetFromName("pooledText"));
-	if (_text)
+	if (::IsValid(_text))
 	{
+		_fontInfo = _text->GetFont();
 		_canvasSlot = Cast<UCanvasPanelSlot>(_text->Slot);
 		if (::IsValid(_canvasSlot))
 		{
@@ -55,10 +56,7 @@ void UPooledUText::SettingTextContents(const FString& text, UCharacterWidgetCont
 	if (::IsValid(_canvasSlot))
 	{
 		_text->SetText(FText::FromString(text));
-		FSlateFontInfo FontInfo = _text->GetFont();
-		FontInfo.Size = 80;
-		_text->SetFont(FontInfo);
-		widgetController->SetTextSetting(this, 30, 100, true);
+		widgetController->SetWidgetSetting(this, 30, 100, 30, 100, true);
 	}
 	
 	UE_LOG(LogTemp, Log, TEXT("Widget initialized successfully"));
@@ -68,4 +66,10 @@ void UPooledUText::Release()
 {
 	TWeakObjectPtr<UPooledUText> weakThis = TWeakObjectPtr<UPooledUText>(this);
 	Pool->ReturnToPool(weakThis);
+}
+
+void UPooledUText::SetSize(const FVector2D& size)
+{
+	// 一応固定値にはしている。今後どうするか
+	_fontInfo.Size = 30;
 }

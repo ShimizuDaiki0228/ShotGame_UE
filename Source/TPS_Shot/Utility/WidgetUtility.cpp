@@ -23,31 +23,43 @@ UWidgetUtility* UWidgetUtility::GetInstance()
 	return _instance;
 }
 
-void UWidgetUtility::SetWidgetWidthScale(const AActor* owner,
+void UWidgetUtility::SetWidgetScale(
+	FVector2D& ownerScreenSize,
+	const AActor* owner,
 	UUserWidget* widget,
 	const APlayerController* playerController,
 	const float widthClampSizeMin,
 	const float widthClampSizeMax,
-	const float heightSize)
+	const float heightClampSizeMin,
+	const float heightClampSizeMax)
 {
-	float ownerScreenSize = UActorScreenSizeCalculator::CalculateScreenWidthSize(owner,
-			playerController,
-			widthClampSizeMin,
-			widthClampSizeMax);
+	ownerScreenSize = UActorScreenSizeCalculator::CalculateScreenSize(
+			owner,
+			playerController);
 
-	if (ownerScreenSize != 0)
+	if (ownerScreenSize != FVector2D::ZeroVector)
 	{
+		if (widthClampSizeMax != 0)
+		{
+			ownerScreenSize.X = FMath::Clamp(ownerScreenSize.X, widthClampSizeMin, widthClampSizeMax);
+		}
+		if (heightClampSizeMax != 0)
+		{
+			ownerScreenSize.Y = FMath::Clamp(ownerScreenSize.Y, heightClampSizeMin, heightClampSizeMax);
+		}
+		
 		// よくない気がしている、今後要修正
 		if (IIFollowActorWidget* followInterface = Cast<IIFollowActorWidget>(widget))
 		{
-			followInterface->SetSize(ownerScreenSize, heightSize);
+			followInterface->SetSize(ownerScreenSize);
+
 		}
 	}
 }
 
 void UWidgetUtility::SetWidgetPosition(UUserWidget* widget,
-	const FVector2D& screenPosition,
-	const FVector2D& positionOffset)
+                                       const FVector2D& screenPosition,
+                                       const FVector2D& positionOffset)
 {
 	FVector2D widgetSize = widget->GetDesiredSize();
 	FVector2D centeredPosition = screenPosition - (widgetSize * 0.5f);
