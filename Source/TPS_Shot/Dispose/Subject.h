@@ -9,39 +9,61 @@
 /**
  *
  */
-class TPS_SHOT_API Subject final : public IISubject
+template<typename... TArgs>
+class TPS_SHOT_API Subject final : public IISubject<TArgs...>
 {
 public:
-	Subject(TWeakObjectPtr<AActor> owner) : _owner(owner)
+	// Subject(TWeakObjectPtr<AActor> owner) : _owner(owner)
+	Subject()
 	{
 
 	}
 
 	virtual ~Subject()
 	{
-		UKismetSystemLibrary::PrintString(_owner.Get(), "goodbye Subject", true, true, FColor::Cyan, 2.f, TEXT("None"));
+		// UKismetSystemLibrary::PrintString(_owner.Get(), "goodbye Subject", true, true, FColor::Cyan, 2.f, TEXT("None"));
 	}
 
-	void Attach(IIObserver* observer) override
+	virtual void ManualAttach(TWeakPtr<IIObserver<TArgs...>> observer) override
 	{
 		_observers.Add(observer);
 	}
 
-	void Detach(IIObserver* observer) override
+	virtual void Detach(TWeakPtr<IIObserver<TArgs...>> observer) override
 	{
 		_observers.Remove(observer);
 	}	
 
-	void Notify() override
+	virtual void Notify(TArgs... args) override
 	{
-		UKismetSystemLibrary::PrintString(_owner.Get(), FString::Printf(TEXT("notify %d observers"), _observers.Num()), true, true, FColor::Cyan, 2.f, TEXT("None"));
+		// UKismetSystemLibrary::PrintString(_owner.Get(), FString::Printf(TEXT("notify %d observers"), _observers.Num()), true, true, FColor::Cyan, 2.f, TEXT("None"));
 		for (auto observer : _observers)
 		{
-			observer->OnNext();
+			if (TSharedPtr<IIObserver<TArgs...>> observerPtr = observer.Pin())
+			{
+				observerPtr->OnNext(args...);
+			}
+			else
+			{
+				// UKismetSystemLibrary::PrintString(_owner.Get(), TEXT("observer isn't valid"), true, true, FColor::Red);
+			}
 		}
 	}
 
+	// 若干重い気もしている
+	virtual void ShutDown() override
+	{
+		// for (auto observer : _observers)
+		// {
+		// 	if (TSharedPtr<IIObserver<TArgs...>> observerPtr = observer.Pin())
+		// 	{
+		// 		observerPtr->RemoveObserver();
+		// 	}
+		// }
+		_observers.Empty();
+		UE_LOG(LogTemp, Log, TEXT("Subject ShutDown"));
+	}
+
 private:
-	TWeakObjectPtr<AActor> _owner;
-	TArray<IIObserver*> _observers;
+	TArray<TWeakPtr<IIObserver<TArgs...>>> _observers;
 };

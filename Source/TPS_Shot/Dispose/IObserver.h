@@ -6,9 +6,12 @@
 #include "UObject/Interface.h"
 #include "Engine/Engine.h"
 
+template<typename... TArgs>
 class TPS_SHOT_API IIObserver
 {
 public:
 	virtual ~IIObserver() {}
-	virtual void OnNext() = 0;
+	virtual void SetSharedPtr(TWeakPtr<IIObserver<TArgs...>> sharedObserver) = 0;
+	virtual void OnNext(TArgs... args) = 0;
+	virtual void RemoveObserver() = 0;
 };
