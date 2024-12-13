@@ -12,7 +12,8 @@
 #include "GameFramework/PawnMovementComponent.h"
 
 
-ATPS_ShotGameMode::ATPS_ShotGameMode()
+ATPS_ShotGameMode::ATPS_ShotGameMode(): _character(nullptr), _spawnVolumeActor(nullptr),
+                                        _shotCharacterPlayerState(nullptr)
 {
 	// set default pawn class to our Blueprinted character
 	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(TEXT("/Game/ThirdPerson/Blueprints/BP_ThirdPersonCharacter"));
@@ -55,8 +56,9 @@ void ATPS_ShotGameMode::BeginPlay()
 	_playingWidget = AssignWidget<UUserWidget_Playing>(_playingWidgetClass);
 	_gameoverWidget = AssignWidget<UGameOverUserWidget>(_gameoverWidgetClass);
 	if (_playingWidget)
+	if (_playingWidget.IsValid())
 	{
-		_widgetManager->ChangeViewPort(_playingWidget);
+		_widgetManager->ChangeViewPort(_playingWidget.Get());
 	}
 
 	TArray<AActor*> foundActors;
@@ -141,7 +143,7 @@ void ATPS_ShotGameMode::GameOver()
 
 	if (_gameoverWidget != nullptr)
 	{
-		_widgetManager->ChangeViewPort(_gameoverWidget, _playingWidget);
+		_widgetManager->ChangeViewPort(_gameoverWidget.Get(), _playingWidget.Get());
 	}
 }
 

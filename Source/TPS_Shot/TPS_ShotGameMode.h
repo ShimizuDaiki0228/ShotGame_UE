@@ -39,15 +39,18 @@ protected:
 	TSubclassOf<class UGameOverUserWidget> _gameoverWidgetClass;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Level")
-		TSoftObjectPtr<UWorld> _titleLevel;
+	TSoftObjectPtr<UWorld> _titleLevel;
 
 //���̎Q��
 private:
+	UPROPERTY()
 	ATPS_ShotCharacter* _character;
 
-	UUserWidget_Playing* _playingWidget;
-	UGameOverUserWidget* _gameoverWidget;
+	TWeakObjectPtr<UUserWidget_Playing> _playingWidget;
+	
+	TWeakObjectPtr<UGameOverUserWidget> _gameoverWidget;
 
+	UPROPERTY()
 	ASpawnVolumeActor* _spawnVolumeActor;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Reference", meta = (AllowPrivateAccess = "true"))
@@ -56,7 +59,7 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Reference", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<class AExplosionEnemyActor> _explosionEnemyActor;
 
-	TObjectPtr<UWidgetManager> _widgetManager;
+	TWeakObjectPtr<UWidgetManager> _widgetManager;
 
 	UPROPERTY()
 	AShotCharacterPlayerState* _shotCharacterPlayerState;
@@ -74,9 +77,6 @@ public:
 private:
 	void Initialized(ALevelManager* levelManager);
 	void Reset();
-
-	template<typename T>
-	T* AssignWidget(TSubclassOf<T> assignWidgetClass);
 };
 
 
