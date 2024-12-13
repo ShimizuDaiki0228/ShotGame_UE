@@ -32,7 +32,6 @@ void UPooledUText::Initialized(AUTextPoolActor* poolActor,
 		{
 			// 正しいのかはわからないが、(0, 0)にすると、目的オブジェクトの画面中心座標に表示されるようになる
 			_canvasSlot->SetSize(FVector2D(0.f, 0.f));
-			UKismetSystemLibrary::PrintString(this, TEXT("TextBlock added to CanvasPanel"), true, true, FColor::Green);
 		}
 		else
 		{

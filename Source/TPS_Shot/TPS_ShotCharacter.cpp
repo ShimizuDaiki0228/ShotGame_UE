@@ -18,9 +18,12 @@
 #include "Utility/ConstUtility.h"
 #include "Engine/SkeletalMeshSocket.h"
 #include "DrawDebugHelpers.h"
+#include "ShotCharacterPlayerState.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "Utility/SoundManagerUtility.h"
+#include "TPS_ShotGameMode.h"
 #include "Enemy/EnemyActor.h"
+#include "GameFramework/GameMode.h"
 
 //////////////////////////////////////////////////////////////////////////
 // ATPS_ShotCharacter
@@ -69,6 +72,11 @@ void ATPS_ShotCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	Super::EndPlay(EndPlayReason);
 }
 
+void ATPS_ShotCharacter::BeginDestroy()
+{
+	Super::BeginDestroy();
+}
+
 void ATPS_ShotCharacter::BeginPlay()
 {
 	// Call the base class  
@@ -80,6 +88,18 @@ void ATPS_ShotCharacter::BeginPlay()
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 		{
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
+		}
+	}
+
+	if (auto gameModeBase = GetWorld()->GetAuthGameMode())
+	{
+		if (auto shotGameMode = Cast<ATPS_ShotGameMode>(gameModeBase))
+		{
+			_shotGameMode = TWeakObjectPtr<ATPS_ShotGameMode>(shotGameMode);
+			if (!_shotGameMode.IsValid())
+			{
+				UKismetSystemLibrary::PrintString(this, TEXT("don't Get GameMode"), true, true, FColor::Red);
+			}
 		}
 	}
 }
@@ -226,7 +246,6 @@ void ATPS_ShotCharacter::Look(const FInputActionValue& Value)
 
 void ATPS_ShotCharacter::Reload()
 {
-	UKismetSystemLibrary::PrintString(this, "Reload", true, true, FColor::Cyan, 2.f, TEXT("None"));
 	UAnimInstance* animInstance = GetMesh()->GetAnimInstance();
 	if (animInstance && _reloadMontage)
 	{
@@ -315,7 +334,8 @@ bool ATPS_ShotCharacter::GetBeamEndLocation(const FVector& muzzleSocketLocation,
 					// �����ƃ_���[�W��ݒ肷��A���͎���
 					if (enemy->DecreaseHP(100))
 					{
-						_scoreProp->SetValue(_scoreProp->GetValue()+1);
+						auto playerState = _shotGameMode->GetPlayerState();
+						playerState->ChangeScore(playerState->GetScore() + 1);
 					}
 				}
 			}

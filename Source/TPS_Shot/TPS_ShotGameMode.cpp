@@ -1,6 +1,8 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "TPS_ShotGameMode.h"
+
+#include "ShotCharacterPlayerState.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Blueprint/UserWidget.h"
 #include "Kismet/GameplayStatics.h"
@@ -18,6 +20,24 @@ ATPS_ShotGameMode::ATPS_ShotGameMode()
 	{
 		DefaultPawnClass = PlayerPawnBPClass.Class;
 	}
+
+
+	static ConstructorHelpers::FClassFinder<APlayerState> PlayerStateBPClass(TEXT("/Game/Blueprints/ShotCharacterPlayerState_BP"));
+    if (PlayerStateBPClass.Succeeded())
+    {
+        PlayerStateClass = PlayerStateBPClass.Class;
+    }
+}
+
+void ATPS_ShotGameMode::PostLogin(APlayerController* NewPlayer)
+{
+	Super::PostLogin(NewPlayer);
+
+	if (AShotCharacterPlayerState* ShotCharacterPlayerState = Cast<AShotCharacterPlayerState>(NewPlayer->PlayerState))
+	{
+		_shotCharacterPlayerState = ShotCharacterPlayerState;
+		_shotCharacterPlayerState->Initialized();
+	}
 }
 
 void ATPS_ShotGameMode::BeginPlay()
@@ -29,7 +49,7 @@ void ATPS_ShotGameMode::BeginPlay()
 	_character = Cast<ATPS_ShotCharacter>(UGameplayStatics::GetPlayerCharacter(this, 0));
 	if (!_character)
 	{
-		UKismetSystemLibrary::PrintString(this, "ƒLƒƒƒ‰ƒNƒ^[‚ğæ“¾‚Å‚«‚Ü‚¹‚ñ‚Å‚µ‚½", true, true, FColor::Cyan, 2.f, TEXT("None"));
+		UKismetSystemLibrary::PrintString(this, "ï¿½Lï¿½ï¿½ï¿½ï¿½ï¿½Nï¿½^ï¿½[ï¿½ï¿½ï¿½æ“¾ï¿½Å‚ï¿½ï¿½Ü‚ï¿½ï¿½ï¿½Å‚ï¿½ï¿½ï¿½", true, true, FColor::Cyan, 2.f, TEXT("None"));
 	}
 	
 	_playingWidget = AssignWidget<UUserWidget_Playing>(_playingWidgetClass);
@@ -48,11 +68,13 @@ void ATPS_ShotGameMode::BeginPlay()
 		levelManager = Cast<ALevelManager>(foundActors[0]);
 		if (levelManager)
 		{
-			UKismetSystemLibrary::PrintString(this, "levelManager is Found", true, true, FColor::Cyan, 2.f, TEXT("None"));		
 			_spawnVolumeActor = levelManager->GetVolumeActor();
 		}
+		else
+		{
+			UKismetSystemLibrary::PrintString(this, "levelManager isn't Found", true, true, FColor::Cyan, 2.f, TEXT("None"));		
+		}
 	}
-
 	
 	Initialized(levelManager);
 	Bind();
@@ -63,15 +85,6 @@ void ATPS_ShotGameMode::Bind()
 {
 	if (_character)
 	{
-		if (_character->ScoreProp.IsValid())
-		{
-			_character->ScoreProp->OnValueChanged.AddLambda([this](const int& newValue)
-			{
-				_score++;
-				_playingWidget->UpdateScore(_score);
-			});
-		}
-
 		if (_character->NumberOfBulletProp.IsValid())
 		{
 			_character->NumberOfBulletProp->OnValueChanged.AddLambda([this](const int& newValue)
@@ -95,13 +108,24 @@ void ATPS_ShotGameMode::Bind()
 				}
 			});
 		}
+			
+		if (::IsValid(_shotCharacterPlayerState) && _shotCharacterPlayerState->SharedScoreUpdateAsObserver.IsValid())
+		{
+			_shotCharacterPlayerState->SharedScoreUpdateAsObserver
+				->Subscribe([this](int score)
+				{
+					_playingWidget->UpdateScore(score);
+				});
+			
+			_shotCharacterPlayerState->TWeakScoreUpdateAsObserver.Pin()->SetSharedPtr(_shotCharacterPlayerState->TWeakScoreUpdateAsObserver);
+		}
 	}
 }
 
 void ATPS_ShotGameMode::GameOver()
 {
 	// TODO
-	// ’†g‚ÌÀ‘••û–@‚ğ•Ï‚¦‚È‚¢‚ÆƒNƒ‰ƒbƒVƒ…‚µ‚Ä‚»‚¤
+	// ï¿½ï¿½ï¿½gï¿½Ìï¿½ï¿½ï¿½ï¿½ï¿½ï¿½@ï¿½ï¿½Ï‚ï¿½ï¿½È‚ï¿½ï¿½ÆƒNï¿½ï¿½ï¿½bï¿½Vï¿½ï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½
 	_spawnVolumeActor->GameOver();
 
 	_playingWidget->Gameover();
@@ -132,17 +156,11 @@ void ATPS_ShotGameMode::Initialized(ALevelManager* levelManager)
 
 void ATPS_ShotGameMode::Reset()
 {
-	_score = 0;
+	_shotCharacterPlayerState->ChangeScore(0);
 
-	if (_playingWidget)
-	{
-		UKismetSystemLibrary::PrintString(this, "Score Reset", true, true, FColor::Cyan, 2.f, TEXT("None"));
-		_playingWidget->Reset(_score);
-
-	}
 	if (_character)
 	{
-		UKismetSystemLibrary::PrintString(this, "Character Reset", true, true, FColor::Cyan, 2.f, TEXT("None"));
+		// UKismetSystemLibrary::PrintString(this, "Character Reset", true, true, FColor::Cyan, 2.f, TEXT("None"));
 		_character->Reset();
 	}
 }
@@ -152,7 +170,7 @@ T* ATPS_ShotGameMode::AssignWidget(TSubclassOf<T> assignWidgetClass)
 {
     if (assignWidgetClass)
     {
-        // ƒEƒBƒWƒFƒbƒg‚ğ¶¬
+        // ï¿½Eï¿½Bï¿½Wï¿½Fï¿½bï¿½gï¿½ğ¶ï¿½
         T* assignWidget = CreateWidget<T>(GetWorld(), assignWidgetClass);
         if (assignWidget)
         {

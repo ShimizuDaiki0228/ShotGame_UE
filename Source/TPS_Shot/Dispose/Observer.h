@@ -10,36 +10,56 @@
  * 
  */
 template<typename... TArgs>
-class TPS_SHOT_API Observer : public IIObserver
+class TPS_SHOT_API Observer : public IIObserver<TArgs...>
 {
 public:
-	Observer(Subject& subject, TFunction<void(TArgs...)> callback = nullptr) : _subjectRef(subject), _callback(callback)
+	Observer() = delete;
+	Observer(TSharedPtr<Subject<TArgs...>> subject)
+	: _subjectRef(subject), _callback(nullptr)
 	{
-		_subjectRef.Attach(this);
-		//UKismetSystemLibrary::PrintString(subject., "attach Observer", true, true, FColor::Cyan, 2.f, TEXT("None"));
+		// _subjectRef->ManualAttach(TSharedPtr<Observer>(this));
+		UE_LOG(LogTemp, Log, TEXT("Observer Construct"));
 	}
 
-	virtual ~Observer()
+	virtual void Subscribe(TFunction<void(TArgs...)> callback)
+	{
+		_callback = callback;
+	}
+
+	virtual ~Observer() override
 	{
 		//UKismetSystemLibrary::PrintString(this, "goodbye Observer", true, true, FColor::Cyan, 2.f, TEXT("None"));
 	}
 
-	void OnNext() override
+	virtual void SetSharedPtr(TWeakPtr<IIObserver<TArgs...>> sharedObserver) override
 	{
+		_sharedObserver = sharedObserver;
+		_subjectRef->ManualAttach(_sharedObserver);
+	}
+
+	virtual void RemoveObserver() override
+	{
+		if (_subjectRef.IsValid())
+		{
+			_subjectRef->Detach(_sharedObserver);
+		}
+		UE_LOG(LogTemp, Log, TEXT("Observer Removed"));
+	}
+	
+	virtual void OnNext(TArgs... args) override
+	{
+		UE_LOG(LogTemp, Log, TEXT("CallBack"));
+
 		if (_callback)
 		{
-			_callback();
+			_callback(args...);
 		}
 	}
 
-	void RemoveObserver()
-	{
-		_subjectRef.Detach(this);
-		//UKismetSystemLibrary::PrintString(this, "Observer removed from list", true, true, FColor::Cyan, 2.f, TEXT("None"));
-	}
 
 private:
 	FString _message;
-	Subject& _subjectRef;
+	TSharedPtr<Subject<TArgs...>> _subjectRef;
 	TFunction<void(TArgs...)> _callback;
+	TWeakPtr<IIObserver<TArgs...>> _sharedObserver;
 };

@@ -60,7 +60,11 @@ TWeakObjectPtr<UPooledUText> AUTextPoolActor::GetPooledObject(
 	if (pooledText.IsValid())
 	{
 		pooledText = CreateNewPooledObject();
-		UKismetSystemLibrary::PrintString(this, TEXT("pooledText new create"), true, true, FColor::Cyan);
+	}
+	else
+	{
+		UKismetSystemLibrary::PrintString(this, TEXT("pooledText doesn't create"), true, true, FColor::Cyan);
+
 	}
 
 	pooledText->SettingTextContents(text, widgetController);

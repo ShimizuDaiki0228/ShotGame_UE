@@ -24,6 +24,8 @@ class ATPS_ShotGameMode : public AGameModeBase
 public:
 	ATPS_ShotGameMode();
 
+	virtual void PostLogin(APlayerController* NewPlayer) override;
+
 protected:
 	void BeginPlay() override;
 
@@ -39,11 +41,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Level")
 		TSoftObjectPtr<UWorld> _titleLevel;
 
-public:
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "HUD")
-		int Score;
-
-//‘¼‚ÌQÆ
+//ï¿½ï¿½ï¿½ÌQï¿½ï¿½
 private:
 	ATPS_ShotCharacter* _character;
 
@@ -60,14 +58,18 @@ private:
 
 	TObjectPtr<UWidgetManager> _widgetManager;
 
-// ƒoƒCƒ“ƒh
+	UPROPERTY()
+	AShotCharacterPlayerState* _shotCharacterPlayerState;
+	
+// ï¿½oï¿½Cï¿½ï¿½ï¿½h
 private:
 	void Bind();
 
 	UFUNCTION()
 	void GameOver();
 
-	int _score;
+public:
+	AShotCharacterPlayerState* GetPlayerState() const {return _shotCharacterPlayerState;}
 
 private:
 	void Initialized(ALevelManager* levelManager);

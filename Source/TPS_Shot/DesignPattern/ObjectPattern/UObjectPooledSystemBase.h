@@ -106,7 +106,7 @@ public:
 			{
 				FScopeLock Lock(&PoolLock);
 				_pooledWidgetStack.Push(object);
-				UKismetSystemLibrary::PrintString(this, TEXT("Object is pooled"), true, true, FColor::Black);
+				// UKismetSystemLibrary::PrintString(this, TEXT("Object is pooled"), true, true, FColor::Black);
 			}
 			PoolLock.Unlock();
 		}
