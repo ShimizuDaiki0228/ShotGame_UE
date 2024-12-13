@@ -10,6 +10,7 @@
 #include "ReactiveProperty/ReadonlyReactiveProperty.h"
 #include "Utility/ConstUtility.h"
 #include "GameFramework/PawnMovementComponent.h"
+#include "Utility/WidgetUtility.h"
 
 
 ATPS_ShotGameMode::ATPS_ShotGameMode(): _character(nullptr), _spawnVolumeActor(nullptr),
@@ -53,9 +54,8 @@ void ATPS_ShotGameMode::BeginPlay()
 		UKismetSystemLibrary::PrintString(this, "�L�����N�^�[���擾�ł��܂���ł���", true, true, FColor::Cyan, 2.f, TEXT("None"));
 	}
 	
-	_playingWidget = AssignWidget<UUserWidget_Playing>(_playingWidgetClass);
-	_gameoverWidget = AssignWidget<UGameOverUserWidget>(_gameoverWidgetClass);
-	if (_playingWidget)
+	_playingWidget = UWidgetUtility::AssignWidget(this, _playingWidgetClass);
+	_gameoverWidget = UWidgetUtility::AssignWidget(this, _gameoverWidgetClass);
 	if (_playingWidget.IsValid())
 	{
 		_widgetManager->ChangeViewPort(_playingWidget.Get());
@@ -165,20 +165,4 @@ void ATPS_ShotGameMode::Reset()
 		// UKismetSystemLibrary::PrintString(this, "Character Reset", true, true, FColor::Cyan, 2.f, TEXT("None"));
 		_character->Reset();
 	}
-}
-
-template<typename T>
-T* ATPS_ShotGameMode::AssignWidget(TSubclassOf<T> assignWidgetClass)
-{
-    if (assignWidgetClass)
-    {
-        // �E�B�W�F�b�g�𐶐�
-        T* assignWidget = CreateWidget<T>(GetWorld(), assignWidgetClass);
-        if (assignWidget)
-        {
-            return assignWidget;
-        }
-    }
-
-    return nullptr;
 }
