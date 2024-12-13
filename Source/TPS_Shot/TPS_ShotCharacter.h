@@ -5,10 +5,15 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
+#include "Dispose/Observer.h"
+#include "Dispose/Subject.h"
 #include "Sound/SoundCue.h"
 #include "ReactiveProperty/ReactiveProperty.h"
 #include "ReactiveProperty/ReadonlyReactiveProperty.h"
 #include "TPS_ShotCharacter.generated.h"
+
+class AShotCharacterPlayerState;
+class ATPS_ShotGameMode;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnScoreUp);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnGameover);
@@ -54,6 +59,8 @@ public:
 	
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason);
 
+	virtual void BeginDestroy() override;
+
 protected:
 
 	/** Called for movement input */
@@ -83,21 +90,20 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Spawning", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<AActor> _bulletActor;
 
-	void CreateBullet();
-
 	bool bCanShot;
-
-	bool ChangeNumberOfBullet(int currentNumberOfBullet);
 	bool bIsReloading;
+	bool bAiming;
+	bool bMovingClip;
+
+	FTimerHandle _reloadTimerHandle;
+
 	int _currentLoadNumber;
-
-	void ChangeNotUseShot();
-
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
 	class USoundCue* _fireSound;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
-		class UParticleSystem* _muzzleFlash;
+	class UParticleSystem* _muzzleFlash;
 
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
@@ -106,41 +112,36 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
 	class UAnimMontage* _reloadMontage;
 
+	UPROPERTY()
+	AShotCharacterPlayerState* _shotCharacterPlayerState;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
 	UParticleSystem* _impatctParticle;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
 	UParticleSystem* _beamParticle;
 
-	bool GetBeamEndLocation(const FVector& muzzleSocketLocation, FVector& outBeamLocation);
-
-	TSharedPtr<ReactiveProperty<int>> _currentHPProp = MakeShared<ReactiveProperty<int>>();
-
-	TSharedPtr<ReactiveProperty<int>> _scoreProp = MakeShared<ReactiveProperty<int>>();
-
-	TSharedPtr<ReactiveProperty<int>> _numberOfBulletProp = MakeShared<ReactiveProperty<int>>();
-
-	void Reload();
-
-	bool bAiming;
-
-	void GrabClip();
-
-	void ReleaseClip();
-
-	bool bMovingClip;
+	UPROPERTY()
+	TWeakObjectPtr<ATPS_ShotGameMode> _shotGameMode;
 
 private:
-	FTimerHandle _reloadTimerHandle;
+	TSharedPtr<ReactiveProperty<int>> _currentHPProp = MakeShared<ReactiveProperty<int>>();
+	
+	TSharedPtr<ReactiveProperty<int>> _numberOfBulletProp = MakeShared<ReactiveProperty<int>>();
+	
+private:
+	void ReleaseClip();
+	void GrabClip();
+	void Reload();
+	void ChangeNotUseShot();
+	void CreateBullet();
+
+	bool ChangeNumberOfBullet(int currentNumberOfBullet);
+	bool GetBeamEndLocation(const FVector& muzzleSocketLocation, FVector& outBeamLocation);
 
 public:
-	void ChangeHP(int newHP);
-
 	TSharedPtr<ReadOnlyReactiveProperty<int>> CurrentHPProp
 		= MakeShared<ReadOnlyReactiveProperty<int>>(_currentHPProp);
-
-	TSharedPtr<ReadOnlyReactiveProperty<int>> ScoreProp
-		= MakeShared<ReadOnlyReactiveProperty<int>>(_scoreProp);
 
 	TSharedPtr<ReadOnlyReactiveProperty<int>> NumberOfBulletProp 
 		= MakeShared<ReadOnlyReactiveProperty<int>>(_numberOfBulletProp);
@@ -152,6 +153,9 @@ public:
 	void Bind();
 	void Reset();
 
+public:
+	void ChangeHP(int newHP);
+	
 public:
 	FORCEINLINE int GetHP() const { return _currentHPProp->GetValue(); }
 };

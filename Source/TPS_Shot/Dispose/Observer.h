@@ -14,11 +14,16 @@ class TPS_SHOT_API Observer : public IIObserver<TArgs...>
 {
 public:
 	Observer() = delete;
-	Observer(TSharedPtr<Subject<TArgs...>> subject, TFunction<void(TArgs...)> callback = nullptr)
-	: _subjectRef(subject), _callback(callback)
+	Observer(TSharedPtr<Subject<TArgs...>> subject)
+	: _subjectRef(subject), _callback(nullptr)
 	{
 		// _subjectRef->ManualAttach(TSharedPtr<Observer>(this));
 		UE_LOG(LogTemp, Log, TEXT("Observer Construct"));
+	}
+
+	virtual void Subscribe(TFunction<void(TArgs...)> callback)
+	{
+		_callback = callback;
 	}
 
 	virtual ~Observer() override

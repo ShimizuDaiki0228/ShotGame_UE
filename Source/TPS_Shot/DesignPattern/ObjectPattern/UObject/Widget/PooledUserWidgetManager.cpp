@@ -24,7 +24,6 @@ TWeakObjectPtr<UPooledUText> UPooledUserWidgetManager::PooledTextCreate(
 	UPooledUText* pooledText = CreateWidget<UPooledUText>(GetWorld(), pooledObjectClass);
 	if (::IsValid(pooledText))
 	{
-		UKismetSystemLibrary::PrintString(this, TEXT("pooledText is valid"), true, true, FColor::Blue);
 		pooledText->AddToViewport();
 		pooledText->Initialized(pooledObjectBase, _canvasPanel, playerController);
 		pooledText->Pool = pooledObjectBase;
