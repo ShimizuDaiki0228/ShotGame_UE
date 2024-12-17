@@ -34,7 +34,7 @@ void ASpawnVolumeActor::Tick(float DeltaTime)
 
 }
 
-void ASpawnVolumeActor::SpawnEnemy(ALevelManager* levelManager, USpawnManager* enemySpawnManager)
+void ASpawnVolumeActor::SpawnEnemy(USpawnManager* enemySpawnManager)
 {
 	UWorld* const world = GetWorld();
 	if (world)
@@ -44,7 +44,7 @@ void ASpawnVolumeActor::SpawnEnemy(ALevelManager* levelManager, USpawnManager* e
 
 		if (_character && spawnedEnemy.IsValid())
 		{
-			spawnedEnemy->Initialized(_character, levelManager);
+			spawnedEnemy->Initialized(_character);
 		}
 		//TimeManagerUtility::GetInstance().Delay(world, this, &ASpawnVolumeActor::SpawnEnemy, _spawnDelay, _spawnEnemyTimerHandle, levelManager, enemySpawnManager);
 	}
@@ -77,8 +77,7 @@ FVector ASpawnVolumeActor::GetRandomPointInVolume()
 void ASpawnVolumeActor::Initialized(
 	TSubclassOf<AExplosionEnemyActor> explosionEnemy,
 	TSubclassOf<ASniperEnemyActor> sniperEnemy,
-	ATPS_ShotCharacter* character,
-	ALevelManager* levelManager)
+	ATPS_ShotCharacter* character)
 {
 	_explosionEnemyActor = explosionEnemy;
 	_sniperEnemyActor = sniperEnemy;
@@ -93,7 +92,7 @@ void ASpawnVolumeActor::Initialized(
 	spawnRotation.Yaw = FMath::FRand() * 360.0f;
 	spawnManager->SetUp(spawnParameters, spawnLocation, spawnRotation);
 
-	SpawnEnemy(levelManager, spawnManager);
+	SpawnEnemy(spawnManager);
 }
 
 void ASpawnVolumeActor::GameOver()

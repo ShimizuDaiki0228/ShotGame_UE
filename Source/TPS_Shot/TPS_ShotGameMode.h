@@ -77,7 +77,7 @@ public:
 	AShotCharacterPlayerState* GetPlayerState() const {return _shotCharacterPlayerState;}
 
 private:
-	void Initialized(ALevelManager* levelManager);
+	void Initialized();
 	void Reset();
 };
 

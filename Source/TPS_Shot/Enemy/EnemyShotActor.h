@@ -29,7 +29,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 public:
-	void Initialized(const FVector& startPosition, const FVector& endPosition, const FRotator& shotDirection, const ALevelManager* levelManager);
+	void Initialized(const FVector& startPosition, const FVector& endPosition, const FRotator& shotDirection);
 
 private:
 	void SetShotRoot(const FVector& startPosition, const FVector& endPosition);
@@ -63,11 +63,6 @@ private:
 	UPROPERTY(Category = "Test", VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<UParticleSystemComponent> reusableHitEffect;
 
-	// ‘O‰ñ‚ÌƒtƒŒ[ƒ€‚Æ”äŠr‚µ‚ÄŒ»İ‚Ìis•ûŒü‚ğæ“¾‚·‚é‚½‚ß‚Ég—p‚·‚é
+	// ï¿½Oï¿½ï¿½Ìƒtï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½Æ”ï¿½rï¿½ï¿½ï¿½ÄŒï¿½ï¿½İ‚Ìiï¿½sï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½æ“¾ï¿½ï¿½ï¿½é‚½ï¿½ß‚Égï¿½pï¿½ï¿½ï¿½ï¿½
 	FVector _cachedPosition;
-
-	/*UPROPERTY(EditDefaultsOnly, Category = "Effect")
-	APoolManager* _impactEffectPool;*/
-
-	const ALevelManager* _levelManager;
 };

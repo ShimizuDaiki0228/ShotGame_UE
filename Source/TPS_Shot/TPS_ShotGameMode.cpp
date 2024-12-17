@@ -66,24 +66,9 @@ void ATPS_ShotGameMode::BeginPlay()
 		_widgetManager->RegisterWidget(GAMEOVER_WIDGET_KEY, _gameoverWidget);
 	}
 
-	TArray<AActor*> foundActors;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ALevelManager::StaticClass(), foundActors);
-	ALevelManager* levelManager = nullptr;
-
-	if (foundActors.Num() > 0)
-	{
-		levelManager = Cast<ALevelManager>(foundActors[0]);
-		if (levelManager)
-		{
-			_spawnVolumeActor = levelManager->GetVolumeActor();
-		}
-		else
-		{
-			UKismetSystemLibrary::PrintString(this, "levelManager isn't Found", true, true, FColor::Cyan, 2.f, TEXT("None"));		
-		}
-	}
+	_spawnVolumeActor = ALevelManager::GetInstance()->GetVolumeActor();
 	
-	Initialized(levelManager);
+	Initialized();
 	Bind();
 	Reset();
 }
@@ -148,9 +133,9 @@ void ATPS_ShotGameMode::GameOver()
 	_widgetManager->ChangeViewPort(GAMEOVER_WIDGET_KEY, PLAYING_WIDGET_KEY);
 }
 
-void ATPS_ShotGameMode::Initialized(ALevelManager* levelManager)
+void ATPS_ShotGameMode::Initialized()
 {
-	_spawnVolumeActor->Initialized(_explosionEnemyActor, _sniperEnemyActor, _character, levelManager);
+	_spawnVolumeActor->Initialized(_explosionEnemyActor, _sniperEnemyActor, _character);
 	_character->Initialized();
 
 	const FName playLevelName = _titleLevel.IsValid() ? FName(*_titleLevel.GetAssetName()) : FName(TEXT("InvalidLevel"));

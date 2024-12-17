@@ -38,11 +38,11 @@ public:
 	virtual void SelfDestroy() override;
 
 private:
-	// ‘¼‚Å‹¤—L‚µ‚È‚¢‚½‚ßunique_ptr‚Å
+	// ï¿½ï¿½ï¿½Å‹ï¿½ï¿½Lï¿½ï¿½ï¿½È‚ï¿½ï¿½ï¿½ï¿½ï¿½unique_ptrï¿½ï¿½
 	std::unique_ptr<IExplosionEnemyState> _currentState;
 
 public:
-	virtual void Initialized(ATPS_ShotCharacter* character, ALevelManager* levelManager) override;
+	virtual void Initialized(ATPS_ShotCharacter* character);
 	
 	void ChangeState(IExplosionEnemyState* newState);
 };

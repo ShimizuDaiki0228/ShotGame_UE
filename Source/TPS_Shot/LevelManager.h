@@ -17,6 +17,14 @@ public:
 	// Sets default values for this actor's properties
 	ALevelManager();
 
+	static ALevelManager* GetInstance();
+
+	virtual void BeginPlay() override;
+
+private:
+	static ALevelManager* _instance;
+
+
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Reference", meta = (AllowPrivateAccess = "true"))
 		class ASpawnVolumeActor* _volumeActor;

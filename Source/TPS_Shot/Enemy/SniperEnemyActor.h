@@ -36,7 +36,7 @@ public:
 	virtual void SelfDestroy() override;
 
 private:
-	// ŒãXƒvƒŒƒCƒ„[‚Æ“¯—l‚Ì’e‚ğg‚¢‚½‚¢‚Ì‚ÅÁ‚µ‚½‚¢
+	// ï¿½ï¿½Xï¿½vï¿½ï¿½ï¿½Cï¿½ï¿½ï¿½[ï¿½Æ“ï¿½ï¿½lï¿½Ì’eï¿½ï¿½ï¿½gï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ì‚Åï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	
 	FTimerHandle _createBulletTimerHandle;
 	FTimerHandle _shotTimeHandle;
@@ -65,8 +65,8 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Audio", meta = (AllowPrivateAccess = "true"))
 	USoundBase* _beamShotSound;
 
-	// ‰½•b‚²‚Æ‚Éray‚ğ”ò‚Î‚·‚©
-	// ‚ ‚Ü‚è‚É”ò‚Î‚µ‚·‚¬‚é‚Æ•‰‰×‚ª‘å‚«‚¢‚½‚ß
+	// ï¿½ï¿½ï¿½bï¿½ï¿½ï¿½Æ‚ï¿½rayï¿½ï¿½ï¿½Î‚ï¿½ï¿½ï¿½
+	// ï¿½ï¿½ï¿½Ü‚ï¿½É”ï¿½Î‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ•ï¿½ï¿½×‚ï¿½ï¿½å‚«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	const float RAY_SPAN = 0.5f;
 	float _elapsedRayTime;
 
@@ -86,7 +86,7 @@ private:
 
 public:
 	void ChangeState(ISniperEnemyState* newState);
-	virtual void Initialized(ATPS_ShotCharacter* character, ALevelManager* levelManager) override;
+	virtual void Initialized(ATPS_ShotCharacter* character) override;
 
 	void BeamShot(int shotNum);
 

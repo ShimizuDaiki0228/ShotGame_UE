@@ -44,11 +44,8 @@ protected:
 	UPROPERTY()
 	ATPS_ShotCharacter* _character;
 
-	UPROPERTY()
-	ALevelManager* _levelManager;
-
 public:
-	virtual void Initialized(ATPS_ShotCharacter* character, ALevelManager* levelManager);
+	virtual void Initialized(ATPS_ShotCharacter* character);
 
 	UPooledObjectActorComponent* Explosion();
 public:

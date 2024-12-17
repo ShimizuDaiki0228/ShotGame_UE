@@ -45,10 +45,7 @@ void AEnemyShotActor::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActo
 {
 	if (OtherActor && (OtherActor != this))
 	{
-		if (_levelManager)
-		{
-			TWeakObjectPtr<UPooledParticleSystemComponent> hitParticleSystemComponent = _levelManager->GetEnemyEffectPool()->GetPooledObject(this);
-		}
+		TWeakObjectPtr<UPooledParticleSystemComponent> hitParticleSystemComponent = ALevelManager::GetInstance()->GetEnemyEffectPool()->GetPooledObject(this);
 
 		Destroy();
 	}
@@ -90,10 +87,8 @@ void AEnemyShotActor::Tick(float DeltaTime)
 	}
 }
 
-void AEnemyShotActor::Initialized(const FVector& startPosition, const FVector& endPosition, const FRotator& shotDirection, const ALevelManager* levelManager)
+void AEnemyShotActor::Initialized(const FVector& startPosition, const FVector& endPosition, const FRotator& shotDirection)
 {
-	_levelManager = levelManager;
-
 	_startPosition = startPosition;
 	_endPosition = endPosition;
 	_shotDirection = shotDirection;
