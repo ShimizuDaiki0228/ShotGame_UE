@@ -30,6 +30,8 @@ protected:
 	void BeginPlay() override;
 
 private:
+	const FString GAMEOVER_WIDGET_KEY = "GAMEOVER";
+	const FString PLAYING_WIDGET_KEY = "PLAYING";
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "HUD", meta = (BlueprintProtected = "true"))

@@ -142,14 +142,9 @@ void ATPS_ShotGameMode::GameOver()
 	{
 		playerController->SetCinematicMode(true, false, false, true, true);
 	}
-
-	_character->GetMesh()->SetSimulatePhysics(true);
-	_character->GetMovementComponent()->MovementState.bCanJump = false;
-
-	if (_gameoverWidget != nullptr)
-	{
-		_widgetManager->ChangeViewPort(_gameoverWidget.Get(), _playingWidget.Get());
-	}
+	
+	_character->GameOver();
+	
 	_widgetManager->ChangeViewPort(GAMEOVER_WIDGET_KEY, PLAYING_WIDGET_KEY);
 }
 
