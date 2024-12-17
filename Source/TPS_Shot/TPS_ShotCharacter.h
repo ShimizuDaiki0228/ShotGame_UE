@@ -152,6 +152,7 @@ public:
 	void Initialized();
 	void Bind();
 	void Reset();
+	void GameOver();
 
 public:
 	void ChangeHP(int newHP);

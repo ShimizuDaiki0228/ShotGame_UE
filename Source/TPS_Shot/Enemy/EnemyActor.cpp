@@ -77,7 +77,7 @@ UPooledObjectActorComponent* AEnemyActor::Explosion()
 			SoundManagerUtility::GetInstance().Play(_explosionSound, this);
 		}
 
-		UPooledObjectActorComponent* object = _levelManager->GetEnemyExplosionPool()->GetPooledObject(this);
+		UPooledObjectActorComponent* object = ALevelManager::GetInstance()->GetEnemyExplosionPool()->GetPooledObject(this);
 		AExplosionEffect* spawnedExplosionEffect = static_cast<AExplosionEffect*>(object->GetOwner());
 		if (spawnedExplosionEffect)
 		{
@@ -99,10 +99,9 @@ UPooledObjectActorComponent* AEnemyActor::Explosion()
 	return nullptr;
 }
 
-void AEnemyActor::Initialized(ATPS_ShotCharacter* character, ALevelManager* levelManager)
+void AEnemyActor::Initialized(ATPS_ShotCharacter* character)
 {
 	_character = character;
-	_levelManager = levelManager;
 
 	_currentHpProp->SetValue(MAX_HP);
 }
@@ -114,7 +113,7 @@ bool AEnemyActor::DecreaseHP(int damage)
 		_currentHpProp->SetValue(_currentHpProp->GetValue() - damage);
 		// _currentHpProp->SetValue(0);
 
-		_levelManager->GetUserWidgetPool()->GetPooledObject(FString::FromInt(damage), _characterWidgetController);
+		ALevelManager::GetInstance()->GetUserWidgetPool()->GetPooledObject(FString::FromInt(damage), _characterWidgetController);
 		
 		
 		if (_currentHpProp->GetValue() <= 0)

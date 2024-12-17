@@ -56,7 +56,7 @@ FVector2D UCharacterWidgetController::SetWidgetSetting(
 
 		FVector2D ownerScreenSize;
 
-		UWidgetUtility::GetInstance()->SetWidgetScale(
+		UWidgetUtility::SetWidgetScale(
 			ownerScreenSize,
 			_cachedOwner,
 			userWidget,
@@ -73,7 +73,7 @@ FVector2D UCharacterWidgetController::SetWidgetSetting(
 			positionOffset.Y = FMath::RandRange(-ownerScreenSize.Y / 2, ownerScreenSize.Y / 2);
 			screenPosition += FVector2D(positionOffset.X, positionOffset.Y);
 		}
-		UWidgetUtility::GetInstance()->SetWidgetPosition(userWidget, screenPosition);
+		UWidgetUtility::SetWidgetPosition(userWidget, screenPosition);
 		return screenPosition;
 	}
 	else

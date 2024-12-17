@@ -3,6 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Blueprint/UserWidget.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "UObject/NoExportTypes.h"
 #include "WidgetUtility.generated.h"
 
@@ -15,8 +17,6 @@ class TPS_SHOT_API UWidgetUtility : public UObject
 	GENERATED_BODY()
 
 public:
-	static UWidgetUtility* GetInstance();
-
 	static void SetWidgetScale(
 		FVector2D& ownerScreenSize,
 		const AActor* owner,
@@ -32,6 +32,22 @@ public:
 		UUserWidget* widget,
 		const FVector2D& screenPosition);
 
-private:
-	static UWidgetUtility* _instance;
+	template<typename T>
+	static T* AssignWidget(UObject* object, TSubclassOf<T> widgetClass);
 };
+
+template <typename T>
+T* UWidgetUtility::AssignWidget(UObject* object, TSubclassOf<T> widgetClass)
+{
+	if (widgetClass && ::IsValid(object))
+	{
+		T* createdWidget = CreateWidget<T>(object->GetWorld(), widgetClass);
+		if (createdWidget)
+		{
+			return createdWidget;
+		}
+	}
+
+	UKismetSystemLibrary::PrintString(object, TEXT("widget don't create"), true, true, FColor::Red);
+	return nullptr;
+}

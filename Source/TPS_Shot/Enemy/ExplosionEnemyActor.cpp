@@ -22,7 +22,7 @@ void AExplosionEnemyActor::BeginPlay()
 	_mesh->SetAngularDamping(5.0f);
 
 
-	//‰Šúó‘Ô‚ÍIdle‚Éİ’è
+	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô‚ï¿½Idleï¿½Éİ’ï¿½
 	_currentState = std::make_unique<ExplosionEnemyIdleState>();
 	_currentState->EnterState(this);
 }
@@ -46,9 +46,9 @@ void AExplosionEnemyActor::SelfDestroy()
 
 
 
-void AExplosionEnemyActor::Initialized(ATPS_ShotCharacter* character, ALevelManager* levelManager)
+void AExplosionEnemyActor::Initialized(ATPS_ShotCharacter* character)
 {
-	Super::Initialized(character, levelManager);
+	Super::Initialized(character);
 }
 
 void AExplosionEnemyActor::ChangeState(IExplosionEnemyState* newState)

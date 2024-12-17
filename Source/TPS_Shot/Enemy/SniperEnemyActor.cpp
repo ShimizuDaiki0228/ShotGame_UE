@@ -95,9 +95,9 @@ void ASniperEnemyActor::ChangeState(ISniperEnemyState* newState)
 	}
 }
 
-void ASniperEnemyActor::Initialized(ATPS_ShotCharacter* character, ALevelManager* levelManager)
+void ASniperEnemyActor::Initialized(ATPS_ShotCharacter* character)
 {
-	Super::Initialized(character, levelManager);
+	Super::Initialized(character);
 
 	_shotLimit = SHOT_DURATION;
 	_elapsedRayTime = RAY_SPAN;
@@ -171,7 +171,7 @@ void ASniperEnemyActor::SetPatrolAreaOrder()
 
 void ASniperEnemyActor::SelectPosition()
 {
-	const TMap<AActor*, bool>& patrolAreaMap = _levelManager->GetPatrolAreaMap();
+	const TMap<AActor*, bool>& patrolAreaMap = ALevelManager::GetInstance()->GetPatrolAreaMap();
 
 	if (!patrolAreaMap.IsEmpty())
 	{
@@ -187,7 +187,7 @@ void ASniperEnemyActor::SelectPosition()
 
 			if (!isSelected)
 			{
-				_levelManager->SetPatrolAreaMap(_nextPosition, patrolArea);
+				ALevelManager::GetInstance()->SetPatrolAreaMap(_nextPosition, patrolArea);
 				_nextPosition = patrolArea;
 				return;
 			}
@@ -212,7 +212,7 @@ void ASniperEnemyActor::BeamShot(int shotNum)
 	_shotSpawnManager->SetTransform(GetActorLocation(), shotRotation);
 	AEnemyShotActor* shotActor = _shotSpawnManager->SpawnActor(_enemyShotActorClass);
 	FVector targetLocation = GetTarget()->GetActorLocation() + TARGET_OFFSET;
-	shotActor->Initialized(GetActorLocation(), targetLocation, GetActorRotation(), _levelManager);
+	shotActor->Initialized(GetActorLocation(), targetLocation, GetActorRotation());
 
 	if (shotNum > 0)
 	{
@@ -229,7 +229,7 @@ void ASniperEnemyActor::SetupCurrentPatrolArea()
 
 void ASniperEnemyActor::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-	_levelManager->SetPatrolAreaMap(nullptr, _nextPosition);
+	ALevelManager::GetInstance()->SetPatrolAreaMap(nullptr, _nextPosition);
 
 	TimeManagerUtility::GetInstance().Cancel(_cacheWorld, _shotTimeHandle);
 }

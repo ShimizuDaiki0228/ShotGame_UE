@@ -30,6 +30,8 @@ protected:
 	void BeginPlay() override;
 
 private:
+	const FString GAMEOVER_WIDGET_KEY = "GAMEOVER";
+	const FString PLAYING_WIDGET_KEY = "PLAYING";
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "HUD", meta = (BlueprintProtected = "true"))
@@ -39,15 +41,18 @@ protected:
 	TSubclassOf<class UGameOverUserWidget> _gameoverWidgetClass;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Level")
-		TSoftObjectPtr<UWorld> _titleLevel;
+	TSoftObjectPtr<UWorld> _titleLevel;
 
 //���̎Q��
 private:
+	UPROPERTY()
 	ATPS_ShotCharacter* _character;
 
-	UUserWidget_Playing* _playingWidget;
-	UGameOverUserWidget* _gameoverWidget;
+	TWeakObjectPtr<UUserWidget_Playing> _playingWidget;
+	
+	TWeakObjectPtr<UGameOverUserWidget> _gameoverWidget;
 
+	UPROPERTY()
 	ASpawnVolumeActor* _spawnVolumeActor;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Reference", meta = (AllowPrivateAccess = "true"))
@@ -56,7 +61,7 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Reference", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<class AExplosionEnemyActor> _explosionEnemyActor;
 
-	TObjectPtr<UWidgetManager> _widgetManager;
+	TWeakObjectPtr<UWidgetManager> _widgetManager;
 
 	UPROPERTY()
 	AShotCharacterPlayerState* _shotCharacterPlayerState;
@@ -72,11 +77,8 @@ public:
 	AShotCharacterPlayerState* GetPlayerState() const {return _shotCharacterPlayerState;}
 
 private:
-	void Initialized(ALevelManager* levelManager);
+	void Initialized();
 	void Reset();
-
-	template<typename T>
-	T* AssignWidget(TSubclassOf<T> assignWidgetClass);
 };
 
 

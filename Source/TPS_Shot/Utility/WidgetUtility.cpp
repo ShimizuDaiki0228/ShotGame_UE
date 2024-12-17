@@ -10,18 +10,6 @@
 #include "TPS_Shot/Widget/IFollowActorWidget.h"
 
 
-UWidgetUtility* UWidgetUtility::_instance = nullptr;
-
-UWidgetUtility* UWidgetUtility::GetInstance()
-{
-	if (_instance)
-	{
-		_instance = NewObject<UWidgetUtility>();
-		// ガベージコレクションから保護
-		_instance->AddToRoot();
-	}
-	return _instance;
-}
 
 void UWidgetUtility::SetWidgetScale(
 	FVector2D& ownerScreenSize,

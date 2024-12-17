@@ -3,12 +3,34 @@
 
 #include "WidgetManager.h"
 
-void UWidgetManager::ChangeViewPort(UUserWidget* newWidget, UUserWidget* deleteWidget)
+void UWidgetManager::ChangeViewPort(const FString& newWidgetKey, const FString& deleteWidgetKey)
 {
-	newWidget->AddToViewport();
-
-	if (deleteWidget != nullptr)
+	if (IsWidgetValidCheck(newWidgetKey) &&
+		!_userWidgetDictionary[newWidgetKey]->IsInViewport())
 	{
-		deleteWidget->RemoveFromParent();
+		_userWidgetDictionary[newWidgetKey]->AddToViewport();
+	}
+	
+	if (IsWidgetValidCheck(deleteWidgetKey) &&
+		_userWidgetDictionary[deleteWidgetKey]->IsInViewport())
+	{
+		_userWidgetDictionary[deleteWidgetKey]->RemoveFromParent();
 	}
 }
+
+void UWidgetManager::RegisterWidget(const FString& key, TWeakObjectPtr<UUserWidget> value)
+{
+	_userWidgetDictionary.Add(key, value);
+}
+
+bool UWidgetManager::IsWidgetValidCheck(const FString& key)
+{
+	if (!key.IsEmpty() && _userWidgetDictionary.Contains(key) &&
+		_userWidgetDictionary[key].IsValid())
+	{
+		return true;
+	}
+
+	return false;
+}
+

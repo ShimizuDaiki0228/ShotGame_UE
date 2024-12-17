@@ -10,9 +10,11 @@
 #include "ReactiveProperty/ReadonlyReactiveProperty.h"
 #include "Utility/ConstUtility.h"
 #include "GameFramework/PawnMovementComponent.h"
+#include "Utility/WidgetUtility.h"
 
 
-ATPS_ShotGameMode::ATPS_ShotGameMode()
+ATPS_ShotGameMode::ATPS_ShotGameMode(): _character(nullptr), _spawnVolumeActor(nullptr),
+                                        _shotCharacterPlayerState(nullptr)
 {
 	// set default pawn class to our Blueprinted character
 	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(TEXT("/Game/ThirdPerson/Blueprints/BP_ThirdPersonCharacter"));
@@ -52,31 +54,21 @@ void ATPS_ShotGameMode::BeginPlay()
 		UKismetSystemLibrary::PrintString(this, "�L�����N�^�[���擾�ł��܂���ł���", true, true, FColor::Cyan, 2.f, TEXT("None"));
 	}
 	
-	_playingWidget = AssignWidget<UUserWidget_Playing>(_playingWidgetClass);
-	_gameoverWidget = AssignWidget<UGameOverUserWidget>(_gameoverWidgetClass);
-	if (_playingWidget)
+	_playingWidget = UWidgetUtility::AssignWidget(this, _playingWidgetClass);
+	_gameoverWidget = UWidgetUtility::AssignWidget(this, _gameoverWidgetClass);
+	if (_playingWidget.IsValid())
 	{
-		_widgetManager->ChangeViewPort(_playingWidget);
+		_widgetManager->RegisterWidget(PLAYING_WIDGET_KEY, _playingWidget);
+		_widgetManager->ChangeViewPort(PLAYING_WIDGET_KEY);
+	}
+	if (_gameoverWidget.IsValid())
+	{
+		_widgetManager->RegisterWidget(GAMEOVER_WIDGET_KEY, _gameoverWidget);
 	}
 
-	TArray<AActor*> foundActors;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ALevelManager::StaticClass(), foundActors);
-	ALevelManager* levelManager = nullptr;
-
-	if (foundActors.Num() > 0)
-	{
-		levelManager = Cast<ALevelManager>(foundActors[0]);
-		if (levelManager)
-		{
-			_spawnVolumeActor = levelManager->GetVolumeActor();
-		}
-		else
-		{
-			UKismetSystemLibrary::PrintString(this, "levelManager isn't Found", true, true, FColor::Cyan, 2.f, TEXT("None"));		
-		}
-	}
+	_spawnVolumeActor = ALevelManager::GetInstance()->GetVolumeActor();
 	
-	Initialized(levelManager);
+	Initialized();
 	Bind();
 	Reset();
 }
@@ -135,19 +127,15 @@ void ATPS_ShotGameMode::GameOver()
 	{
 		playerController->SetCinematicMode(true, false, false, true, true);
 	}
-
-	_character->GetMesh()->SetSimulatePhysics(true);
-	_character->GetMovementComponent()->MovementState.bCanJump = false;
-
-	if (_gameoverWidget != nullptr)
-	{
-		_widgetManager->ChangeViewPort(_gameoverWidget, _playingWidget);
-	}
+	
+	_character->GameOver();
+	
+	_widgetManager->ChangeViewPort(GAMEOVER_WIDGET_KEY, PLAYING_WIDGET_KEY);
 }
 
-void ATPS_ShotGameMode::Initialized(ALevelManager* levelManager)
+void ATPS_ShotGameMode::Initialized()
 {
-	_spawnVolumeActor->Initialized(_explosionEnemyActor, _sniperEnemyActor, _character, levelManager);
+	_spawnVolumeActor->Initialized(_explosionEnemyActor, _sniperEnemyActor, _character);
 	_character->Initialized();
 
 	const FName playLevelName = _titleLevel.IsValid() ? FName(*_titleLevel.GetAssetName()) : FName(TEXT("InvalidLevel"));
@@ -163,20 +151,4 @@ void ATPS_ShotGameMode::Reset()
 		// UKismetSystemLibrary::PrintString(this, "Character Reset", true, true, FColor::Cyan, 2.f, TEXT("None"));
 		_character->Reset();
 	}
-}
-
-template<typename T>
-T* ATPS_ShotGameMode::AssignWidget(TSubclassOf<T> assignWidgetClass)
-{
-    if (assignWidgetClass)
-    {
-        // �E�B�W�F�b�g�𐶐�
-        T* assignWidget = CreateWidget<T>(GetWorld(), assignWidgetClass);
-        if (assignWidget)
-        {
-            return assignWidget;
-        }
-    }
-
-    return nullptr;
 }

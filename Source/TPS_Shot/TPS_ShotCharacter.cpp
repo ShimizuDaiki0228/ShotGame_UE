@@ -292,6 +292,12 @@ void ATPS_ShotCharacter::Reset()
 	_currentHPProp->SetValue(ConstUtility::PLAYER_MAX_HP);
 }
 
+void ATPS_ShotCharacter::GameOver()
+{
+	GetMesh()->SetSimulatePhysics(true);
+	GetMovementComponent()->MovementState.bCanJump = false;
+}
+
 bool ATPS_ShotCharacter::GetBeamEndLocation(const FVector& muzzleSocketLocation, FVector& outBeamLocation)
 {
 	FVector2D viewPortSize;

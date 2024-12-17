@@ -33,7 +33,7 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Spawning", meta = (AllowPrivateAccess = "true"))
 	class UBoxComponent* _whereToSpawn;
 
-	void SpawnEnemy(ALevelManager* levelManager, USpawnManager* enemySpawnManager);
+	void SpawnEnemy(USpawnManager* enemySpawnManager);
 
 	float _spawnDelay;
 
@@ -60,8 +60,7 @@ public:
 	void Initialized(
 		TSubclassOf<AExplosionEnemyActor> explosionEnemy,
 		TSubclassOf<ASniperEnemyActor> sniperEnemy,
-		ATPS_ShotCharacter* character,
-		ALevelManager* levelManager);
+		ATPS_ShotCharacter* character);
 
 public:
 	void GameOver();
