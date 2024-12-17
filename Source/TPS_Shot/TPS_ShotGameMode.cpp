@@ -58,7 +58,12 @@ void ATPS_ShotGameMode::BeginPlay()
 	_gameoverWidget = UWidgetUtility::AssignWidget(this, _gameoverWidgetClass);
 	if (_playingWidget.IsValid())
 	{
-		_widgetManager->ChangeViewPort(_playingWidget.Get());
+		_widgetManager->RegisterWidget(PLAYING_WIDGET_KEY, _playingWidget);
+		_widgetManager->ChangeViewPort(PLAYING_WIDGET_KEY);
+	}
+	if (_gameoverWidget.IsValid())
+	{
+		_widgetManager->RegisterWidget(GAMEOVER_WIDGET_KEY, _gameoverWidget);
 	}
 
 	TArray<AActor*> foundActors;
@@ -145,6 +150,7 @@ void ATPS_ShotGameMode::GameOver()
 	{
 		_widgetManager->ChangeViewPort(_gameoverWidget.Get(), _playingWidget.Get());
 	}
+	_widgetManager->ChangeViewPort(GAMEOVER_WIDGET_KEY, PLAYING_WIDGET_KEY);
 }
 
 void ATPS_ShotGameMode::Initialized(ALevelManager* levelManager)

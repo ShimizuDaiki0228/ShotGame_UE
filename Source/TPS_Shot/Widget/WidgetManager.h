@@ -16,5 +16,12 @@ class TPS_SHOT_API UWidgetManager : public UObject
 	GENERATED_BODY()
 	
 public :
-	void ChangeViewPort(UUserWidget* newWidget, UUserWidget* deleteWidget = nullptr);
+	void ChangeViewPort(const FString& newWidgetKey = "", const FString& deleteWidgetKey = "");
+	void RegisterWidget(const FString& key, TWeakObjectPtr<UUserWidget> value);
+
+private:
+	TMap<FString, TWeakObjectPtr<UUserWidget>> _userWidgetDictionary;
+
+private:
+	bool IsWidgetValidCheck(const FString& key);
 };
