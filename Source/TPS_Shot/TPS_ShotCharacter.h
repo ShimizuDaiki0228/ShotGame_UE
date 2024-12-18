@@ -14,6 +14,7 @@
 
 class AShotCharacterPlayerState;
 class ATPS_ShotGameMode;
+class UPlayerBehaviourController;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnScoreUp);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnGameover);
@@ -120,6 +121,9 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
 	UParticleSystem* _beamParticle;
+
+	UPROPERTY(VisibleDefaultsOnly, Category = "ActorComponent")
+	UPlayerBehaviourController* _behaviourController;
 
 	UPROPERTY()
 	TWeakObjectPtr<ATPS_ShotGameMode> _shotGameMode;

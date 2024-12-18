@@ -24,12 +24,15 @@
 #include "TPS_ShotGameMode.h"
 #include "Enemy/EnemyActor.h"
 #include "GameFramework/GameMode.h"
+#include "PlayerBehaviourController.h"
 
 //////////////////////////////////////////////////////////////////////////
 // ATPS_ShotCharacter
 
 ATPS_ShotCharacter::ATPS_ShotCharacter()
 {
+	_behaviourController = CreateDefaultSubobject<UPlayerBehaviourController>(TEXT("BehaviourController"));
+	
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
 		
@@ -210,38 +213,12 @@ bool ATPS_ShotCharacter::ChangeNumberOfBullet(int currentNumberOfBullet)
 
 void ATPS_ShotCharacter::Move(const FInputActionValue& Value)
 {
-	// input is a Vector2D
-	FVector2D MovementVector = Value.Get<FVector2D>();
-
-	if (Controller != nullptr)
-	{
-		// find out which way is forward
-		const FRotator Rotation = Controller->GetControlRotation();
-		const FRotator YawRotation(0, Rotation.Yaw, 0);
-
-		// get forward vector
-		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-	
-		// get right vector 
-		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-
-		// add movement 
-		AddMovementInput(ForwardDirection, MovementVector.Y);
-		AddMovementInput(RightDirection, MovementVector.X);
-	}
+	_behaviourController->Move(Value);
 }
 
 void ATPS_ShotCharacter::Look(const FInputActionValue& Value)
 {
-	// input is a Vector2D
-	FVector2D LookAxisVector = Value.Get<FVector2D>();
-
-	if (Controller != nullptr)
-	{
-		// add yaw and pitch input to controller
-		AddControllerYawInput(LookAxisVector.X);
-		AddControllerPitchInput(LookAxisVector.Y);
-	}
+	_behaviourController->Look(Value);
 }
 
 void ATPS_ShotCharacter::Reload()
@@ -275,6 +252,7 @@ void ATPS_ShotCharacter::ChangeHP(int newHP)
 
 void ATPS_ShotCharacter::Initialized()
 {
+	_behaviourController->Initialized(this);
 	Bind();
 }
 
