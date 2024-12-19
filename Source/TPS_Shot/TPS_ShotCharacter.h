@@ -99,6 +99,9 @@ private:
 	FTimerHandle _reloadTimerHandle;
 
 	int _currentLoadNumber;
+
+	UPROPERTY()
+	UAnimInstance* _animInstance;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
 	class USoundCue* _fireSound;
@@ -140,7 +143,6 @@ private:
 	void ChangeNotUseShot();
 	void CreateBullet();
 
-	bool ChangeNumberOfBullet(int currentNumberOfBullet);
 	bool GetBeamEndLocation(const FVector& muzzleSocketLocation, FVector& outBeamLocation);
 
 public:
@@ -155,6 +157,7 @@ public:
 public:
 	void Initialized();
 	void Bind();
+	void SetEvent();
 	void Reset();
 	void GameOver();
 

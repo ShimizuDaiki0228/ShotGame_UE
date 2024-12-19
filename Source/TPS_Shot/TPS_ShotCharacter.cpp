@@ -25,6 +25,7 @@
 #include "Enemy/EnemyActor.h"
 #include "GameFramework/GameMode.h"
 #include "PlayerBehaviourController.h"
+#include "Utility/MontageUtility.h"
 
 //////////////////////////////////////////////////////////////////////////
 // ATPS_ShotCharacter
@@ -105,6 +106,8 @@ void ATPS_ShotCharacter::BeginPlay()
 			}
 		}
 	}
+
+	_animInstance = GetMesh()->GetAnimInstance();
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -134,9 +137,7 @@ void ATPS_ShotCharacter::SetupPlayerInputComponent(class UInputComponent* Player
 void ATPS_ShotCharacter::CreateBullet()
 {
 	if (!bCanShot) return;
-
 	if (bIsReloading) return;
-
 
 	ChangeNotUseShot();
 
@@ -156,7 +157,6 @@ void ATPS_ShotCharacter::CreateBullet()
 		}
 
 		_numberOfBulletProp->SetValue(_numberOfBulletProp->GetValue() - 1);
-		bIsReloading = ChangeNumberOfBullet(_numberOfBulletProp->GetValue());
 
 		FVector beamEnd;
 		bool bBeamEnd = GetBeamEndLocation(socketTransform.GetLocation(), beamEnd);
@@ -180,11 +180,24 @@ void ATPS_ShotCharacter::CreateBullet()
 			}
 		}
 		
-		UAnimInstance* animInstance = GetMesh()->GetAnimInstance();
-		if (animInstance && _hipFireMontage)
+		if (_animInstance && _hipFireMontage)
 		{
-			animInstance->Montage_Play(_hipFireMontage);
-			animInstance->Montage_JumpToSection(FName("StartFire"));
+			_animInstance->Montage_Play(_hipFireMontage);
+			_animInstance->Montage_JumpToSection(FName("StartFire"));
+
+			if (_numberOfBulletProp->GetValue() == 0)
+			{
+				MontageUtility::SetMontageEndDelegateWithLambda<TFunction<void(UAnimMontage*, bool)>>
+				(
+					_animInstance,
+					_hipFireMontage,
+					[this](UAnimMontage*, bool)
+					{
+						Reload();
+						UE_LOG(LogTemp, Log, TEXT("Reload Animation Completed Successfully"));
+					}
+				);
+			}
 		}
 	}
 }
@@ -195,21 +208,9 @@ void ATPS_ShotCharacter::ChangeNotUseShot()
 
 	TimeManagerUtility::GetInstance().Delay(GetWorld(), [this]()
 		{
-			bCanShot = true;
-		}, 0.2f, _reloadTimerHandle);
+			bCanShot = _numberOfBulletProp->GetValue() > 0;
+		}, 0.08f, _reloadTimerHandle);
 }
-
-bool ATPS_ShotCharacter::ChangeNumberOfBullet(int currentNumberOfBullet)
-{
-	if (currentNumberOfBullet <= 0)
-	{
-		// �񓯊��Ń����[�h�A�j���[�V�����ƃ����[�h�e�L�X�g�A�j���[�V������s����bIsReloading��false�ɂ�����
-		return true;
-	}
-	return false;
-}
-
-
 
 void ATPS_ShotCharacter::Move(const FInputActionValue& Value)
 {
@@ -223,6 +224,9 @@ void ATPS_ShotCharacter::Look(const FInputActionValue& Value)
 
 void ATPS_ShotCharacter::Reload()
 {
+	if (bIsReloading) return;
+	
+	bIsReloading = true;
 	UAnimInstance* animInstance = GetMesh()->GetAnimInstance();
 	if (animInstance && _reloadMontage)
 	{
@@ -233,6 +237,17 @@ void ATPS_ShotCharacter::Reload()
 
 		animInstance->Montage_Play(_reloadMontage);
 		animInstance->Montage_JumpToSection(montageSection);
+		
+		MontageUtility::SetMontageEndDelegateWithLambda<TFunction<void(UAnimMontage*, bool)>>(
+			animInstance,
+			_reloadMontage,
+			[this](UAnimMontage*, bool)
+			{
+				_numberOfBulletProp->SetValue(MAX_BULLET_NUMBER);
+				bCanShot = true;
+				bIsReloading = false;
+			}
+		);
 	}
 }
 
@@ -254,11 +269,17 @@ void ATPS_ShotCharacter::Initialized()
 {
 	_behaviourController->Initialized(this);
 	Bind();
+	SetEvent();
 }
 
 void ATPS_ShotCharacter::Bind()
 {
 	
+}
+
+void ATPS_ShotCharacter::SetEvent()
+{
+
 }
 
 void ATPS_ShotCharacter::Reset()
