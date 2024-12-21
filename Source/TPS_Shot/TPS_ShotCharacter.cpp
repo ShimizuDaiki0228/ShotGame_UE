@@ -8,21 +8,15 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
-#include "GameFramework/CharacterMovementComponent.h"
 #include "Engine/LocalPlayer.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Kismet/KismetSystemLibrary.h"
-#include "Kismet/GameplayStatics.h"
 #include "Utility/TimeManagerUtility.h"
 #include "Utility/ConstUtility.h"
-#include "Engine/SkeletalMeshSocket.h"
 #include "DrawDebugHelpers.h"
 #include "ShotCharacterPlayerState.h"
-#include "Particles/ParticleSystemComponent.h"
-#include "Utility/SoundManagerUtility.h"
 #include "TPS_ShotGameMode.h"
-#include "Enemy/EnemyActor.h"
 #include "GameFramework/GameMode.h"
 #include "PlayerBehaviourController.h"
 #include "Utility/MontageUtility.h"
@@ -33,6 +27,7 @@
 ATPS_ShotCharacter::ATPS_ShotCharacter()
 {
 	_behaviourController = CreateDefaultSubobject<UPlayerBehaviourController>(TEXT("BehaviourController"));
+	_bulletController = CreateDefaultSubobject<UBulletControllerComponent>(TEXT("BulletControllerComponent"));
 	
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
@@ -97,14 +92,12 @@ void ATPS_ShotCharacter::BeginPlay()
 
 	if (auto gameModeBase = GetWorld()->GetAuthGameMode())
 	{
-		if (auto shotGameMode = Cast<ATPS_ShotGameMode>(gameModeBase))
+		_shotGameMode = Cast<ATPS_ShotGameMode>(gameModeBase);
+		if (!_shotGameMode)
 		{
-			_shotGameMode = TWeakObjectPtr<ATPS_ShotGameMode>(shotGameMode);
-			if (!_shotGameMode.IsValid())
-			{
-				UKismetSystemLibrary::PrintString(this, TEXT("don't Get GameMode"), true, true, FColor::Red);
-			}
+			UKismetSystemLibrary::PrintString(this, TEXT("don't Get GameMode"), true, true, FColor::Red);
 		}
+		
 	}
 
 	_animInstance = GetMesh()->GetAnimInstance();
@@ -139,65 +132,30 @@ void ATPS_ShotCharacter::CreateBullet()
 	if (!bCanShot) return;
 	if (bIsReloading) return;
 
-	ChangeNotUseShot();
-
-	if (_fireSound)
+	if (_bulletController->Create())
 	{
-		SoundManagerUtility::GetInstance().Play(_fireSound, this);
+		_numberOfBulletProp->SetValue(_numberOfBulletProp->GetValue() - 1);
+		ChangeNotUseShot();
 	}
 
-	const USkeletalMeshSocket* barrelSocket = GetMesh()->GetSocketByName("BarrelSocket");
-	if (barrelSocket)
+
+	if (_animInstance && _hipFireMontage)
 	{
-		const FTransform socketTransform = barrelSocket->GetSocketTransform(GetMesh());
+		_animInstance->Montage_Play(_hipFireMontage);
+		_animInstance->Montage_JumpToSection(FName("StartFire"));
 
-		if (_muzzleFlash)
+		if (_numberOfBulletProp->GetValue() == 0)
 		{
-			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), _muzzleFlash, socketTransform);
-		}
-
-		_numberOfBulletProp->SetValue(_numberOfBulletProp->GetValue() - 1);
-
-		FVector beamEnd;
-		bool bBeamEnd = GetBeamEndLocation(socketTransform.GetLocation(), beamEnd);
-		if (bBeamEnd)
-		{
-			if (_impatctParticle)
-			{
-				UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), _impatctParticle, beamEnd);
-			}
-
-			if (_beamParticle)
-			{
-				UParticleSystemComponent* beam = UGameplayStatics::SpawnEmitterAtLocation(
-					GetWorld(),
-					_beamParticle,
-					socketTransform);
-				if (beam)
+			MontageUtility::SetMontageEndDelegateWithLambda<TFunction<void(UAnimMontage*, bool)>>
+			(
+				_animInstance,
+				_hipFireMontage,
+				[this](UAnimMontage*, bool)
 				{
-					beam->SetVectorParameter(FName("Target"), beamEnd);
+					Reload();
+					UE_LOG(LogTemp, Log, TEXT("Reload Animation Completed Successfully"));
 				}
-			}
-		}
-		
-		if (_animInstance && _hipFireMontage)
-		{
-			_animInstance->Montage_Play(_hipFireMontage);
-			_animInstance->Montage_JumpToSection(FName("StartFire"));
-
-			if (_numberOfBulletProp->GetValue() == 0)
-			{
-				MontageUtility::SetMontageEndDelegateWithLambda<TFunction<void(UAnimMontage*, bool)>>
-				(
-					_animInstance,
-					_hipFireMontage,
-					[this](UAnimMontage*, bool)
-					{
-						Reload();
-						UE_LOG(LogTemp, Log, TEXT("Reload Animation Completed Successfully"));
-					}
-				);
-			}
+			);
 		}
 	}
 }
@@ -268,6 +226,7 @@ void ATPS_ShotCharacter::ChangeHP(int newHP)
 void ATPS_ShotCharacter::Initialized()
 {
 	_behaviourController->Initialized(this);
+	_bulletController->Initialized(this);
 	Bind();
 	SetEvent();
 }
@@ -297,73 +256,8 @@ void ATPS_ShotCharacter::GameOver()
 	GetMovementComponent()->MovementState.bCanJump = false;
 }
 
-bool ATPS_ShotCharacter::GetBeamEndLocation(const FVector& muzzleSocketLocation, FVector& outBeamLocation)
+void ATPS_ShotCharacter::PlayHipFireMontage()
 {
-	FVector2D viewPortSize;
-	if (GEngine && GEngine->GameViewport)
-	{
-		GEngine->GameViewport->GetViewportSize(viewPortSize);
-	}
-
-	FVector2D crosshairLocation = FVector2D(viewPortSize.X / 2, viewPortSize.Y / 2);
-	FVector crosshairWorldPosition;
-	FVector crosshairWorldDirection;
-
-	// �X�N���[�����W�����[���h���W�ɕϊ�
-	bool bScreenToWorld = UGameplayStatics::DeprojectScreenToWorld(
-		UGameplayStatics::GetPlayerController(this, 0),
-		crosshairLocation,
-		crosshairWorldPosition,
-		crosshairWorldDirection);
-
-	if (bScreenToWorld)
-	{
-		FHitResult screenTraceHit;
-		const FVector start = crosshairWorldPosition;
-		const FVector end = crosshairWorldPosition + crosshairWorldDirection * 50'000.f;
-
-		outBeamLocation = end;
-
-		GetWorld()->LineTraceSingleByChannel(screenTraceHit, start, end, ECollisionChannel::ECC_Visibility);
-
-		if (screenTraceHit.bBlockingHit)
-		{
-			outBeamLocation = screenTraceHit.Location;
-
-			AActor* hitActor = screenTraceHit.GetActor();
-			if (hitActor)
-			{
-				AEnemyActor* enemy = Cast<AEnemyActor>(hitActor);
-				if (enemy)
-				{
-					// �����ƃ_���[�W��ݒ肷��A���͎���
-					if (enemy->DecreaseHP(100))
-					{
-						auto playerState = _shotGameMode->GetPlayerState();
-						playerState->ChangeScore(playerState->GetScore() + 1);
-					}
-				}
-			}
-		}
-
-		// �N���X�w�A����̃g���[�X�ƕ��킩��̃g���[�X�ō��ق����܂�邽�߂�萳�m�ɂ��邽�߂�
-		FHitResult weaponTraceHit;
-		const FVector weaponTraceStart = muzzleSocketLocation;
-		const FVector weaponTraceEnd = outBeamLocation;
-		GetWorld()->LineTraceSingleByChannel(
-			weaponTraceHit,
-			weaponTraceStart,
-			weaponTraceEnd,
-			ECollisionChannel::ECC_Visibility
-		);
-		if (weaponTraceHit.bBlockingHit)
-		{
-			outBeamLocation = weaponTraceHit.Location;
-		}
-
-		return true;
-	}
-
-	return false;
 }
+
 

@@ -3,11 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "BulletControllerComponent.h"
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
-#include "Dispose/Observer.h"
-#include "Dispose/Subject.h"
-#include "Sound/SoundCue.h"
 #include "ReactiveProperty/ReactiveProperty.h"
 #include "ReactiveProperty/ReadonlyReactiveProperty.h"
 #include "TPS_ShotCharacter.generated.h"
@@ -102,13 +100,6 @@ private:
 
 	UPROPERTY()
 	UAnimInstance* _animInstance;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
-	class USoundCue* _fireSound;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
-	class UParticleSystem* _muzzleFlash;
-
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
 	class UAnimMontage* _hipFireMontage;
@@ -119,17 +110,14 @@ private:
 	UPROPERTY()
 	AShotCharacterPlayerState* _shotCharacterPlayerState;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
-	UParticleSystem* _impatctParticle;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat", meta = (AllowPrivateAccess = "true"))
-	UParticleSystem* _beamParticle;
-
 	UPROPERTY(VisibleDefaultsOnly, Category = "ActorComponent")
 	UPlayerBehaviourController* _behaviourController;
 
+	UPROPERTY(VisibleAnywhere, Category = "ActorComponent")
+	UBulletControllerComponent* _bulletController;
+
 	UPROPERTY()
-	TWeakObjectPtr<ATPS_ShotGameMode> _shotGameMode;
+	ATPS_ShotGameMode* _shotGameMode;
 
 private:
 	TSharedPtr<ReactiveProperty<int>> _currentHPProp = MakeShared<ReactiveProperty<int>>();
@@ -160,11 +148,16 @@ public:
 	void SetEvent();
 	void Reset();
 	void GameOver();
+	
+	void PlayHipFireMontage();
 
 public:
 	void ChangeHP(int newHP);
 	
 public:
 	FORCEINLINE int GetHP() const { return _currentHPProp->GetValue(); }
+
+	// 絶対にダメそうなので直す
+	FORCEINLINE ATPS_ShotGameMode* GetGameMode() const {return _shotGameMode;}
 };
 
