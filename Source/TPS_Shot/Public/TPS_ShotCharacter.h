@@ -10,6 +10,7 @@
 #include "../ReactiveProperty/Public/ReadonlyReactiveProperty.h"
 #include "TPS_ShotCharacter.generated.h"
 
+class AMyPlayerControllerBase;
 class AShotCharacterPlayerState;
 class ATPS_ShotGameMode;
 class UPlayerBehaviourController;
@@ -119,6 +120,9 @@ private:
 	UPROPERTY()
 	ATPS_ShotGameMode* _shotGameMode;
 
+	UPROPERTY()
+	AMyPlayerControllerBase* _playerController;
+
 private:
 	TSharedPtr<ReactiveProperty<int>> _currentHPProp = MakeShared<ReactiveProperty<int>>();
 	
@@ -132,13 +136,6 @@ private:
 	void CreateBullet();
 
 	bool GetBeamEndLocation(const FVector& muzzleSocketLocation, FVector& outBeamLocation);
-
-public:
-	TSharedPtr<ReadOnlyReactiveProperty<int>> CurrentHPProp
-		= MakeShared<ReadOnlyReactiveProperty<int>>(_currentHPProp);
-
-	TSharedPtr<ReadOnlyReactiveProperty<int>> NumberOfBulletProp 
-		= MakeShared<ReadOnlyReactiveProperty<int>>(_numberOfBulletProp);
 
 	FORCEINLINE bool GetAiming() const { return bAiming; }
 

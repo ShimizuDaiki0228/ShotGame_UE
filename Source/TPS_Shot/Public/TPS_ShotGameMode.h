@@ -13,6 +13,8 @@
 #include "SpawnVolumeActor.h"
 #include "TPS_ShotGameMode.generated.h"
 
+class AMyPlayerControllerBase;
+
 UCLASS()
 class ATPS_ShotGameMode : public AGameModeBase
 {
@@ -27,13 +29,10 @@ protected:
 	void BeginPlay() override;
 
 private:
-	const FString GAMEOVER_WIDGET_KEY = "GAMEOVER";
-	const FString PLAYING_WIDGET_KEY = "PLAYING";
+	// const FString GAMEOVER_WIDGET_KEY = "GAMEOVER";
+	// const FString PLAYING_WIDGET_KEY = "PLAYING";
 
 protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "HUD", meta = (BlueprintProtected = "true"))
-	TSubclassOf<class UUserWidget_Playing> _playingWidgetClass;
-	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "HUD", meta = (BlueprintProtected = "true"))
 	TSubclassOf<class UGameOverUserWidget> _gameoverWidgetClass;
 
@@ -45,8 +44,6 @@ private:
 	UPROPERTY()
 	ATPS_ShotCharacter* _character;
 
-	TWeakObjectPtr<UUserWidget_Playing> _playingWidget;
-	
 	TWeakObjectPtr<UGameOverUserWidget> _gameoverWidget;
 
 	UPROPERTY()
@@ -58,10 +55,10 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Reference", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<class AExplosionEnemyActor> _explosionEnemyActor;
 
-	TWeakObjectPtr<UWidgetManager> _widgetManager;
-
 	UPROPERTY()
-	AShotCharacterPlayerState* _shotCharacterPlayerState;
+	AMyPlayerControllerBase* _playerController;
+
+	int _enemyKillCount;
 	
 // �o�C���h
 private:
@@ -71,11 +68,14 @@ private:
 	void GameOver();
 
 public:
-	AShotCharacterPlayerState* GetPlayerState() const {return _shotCharacterPlayerState;}
+	AMyPlayerControllerBase* GetPlayerController() const {return _playerController;}
 
 private:
 	void Initialized();
 	void Reset();
+
+public:
+	void InCreaseEnemyKillCount();
 };
 
 

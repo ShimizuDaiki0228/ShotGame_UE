@@ -12,6 +12,7 @@
 #include "../Public/CharacterWidgetController.h"
 #include "EnemyActor.generated.h"
 
+class AMyPlayerControllerBase;
 
 UCLASS()
 class TPS_SHOT_API AEnemyActor : public AActor
@@ -48,7 +49,7 @@ public:
 	UPooledObjectActorComponent* Explosion();
 public:
 	// hp��������̒l�ȉ��ɂȂ����ꍇ�ɔj�����ăX�R�A���グ�邽�߂�bool�^
-	bool DecreaseHP(int damage);
+	void DecreaseHP(int damage);
 
 public:
 	ATPS_ShotCharacter* GetTarget() const { return _character; }
@@ -57,7 +58,6 @@ public:
 
 private:
 	const int MAX_HP = 500;
-	//int _hp;
 
 	UPROPERTY()
 	USpawnManager* _explosionEffectSpawnManager;
@@ -77,7 +77,10 @@ private:
 	UEnemyHpBarUserWidget* _healthBarWidget;
 
 	UPROPERTY()
-	APlayerController* _cachedPlayerController;
+	AMyPlayerControllerBase* _cachedPlayerController;
+
+	UPROPERTY()
+	ATPS_ShotGameMode* _gameMode;
 
 	UPROPERTY()
 	UCharacterWidgetController* _characterWidgetController;

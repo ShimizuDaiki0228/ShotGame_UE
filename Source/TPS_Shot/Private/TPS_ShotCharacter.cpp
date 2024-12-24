@@ -19,6 +19,7 @@
 #include "GameFramework/GameMode.h"
 #include "PlayerBehaviourController.h"
 #include "../Utility/Public/MontageUtility.h"
+#include "Utility/GameFunctionInstance.h"
 
 //////////////////////////////////////////////////////////////////////////
 // ATPS_ShotCharacter
@@ -96,10 +97,12 @@ void ATPS_ShotCharacter::BeginPlay()
 		{
 			UKismetSystemLibrary::PrintString(this, TEXT("don't Get GameMode"), true, true, FColor::Red);
 		}
-		
 	}
 
+	_playerController = UGameFunctionInstance::GetInstance()->GetPlayerController(this);
 	_animInstance = GetMesh()->GetAnimInstance();
+
+	Reset();
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -232,6 +235,32 @@ void ATPS_ShotCharacter::Initialized()
 
 void ATPS_ShotCharacter::Bind()
 {
+	if (_numberOfBulletProp.IsValid())
+	{
+		_numberOfBulletProp->OnValueChanged.AddLambda([this](const int& newValue)
+			{
+				UKismetSystemLibrary::PrintString(this, TEXT("_numberProp is valid"), true, true, FColor::Cyan);
+
+				_playerController->GetPlayingWidget()->ChangeBulletNumber(newValue);
+			});
+	}
+
+	if (_currentHPProp.IsValid())
+	{
+		_currentHPProp->OnValueChanged.AddLambda([this](const int& newValue)
+		{
+			float currentHpPercentage = 
+				static_cast<float>(_currentHPProp->GetValue()) / static_cast<float>(ConstUtility::PLAYER_MAX_HP);
+
+			_playerController->GetPlayingWidget()->UpdateHPBar(currentHpPercentage);
+
+			if (newValue <= 0)
+			{
+				GameOver();
+			}
+		});
+	}
+
 	
 }
 

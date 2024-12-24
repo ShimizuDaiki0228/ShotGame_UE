@@ -6,6 +6,7 @@
 #include "UObject/NoExportTypes.h"
 #include "CharacterWidgetController.generated.h"
 
+class AMyPlayerControllerBase;
 /**
  * 
  */
@@ -15,7 +16,7 @@ class TPS_SHOT_API UCharacterWidgetController : public UObject
 	GENERATED_BODY()
 
 public:
-	void Initialized(AActor* owner, APlayerController* playerController);
+	void Initialized(AActor* owner);
 	bool IsCharacterProjected(FVector2D& screenPosition) const;
 
 public:

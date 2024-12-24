@@ -34,7 +34,6 @@ public:
 
 	void Gameover();
 
-	//UFUNCTIONを付けないとバインドしても呼んでくれない
 	UFUNCTION()
 	void UpdateHPBar(float hpPercentage);
 
