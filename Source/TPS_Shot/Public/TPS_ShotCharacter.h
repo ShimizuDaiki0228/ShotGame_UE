@@ -137,6 +137,7 @@ private:
 
 	bool GetBeamEndLocation(const FVector& muzzleSocketLocation, FVector& outBeamLocation);
 
+public:
 	FORCEINLINE bool GetAiming() const { return bAiming; }
 
 public:

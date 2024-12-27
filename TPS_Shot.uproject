@@ -13,7 +13,8 @@
 				"UMG",
 				"Niagara",
 				"CoreUObject",
-				"UnrealEd"
+				"UnrealEd",
+				"GameplayAbilities"
 			]
 		}
 	],
@@ -27,6 +28,10 @@
 		},
 		{
 			"Name": "NiagaraFluids",
+			"Enabled": true
+		},
+		{
+			"Name": "GameplayAbilities",
 			"Enabled": true
 		}
 	]
