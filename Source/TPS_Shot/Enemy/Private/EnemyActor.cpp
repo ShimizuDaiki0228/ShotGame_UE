@@ -2,11 +2,15 @@
 
 
 #include "../Public/EnemyActor.h"
+
+#include "LevelManager.h"
 #include "../Utility/Public/SoundManagerUtility.h"
 #include "../Utility/Public/TimeManagerUtility.h"
 #include "Components/ProgressBar.h"
 #include "Kismet/GameplayStatics.h"
 #include "../DesignPattern/ObjectPattern/UObject/Widget/Public/PooledUText.h"
+#include "TPS_Shot/DesignPattern/ObjectPattern/UObject/Widget/Public/UTextPoolActor.h"
+#include "Utility/GameFunctionInstance.h"
 
 // Sets default values
 AEnemyActor::AEnemyActor()
@@ -23,12 +27,13 @@ void AEnemyActor::BeginPlay()
 {
 	Super::BeginPlay();
 
-	_cachedPlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+	_cachedPlayerController = UGameFunctionInstance::GetInstance()->GetPlayerController(this);
+	_gameMode = UGameFunctionInstance::GetInstance()->GetMyGameMode(this);
 	_healthBarWidget = CreateWidget<UEnemyHpBarUserWidget>(GetWorld(), _healthBarComponent);
 	_healthBarWidget->ManualBeginPlay();
 
 	_characterWidgetController = NewObject<UCharacterWidgetController>();
-	_characterWidgetController->Initialized(this, _cachedPlayerController);
+	_characterWidgetController->Initialized(this);
 	_characterWidgetController->SetWidgetSetting(
 		_healthBarWidget,
 		_healthBarWidget->HPBAR_CLAMP_SIZE_MIN,
@@ -104,7 +109,7 @@ void AEnemyActor::Initialized(ATPS_ShotCharacter* character)
 	_currentHpProp->SetValue(MAX_HP);
 }
 
-bool AEnemyActor::DecreaseHP(int damage)
+void AEnemyActor::DecreaseHP(int damage)
 {
 	if (_currentHpProp.IsValid())
 	{
@@ -116,9 +121,8 @@ bool AEnemyActor::DecreaseHP(int damage)
 		
 		if (_currentHpProp->GetValue() <= 0)
 		{
+			_gameMode->InCreaseEnemyKillCount();
 			UPooledObjectActorComponent* explosionPoolActor = Explosion();
-			return true;
 		}
 	}
-	return false;
 }

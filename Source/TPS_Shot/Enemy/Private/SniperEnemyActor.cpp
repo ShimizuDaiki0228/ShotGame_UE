@@ -2,10 +2,12 @@
 
 
 #include "../Public/SniperEnemyActor.h"
+#include "LevelManager.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "../Public/EnemyBulletActor.h"
 #include "../Utility/Public/TimeManagerUtility.h"
+#include "TPS_Shot/Utility/Public/SoundManagerUtility.h"
 
 ASniperEnemyActor::ASniperEnemyActor()
 {

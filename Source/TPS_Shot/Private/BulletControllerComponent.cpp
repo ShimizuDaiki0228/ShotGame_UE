@@ -116,13 +116,7 @@ bool UBulletControllerComponent::GetBeamEndLocation(const FVector& muzzleSocketL
 				AEnemyActor* enemy = Cast<AEnemyActor>(hitActor);
 				if (enemy)
 				{
-					// �����ƃ_���[�W��ݒ肷��A���͎���
-					if (enemy->DecreaseHP(100))
-					{
-						// 絶対にダメな気がするので直す
-						auto playerState = _cacheCharacter->GetGameMode()->GetPlayerState();
-						playerState->ChangeScore(playerState->GetScore() + 1);
-					}
+					enemy->DecreaseHP(100);
 				}
 			}
 		}

@@ -2,15 +2,16 @@
 
 
 #include "CharacterWidgetController.h"
-
+#include "MyPlayerControllerBase.h"
 #include "Blueprint/UserWidget.h"
 #include "Kismet/GameplayStatics.h"
 #include "../Utility/Public/WidgetUtility.h"
+#include "Utility/GameFunctionInstance.h"
 
-void UCharacterWidgetController::Initialized(AActor* owner, APlayerController* playerController)
+void UCharacterWidgetController::Initialized(AActor* owner)
 {
 	_cachedOwner = owner;
-	_cachedPlayerController = playerController;
+	_cachedPlayerController = UGameFunctionInstance::GetInstance()->GetPlayerController(owner);
 }
 
 bool UCharacterWidgetController::IsCharacterProjected(FVector2D& screenPosition) const
