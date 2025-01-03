@@ -7,12 +7,13 @@
 #include "RPGCharacterBase.h"
 #include "GameFramework/PlayerController.h"
 #include "Ability/RPGAbilitySystemComponent.h"
-
-
+#include "Kismet/KismetSystemLibrary.h"
+#include "Net/UnrealNetwork.h"
 
 
 URPGAttributeSet::URPGAttributeSet()
 	:Health(1.0f)
+	,MaxHealth(1.0f)
 	,Damage(0.0f)
 {
 }
@@ -117,6 +118,24 @@ void URPGAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffectMod
 			}
 		}
 	}
+	if (Data.EvaluatedData.Attribute == GetHealthAttribute())
+	{
+		SetHealth(FMath::Clamp(GetHealth(), 0.0f, GetMaxHealth()));
+
+		if (targetCharacter)
+		{
+			targetCharacter->HandleHealthChanged(deltaValue, sourceTags);
+		}
+	}
+}
+
+void URPGAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(URPGAttributeSet, Health);
+	DOREPLIFETIME(URPGAttributeSet, Damage);
+	DOREPLIFETIME(URPGAttributeSet, MaxHealth);
 }
 
 // 最大値が変更したときに現在の値を割合的に一致させる
@@ -136,8 +155,10 @@ void URPGAttributeSet::AdjustAttributeForMaxChange(FGameplayAttributeData& affec
 
 void URPGAttributeSet::OnRep_Health(const FGameplayAttributeData& oldValue)
 {
+	GAMEPLAYATTRIBUTE_REPNOTIFY(URPGAttributeSet, Health, oldValue);
 }
 
 void URPGAttributeSet::OnRep_MaxHealth(const FGameplayAttributeData& oldValue)
 {
+	GAMEPLAYATTRIBUTE_REPNOTIFY(URPGAttributeSet, MaxHealth, oldValue);
 }

@@ -24,23 +24,19 @@ void AMyPlayerControllerBase::BeginPlay()
 	// {
 	// 	_widgetManager->RegisterWidget(GAMEOVER_WIDGET_KEY, _gameoverWidget);
 	// }
+
+	CreateHUD();
 }
 
 void AMyPlayerControllerBase::OnPossess(APawn* InPawn)
 {
-	if (!bIsFinishedPossessAction)
+	Super::OnPossess(InPawn);
+
+	_playerCharacter = Cast<ATPS_ShotCharacter>(InPawn);
+	if (!_playerCharacter)
 	{
-		Super::OnPossess(InPawn);
-
-		_playerCharacter = Cast<ATPS_ShotCharacter>(InPawn);
-		if (!_playerCharacter)
-		{
-			UKismetSystemLibrary::PrintString(this, TEXT("PlayerCharacter don't cast"), true, true, FColor::Red);
-		}
-
-		CreateHUD();
+		UKismetSystemLibrary::PrintString(this, TEXT("PlayerCharacter don't cast"), true, true, FColor::Red);
 	}
-	
 }
 
 ///

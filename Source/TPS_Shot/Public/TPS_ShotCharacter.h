@@ -6,6 +6,7 @@
 #include "BulletControllerComponent.h"
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
+#include "RPGCharacterBase.h"
 #include "../ReactiveProperty/Public/ReactiveProperty.h"
 #include "../ReactiveProperty/Public/ReadonlyReactiveProperty.h"
 #include "TPS_ShotCharacter.generated.h"
@@ -20,7 +21,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnGameover);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnChangeHPBar, float, newHP);
 
 UCLASS(config=Game)
-class ATPS_ShotCharacter : public ACharacter
+class ATPS_ShotCharacter : public ARPGCharacterBase
 {
 	GENERATED_BODY()
 
@@ -57,7 +58,7 @@ class ATPS_ShotCharacter : public ACharacter
 public:
 	ATPS_ShotCharacter();
 	
-	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason);
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 	virtual void BeginDestroy() override;
 
@@ -124,8 +125,6 @@ private:
 	AMyPlayerControllerBase* _playerController;
 
 private:
-	TSharedPtr<ReactiveProperty<int>> _currentHPProp = MakeShared<ReactiveProperty<int>>();
-	
 	TSharedPtr<ReactiveProperty<int>> _numberOfBulletProp = MakeShared<ReactiveProperty<int>>();
 	
 private:
@@ -134,8 +133,6 @@ private:
 	void Reload();
 	void ChangeNotUseShot();
 	void CreateBullet();
-
-	bool GetBeamEndLocation(const FVector& muzzleSocketLocation, FVector& outBeamLocation);
 
 public:
 	FORCEINLINE bool GetAiming() const { return bAiming; }
@@ -149,13 +146,15 @@ public:
 	
 	void PlayHipFireMontage();
 
+	virtual void HandleHealthChanged(float deltaValue, const struct FGameplayTagContainer& eventTags) override;
+
 public:
 	void ChangeHP(int newHP);
 	
 public:
-	FORCEINLINE int GetHP() const { return _currentHPProp->GetValue(); }
-
 	// 絶対にダメそうなので直す
 	FORCEINLINE ATPS_ShotGameMode* GetGameMode() const {return _shotGameMode;}
+
+	float GetHP() const {return GetHealth();}
 };
 

@@ -222,7 +222,6 @@ void ATPS_ShotCharacter::ReleaseClip()
 
 void ATPS_ShotCharacter::ChangeHP(int newHP)
 {
-	_currentHPProp->SetValue(newHP);
 }
 
 void ATPS_ShotCharacter::Initialized()
@@ -244,24 +243,6 @@ void ATPS_ShotCharacter::Bind()
 				_playerController->GetPlayingWidget()->ChangeBulletNumber(newValue);
 			});
 	}
-
-	if (_currentHPProp.IsValid())
-	{
-		_currentHPProp->OnValueChanged.AddLambda([this](const int& newValue)
-		{
-			float currentHpPercentage = 
-				static_cast<float>(_currentHPProp->GetValue()) / static_cast<float>(ConstUtility::PLAYER_MAX_HP);
-
-			_playerController->GetPlayingWidget()->UpdateHPBar(currentHpPercentage);
-
-			if (newValue <= 0)
-			{
-				GameOver();
-			}
-		});
-	}
-
-	
 }
 
 void ATPS_ShotCharacter::SetEvent()
@@ -275,7 +256,7 @@ void ATPS_ShotCharacter::Reset()
 
 	_currentLoadNumber = MAX_BULLET_NUMBER;
 	_numberOfBulletProp->SetValue(MAX_BULLET_NUMBER);
-	_currentHPProp->SetValue(ConstUtility::PLAYER_MAX_HP);
+	// attributeSetのHealthの値を代わりに入れる
 }
 
 void ATPS_ShotCharacter::GameOver()
@@ -286,6 +267,21 @@ void ATPS_ShotCharacter::GameOver()
 
 void ATPS_ShotCharacter::PlayHipFireMontage()
 {
+}
+
+void ATPS_ShotCharacter::HandleHealthChanged(float deltaValue, const struct FGameplayTagContainer& eventTags)
+{
+	Super::HandleHealthChanged(deltaValue, eventTags);
+
+	float currentHealth = FMath::Clamp(GetHealth() + deltaValue , 0 , GetMaxHealth());
+
+	UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("currentHealth : %f"), currentHealth), true, true, FColor::Cyan);
+
+	
+	if (_playerController != nullptr)
+	{
+		_playerController->GetPlayingWidget()->SetHP(currentHealth / GetMaxHealth());
+	}
 }
 
 

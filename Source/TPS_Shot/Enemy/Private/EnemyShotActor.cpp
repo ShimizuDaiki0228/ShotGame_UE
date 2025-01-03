@@ -2,11 +2,15 @@
 
 
 #include "../Public/EnemyShotActor.h"
+
+#include "LevelManager.h"
+#include "RPGCharacterBase.h"
 #include "Components/StaticMeshComponent.h"
 #include "../Utility/Public/EasingAnimationUtility.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "../DesignPattern/ObjectPattern/Public/PooledParticleSystemComponent.h"
+#include "TPS_Shot/Utility/Public/TimeManagerUtility.h"
 
 // Sets default values
 AEnemyShotActor::AEnemyShotActor()
@@ -45,6 +49,11 @@ void AEnemyShotActor::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActo
 		TWeakObjectPtr<UPooledParticleSystemComponent> hitParticleSystemComponent = ALevelManager::GetInstance()->GetEnemyEffectPool()->GetPooledObject(this);
 
 		Destroy();
+		if (auto player = static_cast<ARPGCharacterBase*>(OtherActor))
+		{
+			// UKismetSystemLibrary::PrintString(this, TEXT("Character Base Hit"), true, true, FColor::Red);
+			player->ApplyGameplayEffect(1, _damageAttributeEffect);
+		}
 	}
 }
 
