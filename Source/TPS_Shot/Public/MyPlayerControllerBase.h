@@ -42,9 +42,7 @@ private:
 	UUserWidget_Playing* _playingWidget;
 	
 	TWeakObjectPtr<UWidgetManager> _widgetManager;
-
-	bool bIsFinishedPossessAction;
-
+	
 	UPROPERTY()
 	ATPS_ShotCharacter* _playerCharacter;
 

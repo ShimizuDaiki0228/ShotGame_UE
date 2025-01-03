@@ -27,6 +27,11 @@ void UUserWidget_Playing::ChangeBulletNumber(int newBulletNumber)
 	_numberOfBullet->SetText(numberOfBullet);
 }
 
+void UUserWidget_Playing::SetHP(float percent)
+{
+	_hpBar->SetPercent(percent);
+}
+
 void UUserWidget_Playing::SetScoreText(int newScore)
 {
 	FText scoreText = FText::Format(NSLOCTEXT(" ", "ScoreText", "Score : {0}"), FText::AsNumber(newScore));

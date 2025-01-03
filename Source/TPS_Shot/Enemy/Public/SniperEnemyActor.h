@@ -76,8 +76,10 @@ private:
 	const FRotator SHOT_ROTATION_OFFSET = FRotator(90, 0, 0);
 	const FVector TARGET_OFFSET = FVector(0, 0, -100);
 
+	UPROPERTY()
 	URayObject* _rayObject;
 
+	UPROPERTY()
 	UWorld* _cacheWorld;
 
 	FTimerHandle _nextMoveTimerHandle;

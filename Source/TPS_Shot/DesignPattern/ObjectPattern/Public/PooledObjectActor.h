@@ -5,11 +5,12 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "ObjectPoolActor.h"
-#include "PooledObjectActorComponent.generated.h"
+#include "PooledObjectActor.generated.h"
 
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class TPS_SHOT_API UPooledObjectActorComponent : public UActorComponent
+// class TPS_SHOT_API APooledObjectActor : public AActor
+class TPS_SHOT_API UPooledObjectActor : public UActorComponent
 {
 	GENERATED_BODY()
 

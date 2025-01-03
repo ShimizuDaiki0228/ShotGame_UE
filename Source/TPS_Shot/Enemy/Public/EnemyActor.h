@@ -8,14 +8,15 @@
 #include "../Public/SpawnManager.h"
 #include "../Niagara/Public/ExplosionEffect.h"
 #include "../Widget/Public/EnemyHpBarUserWidget.h"
-#include "TPS_Shot/DesignPattern/ObjectPattern/Public/PooledObjectActorComponent.h"
+#include "TPS_Shot/DesignPattern/ObjectPattern/Public/PooledObjectActor.h"
 #include "../Public/CharacterWidgetController.h"
 #include "EnemyActor.generated.h"
 
 class AMyPlayerControllerBase;
+class ARPGCharacterBase;
 
 UCLASS()
-class TPS_SHOT_API AEnemyActor : public AActor
+class TPS_SHOT_API AEnemyActor : public ARPGCharacterBase
 {
 	GENERATED_BODY()
 	

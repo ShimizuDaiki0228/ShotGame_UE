@@ -26,6 +26,7 @@ public:
 	// 何かしらの値が変わった時に呼ばれる
 	virtual void PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data) override;
 
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	// ReplicatedUsingはプロパティをサーバーからクライアントにレプリケーションする
 	// クライアントが値を受け取った時に指定した関数を呼ぶことができる
 	//

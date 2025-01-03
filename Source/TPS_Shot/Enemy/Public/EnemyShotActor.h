@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "EnemyActor.h"
 #include "GameFramework/Actor.h"
 #include "EnemyShotActor.generated.h"
 
@@ -63,4 +64,13 @@ private:
 
 	// �O��̃t���[���Ɣ�r���Č��݂̐i�s�������擾���邽�߂Ɏg�p����
 	FVector _cachedPosition;
+
+	UPROPERTY()
+	const AEnemyActor* _owner;
+
+	FTimerHandle _destroyTimerHandle;
+
+protected:
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GAS")
+	TSubclassOf<UGameplayEffect> _damageAttributeEffect;
 };

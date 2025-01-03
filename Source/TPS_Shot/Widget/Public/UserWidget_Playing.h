@@ -4,13 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "TPS_Shot/HUD/Public/IHUD.h"
 #include "UserWidget_Playing.generated.h"
 
 /**
  * 
  */
 UCLASS(BlueprintType, Blueprintable)
-class TPS_SHOT_API UUserWidget_Playing : public UUserWidget
+class TPS_SHOT_API UUserWidget_Playing : public UUserWidget, public IIHUD
 {
 	GENERATED_BODY()
 
@@ -40,6 +41,7 @@ public:
 	UFUNCTION()
 	void ChangeBulletNumber(int newBulletNumber);
 
+	virtual void SetHP(float percent) override;
 private:
 	void SetScoreText(int newScore);
 };

@@ -15,11 +15,6 @@ void AEnemyBulletActor::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherAc
 	Super::OnHit(HitComponent, OtherActor, OtherComp, NormalImpulse, Hit);
 
 	ATPS_ShotCharacter* character = Cast<ATPS_ShotCharacter>(OtherActor);
-	if (character)
-	{
-		character->ChangeHP(character->GetHP() - 50);
-	}
-
 }
 
 void AEnemyBulletActor::Initialized(ASniperEnemyActor* sniperEnemy)
