@@ -7,7 +7,6 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "../Public/EnemyBulletActor.h"
 #include "../Utility/Public/TimeManagerUtility.h"
-#include "TPS_Shot/DesignPattern/ObjectPattern/Public/ObjectPoolActor.h"
 #include "TPS_Shot/Utility/Public/SoundManagerUtility.h"
 
 ASniperEnemyActor::ASniperEnemyActor()
@@ -210,18 +209,10 @@ void ASniperEnemyActor::BeamShot(int shotNum)
 	}
 
 	FRotator shotRotation = GetActorRotation() + SHOT_ROTATION_OFFSET;
-	// _shotSpawnManager->SetTransform(GetActorLocation(), shotRotation);
-	// AEnemyShotActor* shotActor = _shotSpawnManager->SpawnActor(_enemyShotActorClass);
-	// shotActor->Initialized(GetActorLocation(), targetLocation, GetActorRotation());
-
-	AEnemyShotActor* shotObject = ALevelManager::GetInstance()->GetEnemyShotPool()->GetPooledObject<AEnemyShotActor>(this);
-	// AEnemyShotActor* shotObject = static_cast<AEnemyShotActor*>(object->GetOwner());
-	if (shotObject)
-	{
-		shotObject->SetActorRotation(shotRotation);
-		FVector targetLocation = GetTarget()->GetActorLocation() + TARGET_OFFSET;
-		shotObject->Initialized(GetActorLocation(), targetLocation, shotRotation);
-	}
+	_shotSpawnManager->SetTransform(GetActorLocation(), shotRotation);
+	AEnemyShotActor* shotActor = _shotSpawnManager->SpawnActor(_enemyShotActorClass);
+	FVector targetLocation = GetTarget()->GetActorLocation() + TARGET_OFFSET;
+	shotActor->Initialized(GetActorLocation(), targetLocation, GetActorRotation());
 
 	if (shotNum > 0)
 	{

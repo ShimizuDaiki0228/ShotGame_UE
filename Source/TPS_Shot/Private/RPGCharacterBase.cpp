@@ -53,18 +53,18 @@ void ARPGCharacterBase::ApplyGameplayEffect(float level, TSubclassOf<UGameplayEf
 {
 	if (abilitySystemComponent)
 	{
-		// // エフェクトの文脈情報
-		// FGameplayEffectContextHandle effectContext = abilitySystemComponent->MakeEffectContext();
-		// effectContext.AddSourceObject(this);
-		//
-		// // エフェクトのスケール値や適用対象の文脈が含まれる
-		// FGameplayEffectSpecHandle specHandle = abilitySystemComponent->MakeOutgoingSpec(gameplayEffect, level, effectContext);
-		//
-		// if (specHandle.IsValid())
-		// {
-		// 	// キャラクターに適用
-		// 	FActiveGameplayEffectHandle geHandle = abilitySystemComponent->ApplyGameplayEffectSpecToSelf(*specHandle.Data.Get());
-		// }
+		// エフェクトの文脈情報
+		FGameplayEffectContextHandle effectContext = abilitySystemComponent->MakeEffectContext();
+		effectContext.AddSourceObject(this);
+
+		// エフェクトのスケール値や適用対象の文脈が含まれる
+		FGameplayEffectSpecHandle specHandle = abilitySystemComponent->MakeOutgoingSpec(gameplayEffect, level, effectContext);
+
+		if (specHandle.IsValid())
+		{
+			// キャラクターに適用
+			FActiveGameplayEffectHandle geHandle = abilitySystemComponent->ApplyGameplayEffectSpecToSelf(*specHandle.Data.Get());
+		}
 	}
 }
 
@@ -100,7 +100,7 @@ void ARPGCharacterBase::OnRep_PlayerState()
 
 	if (abilitySystemComponent && InputComponent)
 	{
-		const FGameplayAbilityInputBinds Binds("Confirm", "Cancel", FTopLevelAssetPath(TEXT("/Script/TPS_Shot.ERPGAbilityInputID")), static_cast<int>(EGASAbilityInputID::Confirm), static_cast<int>(EGASAbilityInputID::Cancel));
+		const FGameplayAbilityInputBinds Binds("Confirm", "Cancel", "EGASAbilityInputID", static_cast<int>(EGASAbilityInputID::Confirm), static_cast<int>(EGASAbilityInputID::Cancel));
 		abilitySystemComponent->BindAbilityActivationToInputComponent(InputComponent,Binds);
 	}
 }

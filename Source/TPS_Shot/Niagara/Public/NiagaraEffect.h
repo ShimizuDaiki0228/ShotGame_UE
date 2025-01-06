@@ -4,25 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "NiagaraActor.h"
-#include "TPS_Shot/DesignPattern/ObjectPattern/Public/PooledObject.h"
 #include "NiagaraEffect.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class TPS_SHOT_API ANiagaraEffect : public ANiagaraActor, public IIPooledObject
+class TPS_SHOT_API ANiagaraEffect : public ANiagaraActor
 {
 	GENERATED_BODY()
 
 public:
 	ANiagaraEffect();
-
-	UPROPERTY()
-	AObjectPoolActor* Pool;
-
-	FORCEINLINE void Release()
-	{
-		Pool->ReturnToPool(this);
-	}
 };
