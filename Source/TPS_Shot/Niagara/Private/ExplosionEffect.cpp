@@ -2,6 +2,8 @@
 
 
 #include "../Public/ExplosionEffect.h"
+
+#include "NiagaraComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Components/StaticMeshComponent.h"
 

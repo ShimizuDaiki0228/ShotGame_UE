@@ -3,21 +3,17 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "NiagaraActor.h"
-#include "TPS_Shot/DesignPattern/ObjectPattern/Public/PooledObject.h"
-#include "NiagaraEffect.generated.h"
+#include "IPooledObject.h"
+#include "GameFramework/Actor.h"
+#include "ObjectPoolActor.h"
+#include "PooledObject.generated.h"
 
-/**
- * 
- */
 UCLASS()
-class TPS_SHOT_API ANiagaraEffect : public ANiagaraActor, public IIPooledObject
+class TPS_SHOT_API APooledObject : public AActor, public IIPooledObject
 {
 	GENERATED_BODY()
 
-public:
-	ANiagaraEffect();
-
+public:	
 	UPROPERTY()
 	AObjectPoolActor* Pool;
 

@@ -47,14 +47,13 @@ void AEnemyShotActor::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActo
 	if (OtherActor && (OtherActor != this))
 	{
 		TWeakObjectPtr<UPooledParticleSystemComponent> hitParticleSystemComponent = ALevelManager::GetInstance()->GetEnemyEffectPool()->GetPooledObject(this);
-
-		Destroy();
 		if (auto player = static_cast<ARPGCharacterBase*>(OtherActor))
 		{
 			// UKismetSystemLibrary::PrintString(this, TEXT("Character Base Hit"), true, true, FColor::Red);
 			player->ApplyGameplayEffect(1, _damageAttributeEffect);
 		}
 	}
+	Release();
 }
 
 // Called every frame

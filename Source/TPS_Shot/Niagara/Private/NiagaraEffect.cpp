@@ -3,6 +3,8 @@
 
 #include "../Public/NiagaraEffect.h"
 
+#include "NiagaraComponent.h"
+
 ANiagaraEffect::ANiagaraEffect() : ANiagaraActor(FObjectInitializer::Get())
 {
 	if (GetRootComponent() == nullptr)

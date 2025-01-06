@@ -39,6 +39,9 @@ private:
 	class AObjectPoolActor* _enemyExplosionPool;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Spawning", meta = (AllowPrivateAccess = "true"))
+	AObjectPoolActor* _enemyShotPool;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Spawning", meta = (AllowPrivateAccess = "true"))
 	class AUTextPoolActor* _userWidgetPool;
 
 public:
@@ -50,6 +53,8 @@ public:
 	AParticleSystemPoolActor* GetEnemyEffectPool() const { return _enemyHitEffectPool; }
 
 	AObjectPoolActor* GetEnemyExplosionPool() const {return _enemyExplosionPool;}
+
+	AObjectPoolActor* GetEnemyShotPool() const {return _enemyShotPool;}
 
 	AUTextPoolActor* GetUserWidgetPool() const {return _userWidgetPool;}
 };

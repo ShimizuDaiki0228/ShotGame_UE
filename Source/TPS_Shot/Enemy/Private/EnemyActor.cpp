@@ -9,6 +9,7 @@
 #include "Components/ProgressBar.h"
 #include "Kismet/GameplayStatics.h"
 #include "../DesignPattern/ObjectPattern/UObject/Widget/Public/PooledUText.h"
+#include "TPS_Shot/DesignPattern/ObjectPattern/Public/ObjectPoolActor.h"
 #include "TPS_Shot/DesignPattern/ObjectPattern/UObject/Widget/Public/UTextPoolActor.h"
 #include "Utility/GameFunctionInstance.h"
 
@@ -71,7 +72,7 @@ void AEnemyActor::SelfDestroy()
 	Destroy();
 }
 
-UPooledObjectActorComponent* AEnemyActor::Explosion()
+AExplosionEffect* AEnemyActor::Explosion()
 {
 	if (_explosionEffect)
 	{
@@ -80,8 +81,8 @@ UPooledObjectActorComponent* AEnemyActor::Explosion()
 			SoundManagerUtility::GetInstance().Play(_explosionSound, this);
 		}
 
-		UPooledObjectActorComponent* object = ALevelManager::GetInstance()->GetEnemyExplosionPool()->GetPooledObject(this);
-		AExplosionEffect* spawnedExplosionEffect = static_cast<AExplosionEffect*>(object->GetOwner());
+		AExplosionEffect* spawnedExplosionEffect = ALevelManager::GetInstance()->GetEnemyExplosionPool()->GetPooledObject<AExplosionEffect>(this);
+		// AExplosionEffect* spawnedExplosionEffect = static_cast<AExplosionEffect*>(object->GetOwner());
 		if (spawnedExplosionEffect)
 		{
 			spawnedExplosionEffect->Initialized(GetTarget());
@@ -96,7 +97,7 @@ UPooledObjectActorComponent* AEnemyActor::Explosion()
 		
 		SelfDestroy();
 
-		return object;
+		return spawnedExplosionEffect;
 	}
 
 	return nullptr;
@@ -122,7 +123,7 @@ void AEnemyActor::DecreaseHP(int damage)
 		if (_currentHpProp->GetValue() <= 0)
 		{
 			_gameMode->InCreaseEnemyKillCount();
-			UPooledObjectActorComponent* explosionPoolActor = Explosion();
+			AExplosionEffect* explosionPoolActor = Explosion();
 		}
 	}
 }

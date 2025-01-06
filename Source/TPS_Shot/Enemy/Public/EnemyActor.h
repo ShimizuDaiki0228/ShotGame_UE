@@ -8,12 +8,12 @@
 #include "../Public/SpawnManager.h"
 #include "../Niagara/Public/ExplosionEffect.h"
 #include "../Widget/Public/EnemyHpBarUserWidget.h"
-#include "TPS_Shot/DesignPattern/ObjectPattern/Public/PooledObjectActor.h"
 #include "../Public/CharacterWidgetController.h"
 #include "EnemyActor.generated.h"
 
 class AMyPlayerControllerBase;
 class ARPGCharacterBase;
+class APooledObject;
 
 UCLASS()
 class TPS_SHOT_API AEnemyActor : public ARPGCharacterBase
@@ -47,7 +47,7 @@ protected:
 public:
 	virtual void Initialized(ATPS_ShotCharacter* character);
 
-	UPooledObjectActorComponent* Explosion();
+	AExplosionEffect* Explosion();
 public:
 	// hp��������̒l�ȉ��ɂȂ����ꍇ�ɔj�����ăX�R�A���グ�邽�߂�bool�^
 	void DecreaseHP(int damage);
