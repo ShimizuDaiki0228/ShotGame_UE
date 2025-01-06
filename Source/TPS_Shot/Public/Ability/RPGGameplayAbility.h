@@ -17,6 +17,8 @@ class TPS_SHOT_API URPGGameplayAbility : public UGameplayAbility
 	GENERATED_BODY()
 
 public:
+	URPGGameplayAbility();
+
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Ability")
 	EGASAbilityInputID abilityInputID = EGASAbilityInputID::None;
 };

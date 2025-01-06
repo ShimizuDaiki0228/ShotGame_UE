@@ -5,11 +5,10 @@
 #include "CoreMinimal.h"
 #include "EnemyActor.h"
 #include "GameFramework/Actor.h"
-#include "TPS_Shot/DesignPattern/ObjectPattern/Public/PooledObject.h"
 #include "EnemyShotActor.generated.h"
 
 UCLASS()
-class TPS_SHOT_API AEnemyShotActor : public APooledObject
+class TPS_SHOT_API AEnemyShotActor : public AActor
 {
 	GENERATED_BODY()
 	

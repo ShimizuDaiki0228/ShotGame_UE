@@ -2,43 +2,35 @@
 
 
 #include "../Public/ObjectPoolActor.h"
-#include "../Public/PooledObject.h"
+#include "../Public/PooledObjectActorComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "NiagaraActor.h"
 #include "TPS_Shot/Niagara/Public/NiagaraEffect.h"
 #include "NiagaraComponent.h"
 
-void AObjectPoolActor::ReturnToPool(AActor* pooledObject)
+void AObjectPoolActor::ReturnToPool(UPooledObjectActorComponent* pooledObject)
 {
-	// 少しDelayをかけて成功するか試してもいいかも
-	if (pooledObject)
+	_pooledObjectStack.Push(pooledObject);
+	ActiveChange(pooledObject->GetOwner(), false);
+}
+
+UPooledObjectActorComponent* AObjectPoolActor::GetPooledObject(const AActor* owner)
+{
+	UPooledObjectActorComponent* pooledObject;
+
+	if (_pooledObjectStack.Num() == 0)
 	{
-		_pooledObjectStack.Add(pooledObject);
-		ActiveChange(pooledObject, false);
+		pooledObject = CreateNewPooledObject();
 	}
 	else
 	{
-		UKismetSystemLibrary::PrintString(this, TEXT("pooledObject isn't valid"), true, true, FColor::Red);
+		pooledObject = _pooledObjectStack.Pop();
 	}
-}
 
-// AActor* AObjectPoolActor::GetPooledObject(const AActor* owner)
-// {
-// 	APooledObject* pooledObject;
-//
-// 	if (_pooledObjectStack.Num() == 0)
-// 	{
-// 		pooledObject = CreateNewPooledObject();
-// 	}
-// 	else
-// 	{
-// 		pooledObject = _pooledObjectStack.Pop();
-// 	}
-//
-// 	ActiveChange(pooledObject->GetOwner(), true);
-// 	pooledObject->GetOwner()->SetActorLocation(owner->GetActorLocation());
-// 	return pooledObject;
-// }
+	ActiveChange(pooledObject->GetOwner(), true);
+	pooledObject->GetOwner()->SetActorLocation(owner->GetActorLocation());
+	return pooledObject;
+}
 
 void AObjectPoolActor::BeginPlay()
 {
@@ -46,44 +38,44 @@ void AObjectPoolActor::BeginPlay()
 
 	for (int i = 0; i < _initPoolSize; i++)
 	{
-		AActor* newObject = CreateNewPooledObject();
+		UPooledObjectActorComponent* newObject = CreateNewPooledObject();
 	}
 }
 
-AActor* AObjectPoolActor::CreateNewPooledObject()
+UPooledObjectActorComponent* AObjectPoolActor::CreateNewPooledObject()
 {
 	if (_objectToPool)
 	{
 		UWorld* world = GetWorld();
 		if (world)
 		{
-			// FActorSpawnParameters spawnParams;
-			// spawnParams.Owner = this;
-			AActor* pooledObject = world->SpawnActor<AActor>(_objectToPool, FVector::ZeroVector, FRotator::ZeroRotator);
-			if (pooledObject)
+			FActorSpawnParameters spawnParams;
+			spawnParams.Owner = this;
+			AActor* newObject = world->SpawnActor<AActor>(_objectToPool, FVector::ZeroVector, FRotator::ZeroRotator, spawnParams);
+			if (newObject)
 			{
-				if (auto iPooledObject = Cast<IIPooledObject>(pooledObject))
-				{
-					iPooledObject->Pool = this;
-					_pooledObjectStack.Add(pooledObject);
-				}
-				
-				//生成するのがナイアガラエフェクトの場合は特別処理
-				ANiagaraEffect* niagaraEffect = Cast<ANiagaraEffect>(pooledObject);
+				// 生成するのがナイアガラエフェクトの場合は特別処理
+				ANiagaraEffect* niagaraEffect = static_cast<ANiagaraEffect*>(newObject);
 				if (niagaraEffect)
 				{
-					UKismetSystemLibrary::PrintString(this, TEXT("niagara"), true, true, FColor::Purple);
 					auto niagaraComponent = niagaraEffect->GetNiagaraComponent();
 					niagaraComponent->Deactivate();
 					niagaraComponent->SetAutoActivate(false);
 				}
 				else
 				{
-					UKismetSystemLibrary::PrintString(this, TEXT("not niagara"), true, true, FColor::Yellow);
-					ActiveChange(pooledObject, false);
+					ActiveChange(newObject, false);
 				}
 				
-				return pooledObject;
+				UPooledObjectActorComponent* pooledObjectActorComponent = NewObject<UPooledObjectActorComponent>(newObject);
+				
+				if (pooledObjectActorComponent)
+				{
+					pooledObjectActorComponent->RegisterComponent();
+					pooledObjectActorComponent->Pool = this;
+					_pooledObjectStack.Add(pooledObjectActorComponent);
+					return pooledObjectActorComponent;
+				}
 			}
 		}
 	}
